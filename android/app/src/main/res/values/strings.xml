@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">chess-exercises-organizer</string>
-    <string name="title_activity_main">chess-exercises-organizer</string>
+    <string name="app_name">Chess Exercises Organizer</string>
+    <string name="title_activity_main">Chess Exercises Organizer</string>
     <string name="package_name">com.loloof64.chessexercisesorganizer</string>
     <string name="custom_url_scheme">com.loloof64.chessexercisesorganizer</string>
 </resources>
