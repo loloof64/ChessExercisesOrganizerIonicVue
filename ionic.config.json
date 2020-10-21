@@ -1,0 +1,7 @@
+{
+  "name": "chess-exercises-organizer",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
