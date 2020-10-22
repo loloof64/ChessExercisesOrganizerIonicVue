@@ -12,8 +12,14 @@
         </ion-toolbar>
       </ion-header>
 
-      <div class="board_zone" :style="{ width: sizePx, height: sizePx }">
-        <ChessBoard :sizePx="size" />
+      <div
+        class="game_zone"
+        :style="[{ width: sizePx, height: sizePx }, gameZoneStyle]"
+      >
+        <div class="chessboard" :style="chessboardStyle">
+          <ChessBoard :sizePx="size" />
+        </div>
+        <div class="meta" :style="metaStyle"></div>
       </div>
     </ion-content>
   </ion-page>
@@ -27,7 +33,7 @@ import {
   IonTitle,
   IonContent,
 } from "@ionic/vue";
-import { ref, computed } from "vue";
+import { ref, reactive, computed, onBeforeUnmount } from "vue";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard.vue";
 
@@ -50,26 +56,67 @@ export default {
       return Math.floor(sizeRatio * minSize);
     }
 
+    function computeLayout() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+
+      const oneDimension = "100%";
+      const twoDimensions = "85% 10%";
+
+      if (isPortrait) {
+        return [oneDimension, twoDimensions];
+      }
+      else {
+        return [twoDimensions, oneDimension];
+      }
+    }
+
     const size = ref(computeSize());
+    const gameZoneStyle = reactive({
+      margin: "0 auto",
+      display: "grid",
+      width: "100%",
+      height: "100%",
+      "grid-template-columns": "100%",
+      "grid-template-rows": "85% 10%",
+      "flex-direction": "column",
+      "justify-content": "center",
+      "align-items": "center",
+    });
+
+    const chessboardStyle = reactive({
+      margin: "auto",
+    });
+    const metaStyle = reactive({
+      width: "100%",
+      height: "100%",
+      "justify-self": "center",
+      "align-self": "center",
+      margin: "0.1em",
+      "background-color": "salmon",
+    });
 
     const sizePx = computed(function () {
       return size.value + "px";
     });
 
-    const orientationListenerHandle = window.addEventListener(
-      "orientationchange",
-      function () {
-        size.value = computeSize();
-      }
-    );
+    function updateSizeAndLayoutOnRotation() {
+      size.value = computeSize();
+      const [columnsLayout, rowsLayout] = computeLayout();
+      gameZoneStyle["grid-template-columns"] = columnsLayout;
+      gameZoneStyle["grid-template-rows"] = rowsLayout;
+    }
 
-    return { size, sizePx };
+    window.addEventListener("orientationchange", updateSizeAndLayoutOnRotation);
+
+    onBeforeUnmount(function () {
+      window.removeEventListener(
+        "orientationchange",
+        updateSizeAndLayoutOnRotation
+      );
+    });
+
+    return { size, sizePx, gameZoneStyle, chessboardStyle, metaStyle };
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.board_zone {
-  margin: 0.9em auto;
-}
-</style>
