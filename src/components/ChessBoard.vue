@@ -1,13 +1,48 @@
 <template>
-  <div id="root" :style="{ width: sizePixels, height: sizePixels }">
-    <div class="cellsRow" v-for="row in [0,1,2,3,4,5,6,7]" :key="'row_' + row">
+  <div
+    id="root"
+    :style="[
+      {
+        width: sizePixels,
+        height: sizePixels,
+      },
+    ]"
+  >
+    <div></div>
+    <div
+      v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
+      :key="'top_coord_' + col"
+      class="coordinate"
+      :style="{ 'font-size': coordinatesFontSize }"
+    >
+      {{ topBottomCoordinateValue(col) }}
+    </div>
+    <div></div>
+
+    <template v-for="row in [0, 1, 2, 3, 4, 5, 6, 7]" :key="'row_' + row">
+      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize }">
+        {{ leftRightCoordinateValue(row) }}
+      </div>
       <div
-        v-for="col in [0,1,2,3,4,5,6,7]"
+        v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
         :key="'cell_' + row + col"
         :class="cellBackgroundClass(row, col)"
-        :style="[cellStyle, cellLocationStyle(row, col)]"
       ></div>
+      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize }">
+        {{ leftRightCoordinateValue(row) }}
+      </div>
+    </template>
+
+    <div></div>
+    <div
+      v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
+      :key="'bottom_coord_' + col"
+      class="coordinate"
+      :style="{ 'font-size': coordinatesFontSize }"
+    >
+      {{ topBottomCoordinateValue(col) }}
     </div>
+    <div></div>
   </div>
 </template>
 
@@ -21,44 +56,38 @@ export default {
     },
   },
   setup(props) {
-    function truncatedSize() {
-        const { sizePx } = props;
-        return sizePx - sizePx%9;
+    function boardSize() {
+      const { sizePx } = props;
+      return sizePx;
     }
     const sizePixels = computed(function () {
-      const sizePx = truncatedSize();
+      const sizePx = boardSize();
       return sizePx + "px";
     });
-    const cellStyle = computed(function () {
-      const sizePx = truncatedSize();
-      const cellsSize = Math.floor(sizePx / 9.0);
-      const cellsSizePx = cellsSize + "px";
-      return {
-        position: "absolute",
-        display: "inline-block",
-        width: cellsSizePx,
-        height: cellsSizePx,
-      };
+
+    const coordinatesFontSize = computed(function () {
+      return Math.floor(sizePixels.value * 0.5) + "px";
     });
 
-    function cellLocationStyle(row, col) {
-      const sizePx = truncatedSize();
-      const cellsSize = sizePx / 9.0;
+    function topBottomCoordinateValue(col) {
+      return "ABCDEFGH".charAt(col);
+    }
 
-      const left = Math.floor(cellsSize * (0.5 + col)) + "px";
-      const top = Math.floor(cellsSize * (0.5 + row)) + "px";
-
-      return {
-        left,
-        top,
-      };
+    function leftRightCoordinateValue(row) {
+      return "87654321".charAt(row);
     }
 
     function cellBackgroundClass(row, col) {
       const isWhiteCell = (row + col) % 2 == 0;
       return isWhiteCell ? "whiteCell" : "blackCell";
     }
-    return { sizePixels, cellStyle, cellBackgroundClass, cellLocationStyle };
+    return {
+      sizePixels,
+      coordinatesFontSize,
+      cellBackgroundClass,
+      topBottomCoordinateValue,
+      leftRightCoordinateValue,
+    };
   },
 };
 </script>
@@ -66,10 +95,16 @@ export default {
 <style lang="scss" scoped>
 #root {
   background-color: olivedrab;
+  display: grid;
+  grid-template-rows: 1fr repeat(8, 2fr) 1fr;
+  grid-template-columns: 1fr repeat(8, 2fr) 1fr;
 }
 
-.cellsRow {
-  position: absolute;
+.coordinate {
+  color: yellow;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .whiteCell {
