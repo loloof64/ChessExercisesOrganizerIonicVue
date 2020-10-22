@@ -21,12 +21,16 @@ export default {
     },
   },
   setup(props) {
+    function truncatedSize() {
+        const { sizePx } = props;
+        return sizePx - sizePx%9;
+    }
     const sizePixels = computed(function () {
-      const { sizePx } = props;
+      const sizePx = truncatedSize();
       return sizePx + "px";
     });
     const cellStyle = computed(function () {
-      const { sizePx } = props;
+      const sizePx = truncatedSize();
       const cellsSize = Math.floor(sizePx / 9.0);
       const cellsSizePx = cellsSize + "px";
       return {
@@ -38,7 +42,7 @@ export default {
     });
 
     function cellLocationStyle(row, col) {
-      const { sizePx } = props;
+      const sizePx = truncatedSize();
       const cellsSize = sizePx / 9.0;
 
       const left = Math.floor(cellsSize * (0.5 + col)) + "px";
