@@ -58,7 +58,7 @@
 
 <script>
 import { IonImg } from "@ionic/vue";
-import { reactive, computed, watch } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import Chess from "chess.js";
 
 export default {
@@ -67,6 +67,10 @@ export default {
       type: Number,
       default: 60,
     },
+    reversed: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: { IonImg },
   setup(props) {
@@ -74,6 +78,7 @@ export default {
       const { sizePx } = props;
       return sizePx;
     }
+
     const sizePixels = computed(function () {
       const sizePx = boardSize();
       return sizePx + "px";
@@ -141,11 +146,13 @@ export default {
     });
 
     function topBottomCoordinateValue(col) {
-      return "ABCDEFGH".charAt(col);
+      const possibleValues = props.reversed ? "HGFEDCBA" : "ABCDEFGH";
+      return possibleValues.charAt(col);
     }
 
     function leftRightCoordinateValue(row) {
-      return "87654321".charAt(row);
+      const possibleValues = props.reversed ? "12345678" : "87654321";
+      return possibleValues.charAt(row);
     }
 
     function cellBackgroundClass(row, col) {
@@ -154,11 +161,11 @@ export default {
     }
 
     function getRank(row) {
-      return row;
+      return props.reversed ? 7-row : row;
     }
 
     function getFile(col) {
-      return col;
+      return props.reversed ? 7-col : col;
     }
 
     function getPieceRawPath(value) {

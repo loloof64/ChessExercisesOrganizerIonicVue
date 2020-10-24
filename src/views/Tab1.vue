@@ -17,22 +17,30 @@
         :style="[{ width: sizePx, height: sizePx }, gameZoneStyle]"
       >
         <div class="chessboard" :style="chessboardStyle">
-          <ChessBoard :sizePx="size" />
+          <ChessBoard :sizePx="size" :reversed="boardReversed" />
         </div>
-        <div class="meta" :style="metaStyle"></div>
+        <div :style="metaStyle">
+          <ion-icon
+            :icon="swapVertical"
+            :style="metaButtonStyle"
+            @click="boardReversed = !boardReversed"
+          />
+        </div>
       </div>
     </ion-content>
   </ion-page>
 </template>
 
-<script lang="ts">
+<script>
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
+  IonIcon,
 } from "@ionic/vue";
+import { swapVertical } from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard.vue";
@@ -46,8 +54,11 @@ export default {
     IonTitle,
     IonContent,
     IonPage,
+    IonIcon,
   },
   setup() {
+    const boardReversed = ref(false);
+
     function computeSize() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
@@ -65,8 +76,7 @@ export default {
 
       if (isPortrait) {
         return [oneDimension, twoDimensions];
-      }
-      else {
+      } else {
         return [twoDimensions, oneDimension];
       }
     }
@@ -96,27 +106,73 @@ export default {
       "background-color": "salmon",
     });
 
+    const metaButtonStyle = reactive({
+      color: "blue",
+      width: "10%",
+      height: "66%",
+      margin: "1.5% 5%",
+      border: "1px solid black",
+    });
+
     const sizePx = computed(function () {
       return size.value + "px";
     });
 
-    function updateSizeAndLayoutOnRotation() {
-      size.value = computeSize();
-      const [columnsLayout, rowsLayout] = computeLayout();
-      gameZoneStyle["grid-template-columns"] = columnsLayout;
-      gameZoneStyle["grid-template-rows"] = rowsLayout;
+    function computeMetaZoneDirection() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+
+      return isPortrait ? "row" : "column";
     }
 
-    window.addEventListener("orientationchange", updateSizeAndLayoutOnRotation);
+    function computeMetaButtonDimension() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+
+      const width = isPortrait ? "10%" : "60%";
+      const height = isPortrait ? "66%" : "15%";
+      const margin = isPortrait ? "2% 5%" : "15% 18%";
+
+      return { width, height, margin };
+    }
+
+    function updateSizeAndLayout() {
+      size.value = computeSize();
+      const [columnsLayout, rowsLayout] = computeLayout();
+      const {
+        width: buttonWidth,
+        height: buttonHeight,
+        margin: buttonMargin,
+      } = computeMetaButtonDimension();
+
+      gameZoneStyle["grid-template-columns"] = columnsLayout;
+      gameZoneStyle["grid-template-rows"] = rowsLayout;
+
+      metaStyle["flex-direction"] = computeMetaZoneDirection();
+
+      metaButtonStyle["width"] = buttonWidth;
+      metaButtonStyle["height"] = buttonHeight;
+      metaButtonStyle["margin"] = buttonMargin;
+    }
+
+    window.addEventListener("orientationchange", updateSizeAndLayout);
 
     onBeforeUnmount(function () {
-      window.removeEventListener(
-        "orientationchange",
-        updateSizeAndLayoutOnRotation
-      );
+      window.removeEventListener("orientationchange", updateSizeAndLayout);
     });
 
-    return { size, sizePx, gameZoneStyle, chessboardStyle, metaStyle };
+    updateSizeAndLayout();
+
+    return {
+      size,
+      sizePx,
+      gameZoneStyle,
+      chessboardStyle,
+      metaStyle,
+      metaButtonStyle,
+      swapVertical,
+      boardReversed,
+    };
   },
 };
 </script>
