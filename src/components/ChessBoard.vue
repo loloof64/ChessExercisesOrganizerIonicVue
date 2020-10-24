@@ -29,8 +29,10 @@
         :class="cellBackgroundClass(row, col)"
       >
         <ion-img
-          v-if="!isEmptyCell(row, col)"
-          :src="getPiecePath(row, col)"
+          v-if="!isEmptyCell(getRank(row, reversed), getFile(col, reversed))"
+          :src="
+            piecesValues.paths[getRank(row, reversed)][getFile(col, reversed)]
+          "
           :width="cellsSizePixels"
           :height="cellsSizePixels"
         ></ion-img>
@@ -58,8 +60,8 @@
 
 <script>
 import { IonImg } from "@ionic/vue";
-import { ref, reactive, computed, watch } from "vue";
-import Chess from "chess.js";
+import { computed } from "vue";
+import useChessBoardLogic from "../hooks/ChessBoardLogic";
 
 export default {
   props: {
@@ -90,57 +92,6 @@ export default {
       return cellsSizePx;
     });
 
-    const game = reactive({
-      handler: new Chess("8/8/8/8/8/8/8/8 w - - 0 1"),
-    });
-
-    const piecesValues = reactive({
-      handler: [],
-    });
-
-    function startNewGame(
-      startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    ) {
-      game.handler = new Chess(startPosition);
-    }
-
-    function getPiecesValues() {
-      const currentPosition = game.handler.fen();
-      const boardValues = currentPosition.split(" ")[0].split("/").reverse();
-
-      const result = [];
-
-      for (let rank = 0; rank < 8; rank++) {
-        const line = [];
-
-        let file = 0;
-        let charPosition = 0;
-
-        while (file < 8) {
-          const currentValue = boardValues[rank][charPosition];
-          const valueAsDigit = currentValue.charCodeAt(0) - "0".charCodeAt(0);
-          const isCorrectDigitValue = valueAsDigit >= 0 && valueAsDigit <= 9;
-
-          if (isCorrectDigitValue) {
-            // clearing as many cells as valueAsDigit requires
-            for (let i = 0; i < valueAsDigit; i++) {
-              line.push(undefined);
-              file++;
-            }
-          } else {
-            line.push(currentValue);
-            file++;
-          }
-
-          charPosition++;
-        }
-
-        result.push(line);
-      }
-
-      return result.reverse();
-    }
-
     const coordinatesFontSize = computed(function () {
       const cellsSize = props.sizePx / 9.0;
       return Math.floor(cellsSize * 0.4) + "px";
@@ -161,79 +112,18 @@ export default {
       return isWhiteCell ? "whiteCell" : "blackCell";
     }
 
-    function getRank(row) {
-      return props.reversed ? 7-row : row;
-    }
+    const {
+      startNewGame,
+      isEmptyCell,
+      playerTurnColor,
+      piecesValues,
+      getRank,
+      getFile,
+    } = useChessBoardLogic();
 
-    function getFile(col) {
-      return props.reversed ? 7-col : col;
-    }
-
-    function getPieceRawPath(value) {
-      let rawImageName;
-      switch (value) {
-        case "P":
-          rawImageName = "Chess_plt45.svg";
-          break;
-        case "N":
-          rawImageName = "Chess_nlt45.svg";
-          break;
-        case "B":
-          rawImageName = "Chess_blt45.svg";
-          break;
-        case "R":
-          rawImageName = "Chess_rlt45.svg";
-          break;
-        case "Q":
-          rawImageName = "Chess_qlt45.svg";
-          break;
-        case "K":
-          rawImageName = "Chess_klt45.svg";
-          break;
-
-        case "p":
-          rawImageName = "Chess_pdt45.svg";
-          break;
-        case "n":
-          rawImageName = "Chess_ndt45.svg";
-          break;
-        case "b":
-          rawImageName = "Chess_bdt45.svg";
-          break;
-        case "r":
-          rawImageName = "Chess_rdt45.svg";
-          break;
-        case "q":
-          rawImageName = "Chess_qdt45.svg";
-          break;
-        case "k":
-          rawImageName = "Chess_kdt45.svg";
-          break;
-        default:
-          return undefined;
-      }
-
-      return `/assets/chess_vectors/${rawImageName}`;
-    }
-
-    watch(game, function () {
-      piecesValues.handler = getPiecesValues();
-    });
-
-    function playerTurnColor() {
-      return game.handler.turn() === "w" ? "white" : "black";
-    }
-
-    function getPiecePath(row, col) {
-      const pieceValue = piecesValues.handler[getRank(row)][getFile(col)];
-      return getPieceRawPath(pieceValue);
-    }
-
-    function isEmptyCell(row, col) {
-      return !getPiecePath(row, col);
-    }
-
-    startNewGame("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
+    startNewGame(
+      "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
+    );
 
     return {
       sizePixels,
@@ -242,9 +132,11 @@ export default {
       cellBackgroundClass,
       topBottomCoordinateValue,
       leftRightCoordinateValue,
-      getPiecePath,
+      piecesValues,
       isEmptyCell,
       playerTurnColor,
+      getFile,
+      getRank,
     };
   },
 };
