@@ -32,7 +32,8 @@
           v-if="!isEmptyCell(row, col)"
           :src="getPiecePath(row, col)"
           :width="cellsSizePixels"
-          :height="cellsSizePixels"></ion-img>
+          :height="cellsSizePixels"
+        ></ion-img>
       </div>
       <div class="coordinate" :style="{ 'font-size': coordinatesFontSize }">
         {{ leftRightCoordinateValue(row) }}
@@ -48,12 +49,15 @@
     >
       {{ topBottomCoordinateValue(col) }}
     </div>
-    <div></div>
+    <div
+      class="playerTurn"
+      :style="{ 'background-color': playerTurnColor() }"
+    ></div>
   </div>
 </template>
 
 <script>
-import {IonImg} from '@ionic/vue';
+import { IonImg } from "@ionic/vue";
 import { reactive, computed, watch } from "vue";
 import Chess from "chess.js";
 
@@ -64,7 +68,7 @@ export default {
       default: 60,
     },
   },
-  components: {IonImg},
+  components: { IonImg },
   setup(props) {
     function boardSize() {
       const { sizePx } = props;
@@ -208,6 +212,10 @@ export default {
       piecesValues.handler = getPiecesValues();
     });
 
+    function playerTurnColor() {
+      return game.handler.turn() === "w" ? "white" : "black";
+    }
+
     function getPiecePath(row, col) {
       const pieceValue = piecesValues.handler[getRank(row)][getFile(col)];
       return getPieceRawPath(pieceValue);
@@ -217,7 +225,7 @@ export default {
       return !getPiecePath(row, col);
     }
 
-    startNewGame();
+    startNewGame("rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2");
 
     return {
       sizePixels,
@@ -228,6 +236,7 @@ export default {
       leftRightCoordinateValue,
       getPiecePath,
       isEmptyCell,
+      playerTurnColor,
     };
   },
 };
@@ -254,5 +263,13 @@ export default {
 
 .blackCell {
   background-color: peru;
+}
+
+.playerTurn {
+  border-radius: 45%;
+  width: 80%;
+  height: 80%;
+  left: 5%;
+  top: 5%;
 }
 </style>
