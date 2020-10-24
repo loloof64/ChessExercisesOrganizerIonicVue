@@ -3,8 +3,8 @@
     id="root"
     :style="[
       {
-        width: sizePixels,
-        height: sizePixels,
+        width: sizePixels(boardSize()),
+        height: sizePixels(boardSize()),
       },
     ]"
   >
@@ -13,15 +13,15 @@
       v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
       :key="'top_coord_' + col"
       class="coordinate"
-      :style="{ 'font-size': coordinatesFontSize }"
+      :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
     >
-      {{ topBottomCoordinateValue(col) }}
+      {{ topBottomCoordinateValue(col, reversed) }}
     </div>
     <div></div>
 
     <template v-for="row in [0, 1, 2, 3, 4, 5, 6, 7]" :key="'row_' + row">
-      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize }">
-        {{ leftRightCoordinateValue(row) }}
+      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize(boardSize()) }">
+        {{ leftRightCoordinateValue(row, reversed) }}
       </div>
       <div
         v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
@@ -33,12 +33,12 @@
           :src="
             piecesValues.paths[getRank(row, reversed)][getFile(col, reversed)]
           "
-          :width="cellsSizePixels"
-          :height="cellsSizePixels"
+          :width="cellsSizePixels(boardSize())"
+          :height="cellsSizePixels(boardSize())"
         ></ion-img>
       </div>
-      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize }">
-        {{ leftRightCoordinateValue(row) }}
+      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize(boardSize()) }">
+        {{ leftRightCoordinateValue(row, reversed) }}
       </div>
     </template>
 
@@ -47,9 +47,9 @@
       v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
       :key="'bottom_coord_' + col"
       class="coordinate"
-      :style="{ 'font-size': coordinatesFontSize }"
+      :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
     >
-      {{ topBottomCoordinateValue(col) }}
+      {{ topBottomCoordinateValue(col, reversed) }}
     </div>
     <div
       class="playerTurn"
@@ -62,6 +62,7 @@
 import { IonImg } from "@ionic/vue";
 import { computed } from "vue";
 import useChessBoardLogic from "../hooks/ChessBoardLogic";
+import useChessBoardGraphic from "../hooks/ChessBoardGraphic";
 
 export default {
   props: {
@@ -81,36 +82,14 @@ export default {
       return sizePx;
     }
 
-    const sizePixels = computed(function () {
-      const sizePx = boardSize();
-      return sizePx + "px";
-    });
-
-    const cellsSizePixels = computed(function () {
-      const sizePx = boardSize();
-      const cellsSizePx = sizePx / 9.0 + "px";
-      return cellsSizePx;
-    });
-
-    const coordinatesFontSize = computed(function () {
-      const cellsSize = props.sizePx / 9.0;
-      return Math.floor(cellsSize * 0.4) + "px";
-    });
-
-    function topBottomCoordinateValue(col) {
-      const possibleValues = props.reversed ? "HGFEDCBA" : "ABCDEFGH";
-      return possibleValues.charAt(col);
-    }
-
-    function leftRightCoordinateValue(row) {
-      const possibleValues = props.reversed ? "12345678" : "87654321";
-      return possibleValues.charAt(row);
-    }
-
-    function cellBackgroundClass(row, col) {
-      const isWhiteCell = (row + col) % 2 == 0;
-      return isWhiteCell ? "whiteCell" : "blackCell";
-    }
+    const {
+      sizePixels,
+      cellsSizePixels,
+      coordinatesFontSize,
+      topBottomCoordinateValue,
+      leftRightCoordinateValue,
+      cellBackgroundClass,
+    } = useChessBoardGraphic();
 
     const {
       startNewGame,
@@ -126,6 +105,7 @@ export default {
     );
 
     return {
+      boardSize,
       sizePixels,
       cellsSizePixels,
       coordinatesFontSize,
