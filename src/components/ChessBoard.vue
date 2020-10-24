@@ -142,7 +142,8 @@ export default {
     }
 
     const coordinatesFontSize = computed(function () {
-      return Math.floor(sizePixels.value * 0.5) + "px";
+      const cellsSize = props.sizePx / 9.0;
+      return Math.floor(cellsSize * 0.4) + "px";
     });
 
     function topBottomCoordinateValue(col) {
