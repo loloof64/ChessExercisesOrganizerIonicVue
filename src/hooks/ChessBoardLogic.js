@@ -116,8 +116,8 @@ export default function useChessBoardLogic() {
     return piecesValues.raws[rank][file] === undefined;
   }
 
-  function playerTurnColor() {
-    return game.handler.turn() === "w" ? "white" : "black";
+  function isWhiteTurn() {
+    return game.handler.turn() === "w";
   }
 
   function updatePieces() {
@@ -134,7 +134,7 @@ export default function useChessBoardLogic() {
   return {
     startNewGame,
     isEmptyCell,
-    playerTurnColor,
+    isWhiteTurn,
     getRank,
     getFile,
     piecesValues,

@@ -20,7 +20,10 @@
     <div></div>
 
     <template v-for="row in [0, 1, 2, 3, 4, 5, 6, 7]" :key="'row_' + row">
-      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize(boardSize()) }">
+      <div
+        class="coordinate"
+        :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
+      >
         {{ leftRightCoordinateValue(row, reversed) }}
       </div>
       <div
@@ -37,7 +40,10 @@
           :height="cellsSizePixels(boardSize())"
         ></ion-img>
       </div>
-      <div class="coordinate" :style="{ 'font-size': coordinatesFontSize(boardSize()) }">
+      <div
+        class="coordinate"
+        :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
+      >
         {{ leftRightCoordinateValue(row, reversed) }}
       </div>
     </template>
@@ -60,7 +66,6 @@
 
 <script>
 import { IonImg } from "@ionic/vue";
-import { computed } from "vue";
 import useChessBoardLogic from "../hooks/ChessBoardLogic";
 import useChessBoardGraphic from "../hooks/ChessBoardGraphic";
 
@@ -94,11 +99,15 @@ export default {
     const {
       startNewGame,
       isEmptyCell,
-      playerTurnColor,
+      isWhiteTurn,
       piecesValues,
       getRank,
       getFile,
     } = useChessBoardLogic();
+
+    function playerTurnColor() {
+      return isWhiteTurn() ? "white" : "black";
+    }
 
     startNewGame(
       "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
