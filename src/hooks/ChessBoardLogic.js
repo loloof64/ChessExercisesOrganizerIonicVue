@@ -54,7 +54,7 @@ export default function useChessBoardLogic() {
       result.push(line);
     }
 
-    return result.reverse();
+    return result;
   }
 
   function getPieceRawPath(value) {
@@ -105,7 +105,7 @@ export default function useChessBoardLogic() {
   }
 
   function getRank(row, reversed) {
-    return reversed ? 7 - row : row;
+    return reversed ? row : 7 - row;
   }
 
   function getFile(col, reversed) {

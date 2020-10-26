@@ -80,9 +80,6 @@
           height: sizePixels(boardSize()),
         },
       ]"
-      @mousedown="(e) => e.preventDefault()"
-      @mouseup="(e) => e.preventDefault()"
-      @mousemove="(e) => e.preventDefault()"
     >
       <div
         class="board_dragged_piece_zone"
@@ -170,9 +167,7 @@ export default {
       dndState.draggedPieceSrc = null;
     }
 
-    function handleDragStart(detail) {
-      dndState.started = true;
-
+    function handleDragStart(detail)  {
       const rootEl = document.querySelector(".board_root");
       const x = detail.currentX - rootEl.offsetLeft;
       const y = detail.currentY - rootEl.offsetTop;
@@ -183,6 +178,17 @@ export default {
 
       const file = props.reversed ? 7 - col : col;
       const rank = props.reversed ? row : 7 - row;
+      const cellValue = piecesValues.raws[rank][file];
+
+      if ([undefined, null].includes(cellValue)) return;
+      const isWhitePiece = ["P", "N", "B", "R", "Q", "K"].includes(cellValue);
+      const isBlackPiece = ["p", "n", "b", "r" , "q", "k"].includes(cellValue);
+      const whiteInTurn = isWhiteTurn();
+      const isPlayerInTurnPiece = (whiteInTurn && isWhitePiece) || (!whiteInTurn && isBlackPiece);
+
+      if (!isPlayerInTurnPiece) return;
+
+      dndState.started = true;
 
       dndState.startFile = file;
       dndState.startRank = rank;
@@ -191,9 +197,7 @@ export default {
       dndState.draggedPieceY = y - cellsSize * 0.5;
 
       dndState.draggedPieceSrc =
-        piecesValues.paths[getRank(row, props.reversed)][
-          getFile(col, props.reversed)
-        ];
+        piecesValues.paths[rank][file];
     }
 
     function handleDragEnd() {
