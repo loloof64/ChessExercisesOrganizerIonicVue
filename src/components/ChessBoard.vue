@@ -41,7 +41,7 @@
           :class="cellBackgroundClassHighlightingOverride(row, col)"
         >
           <ion-img
-            v-if="!isEmptyCell(getRank(row, reversed), getFile(col, reversed))"
+            v-if="mustShowPiece(row, col)"
             :src="
               piecesValues.paths[getRank(row, reversed)][getFile(col, reversed)]
             "
@@ -83,7 +83,22 @@
       @mousedown="(e) => e.preventDefault()"
       @mouseup="(e) => e.preventDefault()"
       @mousemove="(e) => e.preventDefault()"
-    ></div>
+    >
+      <div
+        class="board_dragged_piece_zone"
+        :style="{
+          width: cellsSizePixels(boardSize()),
+          height: cellsSizePixels(boardSize()),
+          left: dndState.draggedPieceX + 'px',
+          top: dndState.draggedPieceY + 'px',
+        }"
+      >
+        <ion-img
+          v-if="mustShowDraggedPiece()"
+          :src="dndState.draggedPieceSrc"
+        ></ion-img>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -139,6 +154,9 @@ export default {
       startRank: null,
       endFile: null,
       endRank: null,
+      draggedPieceX: null,
+      draggedPieceY: null,
+      draggedPieceSrc: null,
     });
 
     function resetDndState() {
@@ -147,12 +165,15 @@ export default {
       dndState.startRank = null;
       dndState.endFile = null;
       dndState.endRank = null;
+      dndState.draggedPieceX = null;
+      dndState.draggedPieceY = null;
+      dndState.draggedPieceSrc = null;
     }
 
     function handleDragStart(detail) {
       dndState.started = true;
 
-      const rootEl = document.querySelector('.board_root');
+      const rootEl = document.querySelector(".board_root");
       const x = detail.currentX - rootEl.offsetLeft;
       const y = detail.currentY - rootEl.offsetTop;
 
@@ -165,6 +186,14 @@ export default {
 
       dndState.startFile = file;
       dndState.startRank = rank;
+
+      dndState.draggedPieceX = x - cellsSize * 0.5;
+      dndState.draggedPieceY = y - cellsSize * 0.5;
+
+      dndState.draggedPieceSrc =
+        piecesValues.paths[getRank(row, props.reversed)][
+          getFile(col, props.reversed)
+        ];
     }
 
     function handleDragEnd() {
@@ -174,7 +203,7 @@ export default {
     function handleDragMove(detail) {
       if (!dndState.started) return;
 
-      const rootEl = document.querySelector('.board_root');
+      const rootEl = document.querySelector(".board_root");
       const x = detail.currentX - rootEl.offsetLeft;
       const y = detail.currentY - rootEl.offsetTop;
 
@@ -187,6 +216,9 @@ export default {
 
       dndState.endFile = file;
       dndState.endRank = rank;
+
+      dndState.draggedPieceX = x - cellsSize * 0.5;
+      dndState.draggedPieceY = y - cellsSize * 0.5;
     }
 
     function handleDragLeave() {
@@ -198,7 +230,8 @@ export default {
       const file = props.reversed ? 7 - col : col;
       const rank = props.reversed ? row : 7 - row;
       const standardBackgroundClass = cellBackgroundClass(row, col);
-      const isDndCrossCell = file === dndState.endFile || rank === dndState.endRank;
+      const isDndCrossCell =
+        file === dndState.endFile || rank === dndState.endRank;
       const isStartDndCell =
         file === dndState.startFile && rank === dndState.startRank;
       const isEndDndCell =
@@ -208,6 +241,26 @@ export default {
       if (isDndCrossCell) return "dndCrossCell";
       if (isStartDndCell) return "dndStartCell";
       return standardBackgroundClass;
+    }
+
+    function mustShowPiece(row, col) {
+      const file = props.reversed ? 7 - col : col;
+      const rank = props.reversed ? row : 7 - row;
+      const isTheDraggedPiece =
+        file === dndState.startFile && rank === dndState.startRank;
+
+      if (isTheDraggedPiece) return false;
+      return !isEmptyCell(
+        getRank(row, props.reversed),
+        getFile(col, props.reversed)
+      );
+    }
+
+    function mustShowDraggedPiece() {
+      return (
+        ![null, undefined].includes(dndState.draggedPieceX) &&
+        ![null, undefined].includes(dndState.draggedPieceY)
+      );
     }
 
     onMounted(function () {
@@ -244,6 +297,9 @@ export default {
       handleDragMove,
       handleDragLeave,
       cellBackgroundClassHighlightingOverride,
+      mustShowPiece,
+      mustShowDraggedPiece,
+      dndState,
     };
   },
 };
@@ -300,5 +356,9 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+.board_dragged_piece_zone {
+  position: absolute;
 }
 </style>
