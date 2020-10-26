@@ -1,5 +1,3 @@
-import {computed} from 'vue';
-
 export default function useChessBoardGraphic() {
   const sizePixels = function(boardSizePx) {
     const sizePx = boardSizePx;
