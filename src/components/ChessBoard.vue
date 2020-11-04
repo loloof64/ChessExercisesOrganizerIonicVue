@@ -27,9 +27,6 @@
           height: sizePixels(boardSize()),
         },
       ]"
-      @mousedown="(e) => e.preventDefault()"
-      @mouseup="(e) => e.preventDefault()"
-      @mousemove="(e) => e.preventDefault()"
     >
       <div
         class="board_dragged_piece_zone"
@@ -182,7 +179,7 @@ export default {
         onStart: handleDragStart,
         onEnd: handleDragEnd,
         onMove: handleDragMove,
-        threshold: 1,
+        threshold: 0,
       });
 
       boardGesture.enable();
