@@ -8,69 +8,16 @@
       },
     ]"
   >
-    <div
-      class="board_main_layer"
-      :style="[
-        {
-          width: sizePixels(boardSize()),
-          height: sizePixels(boardSize()),
-        },
-      ]"
-    >
-      <div></div>
-      <div
-        v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
-        :key="'top_coord_' + col"
-        class="coordinate"
-        :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
-      >
-        {{ topBottomCoordinateValue(col, reversed) }}
-      </div>
-      <div></div>
-
-      <template v-for="row in [0, 1, 2, 3, 4, 5, 6, 7]" :key="'row_' + row">
-        <div
-          class="coordinate"
-          :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
-        >
-          {{ leftRightCoordinateValue(row, reversed) }}
-        </div>
-        <div
-          v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
-          :key="'cell_' + row + col"
-          :class="cellBackgroundClassHighlightingOverride(row, col)"
-        >
-          <ion-img
-            v-if="mustShowPiece(row, col)"
-            :src="
-              piecesValues.paths[getRank(row, reversed)][getFile(col, reversed)]
-            "
-            :width="cellsSizePixels(boardSize())"
-            :height="cellsSizePixels(boardSize())"
-          ></ion-img>
-        </div>
-        <div
-          class="coordinate"
-          :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
-        >
-          {{ leftRightCoordinateValue(row, reversed) }}
-        </div>
-      </template>
-
-      <div></div>
-      <div
-        v-for="col in [0, 1, 2, 3, 4, 5, 6, 7]"
-        :key="'bottom_coord_' + col"
-        class="coordinate"
-        :style="{ 'font-size': coordinatesFontSize(boardSize()) }"
-      >
-        {{ topBottomCoordinateValue(col, reversed) }}
-      </div>
-      <div
-        class="playerTurn"
-        :style="{ 'background-color': playerTurnColor() }"
-      ></div>
-    </div>
+    <ChessBoardMainLayer
+      :sizePx="sizePx"
+      :reversed="reversed"
+      :dragAndDropCoordinates="{
+        startFile: dndState.startFile,
+        startRank: dndState.startRank,
+        endFile: dndState.endFile,
+        endRank: dndState.endRank,
+      }"
+    />
 
     <div
       class="board_dnd_layer"
@@ -80,6 +27,9 @@
           height: sizePixels(boardSize()),
         },
       ]"
+      @mousedown="(e) => e.preventDefault()"
+      @mouseup="(e) => e.preventDefault()"
+      @mousemove="(e) => e.preventDefault()"
     >
       <div
         class="board_dragged_piece_zone"
@@ -104,6 +54,7 @@ import { IonImg, createGesture } from "@ionic/vue";
 import { reactive, onMounted } from "vue";
 import useChessBoardLogic from "../hooks/ChessBoardLogic";
 import useChessBoardGraphic from "../hooks/ChessBoardGraphic";
+import ChessBoardMainLayer from "../components/ChessBoardMainLayer";
 
 export default {
   props: {
@@ -116,34 +67,22 @@ export default {
       default: false,
     },
   },
-  components: { IonImg },
+  components: { IonImg, ChessBoardMainLayer },
   setup(props) {
     function boardSize() {
       const { sizePx } = props;
       return sizePx;
     }
 
-    const {
-      sizePixels,
-      cellsSizePixels,
-      coordinatesFontSize,
-      topBottomCoordinateValue,
-      leftRightCoordinateValue,
-      cellBackgroundClass,
-    } = useChessBoardGraphic();
+    const { sizePixels, cellsSizePixels } = useChessBoardGraphic();
 
     const {
-      startNewGame,
       isEmptyCell,
       isWhiteTurn,
       piecesValues,
       getRank,
       getFile,
     } = useChessBoardLogic();
-
-    function playerTurnColor() {
-      return isWhiteTurn() ? "white" : "black";
-    }
 
     const dndState = reactive({
       started: false,
@@ -167,7 +106,7 @@ export default {
       dndState.draggedPieceSrc = null;
     }
 
-    function handleDragStart(detail)  {
+    function handleDragStart(detail) {
       const rootEl = document.querySelector(".board_root");
       const x = detail.currentX - rootEl.offsetLeft;
       const y = detail.currentY - rootEl.offsetTop;
@@ -182,9 +121,10 @@ export default {
 
       if ([undefined, null].includes(cellValue)) return;
       const isWhitePiece = ["P", "N", "B", "R", "Q", "K"].includes(cellValue);
-      const isBlackPiece = ["p", "n", "b", "r" , "q", "k"].includes(cellValue);
+      const isBlackPiece = ["p", "n", "b", "r", "q", "k"].includes(cellValue);
       const whiteInTurn = isWhiteTurn();
-      const isPlayerInTurnPiece = (whiteInTurn && isWhitePiece) || (!whiteInTurn && isBlackPiece);
+      const isPlayerInTurnPiece =
+        (whiteInTurn && isWhitePiece) || (!whiteInTurn && isBlackPiece);
 
       if (!isPlayerInTurnPiece) return;
 
@@ -196,8 +136,7 @@ export default {
       dndState.draggedPieceX = x - cellsSize * 0.5;
       dndState.draggedPieceY = y - cellsSize * 0.5;
 
-      dndState.draggedPieceSrc =
-        piecesValues.paths[rank][file];
+      dndState.draggedPieceSrc = piecesValues.paths[rank][file];
     }
 
     function handleDragEnd() {
@@ -230,36 +169,6 @@ export default {
       resetDndState();
     }
 
-    function cellBackgroundClassHighlightingOverride(row, col) {
-      const file = props.reversed ? 7 - col : col;
-      const rank = props.reversed ? row : 7 - row;
-      const standardBackgroundClass = cellBackgroundClass(row, col);
-      const isDndCrossCell =
-        file === dndState.endFile || rank === dndState.endRank;
-      const isStartDndCell =
-        file === dndState.startFile && rank === dndState.startRank;
-      const isEndDndCell =
-        file === dndState.endFile && rank === dndState.endRank;
-
-      if (isEndDndCell) return "dndEndCell";
-      if (isDndCrossCell) return "dndCrossCell";
-      if (isStartDndCell) return "dndStartCell";
-      return standardBackgroundClass;
-    }
-
-    function mustShowPiece(row, col) {
-      const file = props.reversed ? 7 - col : col;
-      const rank = props.reversed ? row : 7 - row;
-      const isTheDraggedPiece =
-        file === dndState.startFile && rank === dndState.startRank;
-
-      if (isTheDraggedPiece) return false;
-      return !isEmptyCell(
-        getRank(row, props.reversed),
-        getFile(col, props.reversed)
-      );
-    }
-
     function mustShowDraggedPiece() {
       return (
         ![null, undefined].includes(dndState.draggedPieceX) &&
@@ -279,29 +188,18 @@ export default {
       boardGesture.enable();
     });
 
-    startNewGame(
-      "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
-    );
-
     return {
       boardSize,
       sizePixels,
       cellsSizePixels,
-      coordinatesFontSize,
-      cellBackgroundClass,
-      topBottomCoordinateValue,
-      leftRightCoordinateValue,
       piecesValues,
       isEmptyCell,
-      playerTurnColor,
       getFile,
       getRank,
       handleDragStart,
       handleDragEnd,
       handleDragMove,
       handleDragLeave,
-      cellBackgroundClassHighlightingOverride,
-      mustShowPiece,
       mustShowDraggedPiece,
       dndState,
     };
@@ -312,48 +210,6 @@ export default {
 <style lang="scss" scoped>
 .board_root {
   position: relative;
-}
-
-.board_main_layer {
-  background-color: rgb(124, 124, 124);
-  display: grid;
-  grid-template-rows: 1fr repeat(8, 2fr) 1fr;
-  grid-template-columns: 1fr repeat(8, 2fr) 1fr;
-}
-
-.coordinate {
-  color: yellow;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.whiteCell {
-  background-color: navajowhite;
-}
-
-.blackCell {
-  background-color: peru;
-}
-
-.dndCrossCell {
-  background-color: blueviolet;
-}
-
-.dndStartCell {
-  background-color: red;
-}
-
-.dndEndCell {
-  background-color: green;
-}
-
-.playerTurn {
-  border-radius: 45%;
-  width: 80%;
-  height: 80%;
-  left: 5%;
-  top: 5%;
 }
 
 .board_dnd_layer {
