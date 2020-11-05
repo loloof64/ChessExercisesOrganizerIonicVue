@@ -19,39 +19,21 @@
       }"
     />
 
-    <div
-      class="board_dnd_layer"
-      :style="[
-        {
-          width: sizePixels(boardSize()),
-          height: sizePixels(boardSize()),
-        },
-      ]"
-    >
-      <div
-        class="board_dragged_piece_zone"
-        :style="{
-          width: cellsSizePixels(boardSize()),
-          height: cellsSizePixels(boardSize()),
-          left: dndState.draggedPieceX + 'px',
-          top: dndState.draggedPieceY + 'px',
-        }"
-      >
-        <ion-img
-          v-if="mustShowDraggedPiece()"
-          :src="dndState.draggedPieceSrc"
-        ></ion-img>
-      </div>
-    </div>
+    <ChessBoardDndLayer
+      :sizePx="sizePx"
+      :reversed="reversed"
+      :dndState="dndState"
+    />
   </div>
 </template>
 
 <script>
-import { IonImg, createGesture } from "@ionic/vue";
+import { createGesture } from "@ionic/vue";
 import { reactive, onMounted } from "vue";
-import useChessBoardLogic from "../hooks/ChessBoardLogic";
-import useChessBoardGraphic from "../hooks/ChessBoardGraphic";
-import ChessBoardMainLayer from "../components/ChessBoardMainLayer";
+import useChessBoardLogic from "@/hooks/ChessBoardLogic";
+import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
+import ChessBoardMainLayer from "@/components/ChessBoardMainLayer";
+import ChessBoardDndLayer from "@/components/ChessBoardDndLayer";
 
 export default {
   props: {
@@ -64,7 +46,7 @@ export default {
       default: false,
     },
   },
-  components: { IonImg, ChessBoardMainLayer },
+  components: { ChessBoardMainLayer, ChessBoardDndLayer },
   setup(props) {
     function boardSize() {
       const { sizePx } = props;
@@ -114,6 +96,7 @@ export default {
 
       const file = props.reversed ? 7 - col : col;
       const rank = props.reversed ? row : 7 - row;
+      if (file < 0 || file > 7 || rank < 0 || rank > 7) return;
       const cellValue = piecesValues.raws[rank][file];
 
       if ([undefined, null].includes(cellValue)) return;
@@ -166,13 +149,6 @@ export default {
       resetDndState();
     }
 
-    function mustShowDraggedPiece() {
-      return (
-        ![null, undefined].includes(dndState.draggedPieceX) &&
-        ![null, undefined].includes(dndState.draggedPieceY)
-      );
-    }
-
     onMounted(function () {
       const boardGesture = createGesture({
         el: document.querySelector(".board_dnd_layer"),
@@ -197,7 +173,6 @@ export default {
       handleDragEnd,
       handleDragMove,
       handleDragLeave,
-      mustShowDraggedPiece,
       dndState,
     };
   },
@@ -207,15 +182,5 @@ export default {
 <style lang="scss" scoped>
 .board_root {
   position: relative;
-}
-
-.board_dnd_layer {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.board_dragged_piece_zone {
-  position: absolute;
 }
 </style>

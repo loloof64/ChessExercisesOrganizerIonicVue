@@ -66,8 +66,8 @@
 
 <script>
 import { IonImg } from "@ionic/vue";
-import useChessBoardGraphic from "../hooks/ChessBoardGraphic";
-import useChessBoardLogic from "../hooks/ChessBoardLogic";
+import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
+import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 
 export default {
   props: {
@@ -102,7 +102,13 @@ export default {
       cellBackgroundClass,
     } = useChessBoardGraphic();
 
-    const { isEmptyCell, getFile, getRank, isWhiteTurn, piecesValues } = useChessBoardLogic();
+    const {
+      isEmptyCell,
+      getFile,
+      getRank,
+      isWhiteTurn,
+      piecesValues,
+    } = useChessBoardLogic();
 
     function playerTurnColor() {
       return isWhiteTurn() ? "white" : "black";
@@ -122,10 +128,11 @@ export default {
         file === props.dragAndDropCoordinates.endFile &&
         rank === props.dragAndDropCoordinates.endRank;
 
-      if (isEndDndCell) return "dndEndCell";
-      if (isDndCrossCell) return "dndCrossCell";
-      if (isStartDndCell) return "dndStartCell";
-      return standardBackgroundClass;
+      let cellClass = standardBackgroundClass;
+      if (isDndCrossCell) cellClass = "dndCrossCell";
+      if (isStartDndCell) cellClass = "dndStartCell";
+      if (isEndDndCell) cellClass = "dndEndCell";
+      return cellClass;
     }
 
     function mustShowPiece(row, col) {
