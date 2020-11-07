@@ -1,5 +1,4 @@
 import { reactive } from "vue";
-import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 
 export default function useChessBoardDragAndDrop() {
   const dndState = reactive({
@@ -12,11 +11,6 @@ export default function useChessBoardDragAndDrop() {
     draggedPieceY: null,
     draggedPieceSrc: null,
   });
-
-  const {
-    isLegalMove,
-    makeMove
-  } = useChessBoardLogic();
 
   function resetDndState() {
     dndState.started = false;
@@ -62,7 +56,9 @@ export default function useChessBoardDragAndDrop() {
     dndState.draggedPieceSrc = piecesPaths.value[rank][file];
   }
 
-  function handleDragEnd() {
+  function handleDragEnd({
+    isLegalMove, makeMove,
+  }) {
     const moveObject = {
       startFile: dndState.startFile,
       startRank: dndState.startRank,

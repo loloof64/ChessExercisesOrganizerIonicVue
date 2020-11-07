@@ -33,7 +33,7 @@
       >
         <ion-img
           v-if="mustShowPiece(row, col)"
-          :src="piecesPaths[getRank(row, reversed)][getFile(col, reversed)]"
+          :src="getPiecePath(row, col)"
           :width="cellsSizePixels(boardSize())"
           :height="cellsSizePixels(boardSize())"
         ></ion-img>
@@ -84,6 +84,22 @@ export default {
         return {};
       },
     },
+    whiteTurn: {
+      type: Boolean,
+      default: true,
+    },
+    piecesValues: {
+      type: Array,
+      default: () => {
+        return undefined;
+      },
+    },
+    piecesPaths: {
+      type: Array,
+      default: () => {
+        return undefined;
+      },
+    },
   },
   components: { IonImg },
   setup(props) {
@@ -101,17 +117,10 @@ export default {
       cellBackgroundClass,
     } = useChessBoardGraphic();
 
-    const {
-      isEmptyCell,
-      getFile,
-      getRank,
-      isWhiteTurn,
-      piecesValues,
-      piecesPaths,
-    } = useChessBoardLogic();
+    const { getFile, getRank } = useChessBoardLogic();
 
     const playerTurnColor = computed(() => {
-      return isWhiteTurn.value ? "white" : "black";
+      return props.whiteTurn ? "white" : "black";
     });
 
     function cellBackgroundClassHighlightingOverride(row, col) {
@@ -135,19 +144,27 @@ export default {
       return cellClass;
     }
 
+    function isEmptyCell(rank, file) {
+      return props.piecesValues[rank][file] === undefined;
+    }
+
     function mustShowPiece(row, col) {
-      const file = props.reversed ? 7 - col : col;
-      const rank = props.reversed ? row : 7 - row;
+      const file = getFile(col, props.reversed);
+      const rank = getRank(row, props.reversed);
+
       const isTheDraggedPiece =
         file === props.dragAndDropCoordinates.startFile &&
         rank === props.dragAndDropCoordinates.startRank;
 
       if (isTheDraggedPiece) return false;
 
-      return !isEmptyCell(
-        getRank(row, props.reversed),
+      return !isEmptyCell(rank, file);
+    }
+
+    function getPiecePath(row, col) {
+      return props.piecesPaths[getRank(row, props.reversed)][
         getFile(col, props.reversed)
-      );
+      ];
     }
 
     return {
@@ -160,10 +177,7 @@ export default {
       cellBackgroundClassHighlightingOverride,
       mustShowPiece,
       playerTurnColor,
-      piecesValues,
-      piecesPaths,
-      getFile,
-      getRank,
+      getPiecePath,
     };
   },
 };

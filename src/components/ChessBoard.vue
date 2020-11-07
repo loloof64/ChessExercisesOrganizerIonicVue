@@ -17,6 +17,9 @@
         endFile: dndState.endFile,
         endRank: dndState.endRank,
       }"
+      :whiteTurn="isWhiteTurn"
+      :piecesValues="piecesValues"
+      :piecesPaths="piecesPaths"
     />
 
     <ChessBoardDndLayer
@@ -57,12 +60,13 @@ export default {
     const { sizePixels, cellsSizePixels } = useChessBoardGraphic();
 
     const {
-      isEmptyCell,
       piecesValues,
       piecesPaths,
       getRank,
       getFile,
       isWhiteTurn,
+      isLegalMove,
+      makeMove,
     } = useChessBoardLogic();
 
     const {
@@ -84,7 +88,10 @@ export default {
             piecesPaths,
             whiteTurn: isWhiteTurn.value,
           }),
-        onEnd: handleDragEnd,
+        onEnd: () => handleDragEnd({
+          isLegalMove,
+          makeMove,
+        }),
         onMove: (detail) =>
           handleDragMove({
             detail,
@@ -102,13 +109,14 @@ export default {
       sizePixels,
       cellsSizePixels,
       piecesValues,
-      isEmptyCell,
+      piecesPaths,
       getFile,
       getRank,
       handleDragStart,
       handleDragEnd,
       handleDragMove,
       dndState,
+      isWhiteTurn,
     };
   },
 };

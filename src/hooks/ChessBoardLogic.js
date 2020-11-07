@@ -111,10 +111,6 @@ export default function useChessBoardLogic() {
     return reversed ? 7 - col : col;
   }
 
-  function isEmptyCell(rank, file) {
-    return piecesValues.value[rank][file] === undefined;
-  }
-
   const isWhiteTurn = computed(() => {
     return game.value.turn() === "w";
   });
@@ -163,7 +159,6 @@ export default function useChessBoardLogic() {
     getFile,
     piecesValues,
     piecesPaths,
-    isEmptyCell,
     isWhiteTurn,
     isLegalMove,
     makeMove,
