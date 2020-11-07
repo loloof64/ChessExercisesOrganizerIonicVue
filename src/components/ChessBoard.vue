@@ -26,18 +26,28 @@
       :sizePx="sizePx"
       :reversed="reversed"
       :dndState="dndState"
+      :resetDndState="resetDndState"
+    />
+
+    <ChessBoardPromotionDialog
+      :open="promotionDialogOpen"
+      :sizePx="sizePx"
+      :whitePlayer="promotionDialogWhitePlayer"
+      @cancelMove="cancelPromotionSelection"
+      @commitPromotion="(type) => terminatePromotionMove({type, makeMove})"
     />
   </div>
 </template>
 
 <script>
 import { createGesture } from "@ionic/vue";
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
 import ChessBoardMainLayer from "@/components/ChessBoardMainLayer";
 import ChessBoardDndLayer from "@/components/ChessBoardDndLayer";
+import ChessBoardPromotionDialog from "@/components/ChessBoardPromotionDialog";
 
 export default {
   props: {
@@ -50,12 +60,15 @@ export default {
       default: false,
     },
   },
-  components: { ChessBoardMainLayer, ChessBoardDndLayer },
+  components: { ChessBoardMainLayer, ChessBoardDndLayer, ChessBoardPromotionDialog },
   setup(props) {
     function boardSize() {
       const { sizePx } = props;
       return sizePx;
     }
+
+    const promotionDialogOpen = ref(false);
+    const promotionDialogWhitePlayer = ref(true);
 
     const { sizePixels, cellsSizePixels } = useChessBoardGraphic();
 
@@ -67,14 +80,28 @@ export default {
       isWhiteTurn,
       isLegalMove,
       makeMove,
+      isPromotionMove,
+      startNewGame,
     } = useChessBoardLogic();
 
     const {
       dndState,
+      resetDndState,
       handleDragStart,
       handleDragMove,
       handleDragEnd,
+      terminatePromotionMove,
     } = useChessBoardDragAndDrop();
+
+    function requestPromotionSelection() {
+      promotionDialogWhitePlayer.value = isWhiteTurn.value;
+      promotionDialogOpen.value = true;
+    }
+
+    function cancelPromotionSelection() {
+      resetDndState();
+      promotionDialogOpen.value = false;
+    }
 
     onMounted(function () {
       const boardGesture = createGesture({
@@ -88,10 +115,13 @@ export default {
             piecesPaths,
             whiteTurn: isWhiteTurn.value,
           }),
-        onEnd: () => handleDragEnd({
-          isLegalMove,
-          makeMove,
-        }),
+        onEnd: () =>
+          handleDragEnd({
+            isLegalMove,
+            makeMove,
+            isPromotionMove,
+            requestPromotionSelection,
+          }),
         onMove: (detail) =>
           handleDragMove({
             detail,
@@ -103,6 +133,8 @@ export default {
 
       boardGesture.enable();
     });
+
+    startNewGame();
 
     return {
       boardSize,
@@ -117,6 +149,12 @@ export default {
       handleDragMove,
       dndState,
       isWhiteTurn,
+      promotionDialogOpen,
+      promotionDialogWhitePlayer,
+      cancelPromotionSelection,
+      terminatePromotionMove,
+      makeMove,
+      resetDndState,
     };
   },
 };

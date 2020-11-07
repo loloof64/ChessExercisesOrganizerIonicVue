@@ -150,9 +150,15 @@ export default function useChessBoardLogic() {
     game.value = new Chess(game.value.fen());
   }
 
-  startNewGame(
-    "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
-  );
+  function isPromotionMove({ startFile, startRank, endRank }) {
+    const startCellStr =
+      "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
+    const movingPiece = game.value.get(startCellStr);
+    const isMovingAPawn = movingPiece?.type === "p";
+
+    if (!isMovingAPawn) return false;
+    return (isWhiteTurn.value && endRank === 7) || (!isWhiteTurn.value && endRank === 0);
+  }
 
   return {
     getRank,
@@ -162,5 +168,7 @@ export default function useChessBoardLogic() {
     isWhiteTurn,
     isLegalMove,
     makeMove,
+    isPromotionMove,
+    startNewGame,
   };
 }

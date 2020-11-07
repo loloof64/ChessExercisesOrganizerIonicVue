@@ -34,8 +34,6 @@
         <ion-img
           v-if="mustShowPiece(row, col)"
           :src="getPiecePath(row, col)"
-          :width="cellsSizePixels(boardSize())"
-          :height="cellsSizePixels(boardSize())"
         ></ion-img>
       </div>
       <div
@@ -110,7 +108,6 @@ export default {
 
     const {
       sizePixels,
-      cellsSizePixels,
       coordinatesFontSize,
       topBottomCoordinateValue,
       leftRightCoordinateValue,
@@ -170,7 +167,6 @@ export default {
     return {
       boardSize,
       sizePixels,
-      cellsSizePixels,
       coordinatesFontSize,
       topBottomCoordinateValue,
       leftRightCoordinateValue,

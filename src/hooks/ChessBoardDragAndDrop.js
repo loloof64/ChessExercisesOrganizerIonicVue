@@ -12,6 +12,8 @@ export default function useChessBoardDragAndDrop() {
     draggedPieceSrc: null,
   });
 
+  const pendingPromotionMove = reactive({});
+
   function resetDndState() {
     dndState.started = false;
     dndState.startFile = null;
@@ -23,7 +25,14 @@ export default function useChessBoardDragAndDrop() {
     dndState.draggedPieceSrc = null;
   }
 
-  function handleDragStart({detail, boardSizePx, reversed, piecesValues, piecesPaths, whiteTurn}) {
+  function handleDragStart({
+    detail,
+    boardSizePx,
+    reversed,
+    piecesValues,
+    piecesPaths,
+    whiteTurn,
+  }) {
     const rootEl = document.querySelector(".board_root");
     const x = detail.currentX - rootEl.offsetLeft;
     const y = detail.currentY - rootEl.offsetTop;
@@ -57,21 +66,34 @@ export default function useChessBoardDragAndDrop() {
   }
 
   function handleDragEnd({
-    isLegalMove, makeMove,
+    isLegalMove,
+    makeMove,
+    isPromotionMove,
+    requestPromotionSelection,
   }) {
     const moveObject = {
       startFile: dndState.startFile,
       startRank: dndState.startRank,
       endFile: dndState.endFile,
       endRank: dndState.endRank,
-      promotion: 'q'
+      promotion: "q",
     };
 
-    if (isLegalMove(moveObject)) makeMove(moveObject);
+    if (isLegalMove(moveObject)) {
+      if (isPromotionMove(moveObject)) {
+        pendingPromotionMove.startFile = moveObject.startFile;
+        pendingPromotionMove.startRank = moveObject.startRank;
+        pendingPromotionMove.endFile = moveObject.endFile;
+        pendingPromotionMove.endRank = moveObject.endRank;
+        requestPromotionSelection();
+        return;
+      }
+      makeMove(moveObject);
+    }
     resetDndState();
   }
 
-  function handleDragMove({detail, boardSizePx, reversed}) {
+  function handleDragMove({ detail, boardSizePx, reversed }) {
     if (!dndState.started) return;
 
     const rootEl = document.querySelector(".board_root");
@@ -92,11 +114,31 @@ export default function useChessBoardDragAndDrop() {
     dndState.draggedPieceY = y - cellsSize * 0.5;
   }
 
+  function terminatePromotionMove({type, makeMove}) {
+    const moveObject = {
+      startFile: pendingPromotionMove.startFile,
+      startRank: pendingPromotionMove.startRank,
+      endFile: pendingPromotionMove.endFile,
+      endRank: pendingPromotionMove.endRank,
+      promotion: type,
+    };
+
+    pendingPromotionMove.startFile = undefined;
+    pendingPromotionMove.startRank = undefined;
+    pendingPromotionMove.endFile = undefined;
+    pendingPromotionMove.endRank = undefined;
+
+    makeMove(moveObject);
+
+    resetDndState();
+  }
+
   return {
     dndState,
     resetDndState,
     handleDragStart,
     handleDragEnd,
     handleDragMove,
+    terminatePromotionMove,
   };
 }
