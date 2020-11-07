@@ -33,9 +33,7 @@
       >
         <ion-img
           v-if="mustShowPiece(row, col)"
-          :src="
-            piecesValues.paths[getRank(row, reversed)][getFile(col, reversed)]
-          "
+          :src="piecesPaths[getRank(row, reversed)][getFile(col, reversed)]"
           :width="cellsSizePixels(boardSize())"
           :height="cellsSizePixels(boardSize())"
         ></ion-img>
@@ -59,12 +57,13 @@
     </div>
     <div
       class="playerTurn"
-      :style="{ 'background-color': playerTurnColor() }"
+      :style="{ 'background-color': playerTurnColor }"
     ></div>
   </div>
 </template>
 
 <script>
+import { computed } from "vue";
 import { IonImg } from "@ionic/vue";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
@@ -108,11 +107,12 @@ export default {
       getRank,
       isWhiteTurn,
       piecesValues,
+      piecesPaths,
     } = useChessBoardLogic();
 
-    function playerTurnColor() {
-      return isWhiteTurn() ? "white" : "black";
-    }
+    const playerTurnColor = computed(() => {
+      return isWhiteTurn.value ? "white" : "black";
+    });
 
     function cellBackgroundClassHighlightingOverride(row, col) {
       const file = props.reversed ? 7 - col : col;
@@ -161,6 +161,7 @@ export default {
       mustShowPiece,
       playerTurnColor,
       piecesValues,
+      piecesPaths,
       getFile,
       getRank,
     };

@@ -59,6 +59,7 @@ export default {
     const {
       isEmptyCell,
       piecesValues,
+      piecesPaths,
       getRank,
       getFile,
       isWhiteTurn,
@@ -80,7 +81,8 @@ export default {
             boardSizePx: props.sizePx,
             reversed: props.reversed,
             piecesValues,
-            whiteTurn: isWhiteTurn(),
+            piecesPaths,
+            whiteTurn: isWhiteTurn.value,
           }),
         onEnd: handleDragEnd,
         onMove: (detail) =>

@@ -1,24 +1,17 @@
 import Chess from "chess.js";
-import { reactive, watch } from "vue";
+import { ref, computed } from "vue";
 
 export default function useChessBoardLogic() {
-  const game = reactive({
-    handler: new Chess("8/8/8/8/8/8/8/8 w - - 0 1"),
-  });
-
-  const piecesValues = reactive({
-    raws: [],
-    paths: [],
-  });
+  const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
 
   function startNewGame(
     startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   ) {
-    game.handler = new Chess(startPosition);
+    game.value = new Chess(startPosition);
   }
 
-  function getPiecesValues() {
-    const currentPosition = game.handler.fen();
+  const piecesValues = computed(() => {
+    const currentPosition = game.value.fen();
     const boardValues = currentPosition
       .split(" ")[0]
       .split("/")
@@ -55,7 +48,7 @@ export default function useChessBoardLogic() {
     }
 
     return result;
-  }
+  });
 
   function getPieceRawPath(value) {
     let rawImageName;
@@ -104,6 +97,12 @@ export default function useChessBoardLogic() {
     return `/assets/chess_vectors/${rawImageName}`;
   }
 
+  const piecesPaths = computed(() => {
+    return piecesValues.value.map((line) =>
+      line.map((item) => getPieceRawPath(item))
+    );
+  });
+
   function getRank(row, reversed) {
     return reversed ? row : 7 - row;
   }
@@ -113,34 +112,60 @@ export default function useChessBoardLogic() {
   }
 
   function isEmptyCell(rank, file) {
-    return piecesValues.raws[rank][file] === undefined;
+    return piecesValues.value[rank][file] === undefined;
   }
 
-  function isWhiteTurn() {
-    return game.handler.turn() === "w";
-  }
-
-  function updatePieces() {
-    piecesValues.raws = getPiecesValues();
-    piecesValues.paths = piecesValues.raws.map((line) =>
-      line.map((cellValue) => getPieceRawPath(cellValue))
-    );
-  }
-
-  watch(game, function() {
-    updatePieces();
+  const isWhiteTurn = computed(() => {
+    return game.value.turn() === "w";
   });
 
-  updatePieces();
+  function isLegalMove({ startFile, startRank, endFile, endRank }) {
+    const fromCellStr =
+      "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
+    const toCellStr = "abcdefgh".charAt(endFile) + "12345678".charAt(endRank);
+    const gameCopy = new Chess(game.value.fen());
+
+    const result = gameCopy.move({
+      from: fromCellStr,
+      to: toCellStr,
+      promotion: "q",
+    });
+
+    return result !== null;
+  }
+
+  function makeMove({
+    startFile,
+    startRank,
+    endFile,
+    endRank,
+    promotion = "q",
+  }) {
+    const fromCellStr =
+      "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
+    const toCellStr = "abcdefgh".charAt(endFile) + "12345678".charAt(endRank);
+
+    game.value.move({
+      from: fromCellStr,
+      to: toCellStr,
+      promotion,
+    });
+
+    game.value = new Chess(game.value.fen());
+  }
+
   startNewGame(
     "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
   );
 
   return {
-    isEmptyCell,
-    isWhiteTurn,
     getRank,
     getFile,
     piecesValues,
+    piecesPaths,
+    isEmptyCell,
+    isWhiteTurn,
+    isLegalMove,
+    makeMove,
   };
 }

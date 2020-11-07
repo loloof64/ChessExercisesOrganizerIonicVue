@@ -1,4 +1,5 @@
 import { reactive } from "vue";
+import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 
 export default function useChessBoardDragAndDrop() {
   const dndState = reactive({
@@ -12,6 +13,11 @@ export default function useChessBoardDragAndDrop() {
     draggedPieceSrc: null,
   });
 
+  const {
+    isLegalMove,
+    makeMove
+  } = useChessBoardLogic();
+
   function resetDndState() {
     dndState.started = false;
     dndState.startFile = null;
@@ -23,7 +29,7 @@ export default function useChessBoardDragAndDrop() {
     dndState.draggedPieceSrc = null;
   }
 
-  function handleDragStart({detail, boardSizePx, reversed, piecesValues, whiteTurn}) {
+  function handleDragStart({detail, boardSizePx, reversed, piecesValues, piecesPaths, whiteTurn}) {
     const rootEl = document.querySelector(".board_root");
     const x = detail.currentX - rootEl.offsetLeft;
     const y = detail.currentY - rootEl.offsetTop;
@@ -35,7 +41,7 @@ export default function useChessBoardDragAndDrop() {
     const file = reversed ? 7 - col : col;
     const rank = reversed ? row : 7 - row;
     if (file < 0 || file > 7 || rank < 0 || rank > 7) return;
-    const cellValue = piecesValues.raws[rank][file];
+    const cellValue = piecesValues.value[rank][file];
 
     if ([undefined, null].includes(cellValue)) return;
     const isWhitePiece = ["P", "N", "B", "R", "Q", "K"].includes(cellValue);
@@ -53,10 +59,19 @@ export default function useChessBoardDragAndDrop() {
     dndState.draggedPieceX = x - cellsSize * 0.5;
     dndState.draggedPieceY = y - cellsSize * 0.5;
 
-    dndState.draggedPieceSrc = piecesValues.paths[rank][file];
+    dndState.draggedPieceSrc = piecesPaths.value[rank][file];
   }
 
   function handleDragEnd() {
+    const moveObject = {
+      startFile: dndState.startFile,
+      startRank: dndState.startRank,
+      endFile: dndState.endFile,
+      endRank: dndState.endRank,
+      promotion: 'q'
+    };
+
+    if (isLegalMove(moveObject)) makeMove(moveObject);
     resetDndState();
   }
 
