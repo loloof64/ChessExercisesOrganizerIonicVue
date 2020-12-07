@@ -6,12 +6,12 @@ export default function useChessBoardGraphic() {
 
   const cellsSizePixels = function(boardSizePx) {
     const sizePx = boardSizePx;
-    const cellsSizePx = sizePx / 9.0 + "px";
+    const cellsSizePx = sizePx * 0.1111 + "px";
     return cellsSizePx;
   };
 
   const coordinatesFontSize = function(boardSizePx) {
-    const cellsSize = boardSizePx / 9.0;
+    const cellsSize = boardSizePx * 0.1111;
     return Math.floor(cellsSize * 0.4) + "px";
   };
 

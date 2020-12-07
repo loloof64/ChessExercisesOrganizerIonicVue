@@ -34,14 +34,14 @@
       :sizePx="sizePx"
       :whitePlayer="promotionDialogWhitePlayer"
       @cancelMove="cancelPromotionSelection"
-      @commitPromotion="(type) => terminatePromotionMove({type, makeMove})"
+      @commitPromotion="(type) => terminatePromotionMove({ type, makeMove })"
     />
   </div>
 </template>
 
 <script>
 import { createGesture } from "@ionic/vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
@@ -60,7 +60,11 @@ export default {
       default: false,
     },
   },
-  components: { ChessBoardMainLayer, ChessBoardDndLayer, ChessBoardPromotionDialog },
+  components: {
+    ChessBoardMainLayer,
+    ChessBoardDndLayer,
+    ChessBoardPromotionDialog,
+  },
   setup(props) {
     function boardSize() {
       const { sizePx } = props;
@@ -132,6 +136,32 @@ export default {
       });
 
       boardGesture.enable();
+    });
+
+    function getLocationRatio(locationPx) {
+      return locationPx / props.sizePx;
+    }
+
+    function getLocationPxFromRatio(locationRatio) {
+      return props.sizePx * locationRatio;
+    }
+
+    function adaptDraggedPieceLocationForReversedConfiguration() {
+      const locationRatioX = getLocationRatio(dndState.draggedPieceX);
+      const locationRatioY = getLocationRatio(dndState.draggedPieceY);
+
+      const newLocationRationX = 1 - locationRatioX - 0.1111;
+      const newLocationRationY = 1 - locationRatioY - 0.1111;
+
+      const newDraggedPieceX = getLocationPxFromRatio(newLocationRationX);
+      const newDraggedPieceY = getLocationPxFromRatio(newLocationRationY);
+
+      dndState.draggedPieceX = newDraggedPieceX;
+      dndState.draggedPieceY = newDraggedPieceY;
+    }
+
+    watch([() => props.reversed], () => {
+      adaptDraggedPieceLocationForReversedConfiguration();
     });
 
     startNewGame();
