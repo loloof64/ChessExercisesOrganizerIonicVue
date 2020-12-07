@@ -65,7 +65,7 @@ export default {
     ChessBoardDndLayer,
     ChessBoardPromotionDialog,
   },
-  setup(props) {
+  setup(props, context) {
     function boardSize() {
       const { sizePx } = props;
       return sizePx;
@@ -74,7 +74,7 @@ export default {
     const promotionDialogOpen = ref(false);
     const promotionDialogWhitePlayer = ref(true);
 
-    const draggedPieceLocationRatio = reactive({x: null, y: null});
+    const draggedPieceLocationRatio = reactive({ x: null, y: null });
 
     const { sizePixels, cellsSizePixels } = useChessBoardGraphic();
 
@@ -88,6 +88,13 @@ export default {
       makeMove,
       isPromotionMove,
       startNewGame,
+      getGameStatus,
+      GAME_STATUS_WHITE_WIN,
+      GAME_STATUS_BLACK_WIN,
+      GAME_STATUS_DRAW_STALEMATE,
+      GAME_STATUS_DRAW_THREE_FOLD_REPETITION,
+      GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL,
+      GAME_STATUS_DRAW_FIFTY_MOVES_RULE,
     } = useChessBoardLogic();
 
     const {
@@ -98,6 +105,30 @@ export default {
       handleDragEnd,
       terminatePromotionMove,
     } = useChessBoardDragAndDrop();
+
+    function emitEndGameStatusIfAppropriate() {
+      const currentStatus = getGameStatus();
+      switch (currentStatus) {
+        case GAME_STATUS_WHITE_WIN:
+          context.emit("win", true);
+          break;
+        case GAME_STATUS_BLACK_WIN:
+          context.emit("win", false);
+          break;
+        case GAME_STATUS_DRAW_STALEMATE:
+          context.emit("stalemate");
+          break;
+        case GAME_STATUS_DRAW_THREE_FOLD_REPETITION:
+          context.emit("three-fold-repetition");
+          break;
+        case GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL:
+          context.emit("insufficient-material");
+          break;
+        case GAME_STATUS_DRAW_FIFTY_MOVES_RULE:
+          context.emit("fifty-moves");
+          break;
+      }
+    }
 
     function requestPromotionSelection() {
       promotionDialogWhitePlayer.value = isWhiteTurn.value;
@@ -121,13 +152,15 @@ export default {
             piecesPaths,
             whiteTurn: isWhiteTurn.value,
           }),
-        onEnd: () =>
+        onEnd: () => {
           handleDragEnd({
             isLegalMove,
             makeMove,
             isPromotionMove,
             requestPromotionSelection,
-          }),
+          });
+          emitEndGameStatusIfAppropriate();
+        },
         onMove: (detail) =>
           handleDragMove({
             detail,
@@ -163,8 +196,12 @@ export default {
     }
 
     function adaptDraggedPieceLocationForResizedConfiguration() {
-      const newDraggedPieceX = getLocationPxFromRatio(draggedPieceLocationRatio.x);
-      const newDraggedPieceY = getLocationPxFromRatio(draggedPieceLocationRatio.y);
+      const newDraggedPieceX = getLocationPxFromRatio(
+        draggedPieceLocationRatio.x
+      );
+      const newDraggedPieceY = getLocationPxFromRatio(
+        draggedPieceLocationRatio.y
+      );
 
       dndState.draggedPieceX = newDraggedPieceX;
       dndState.draggedPieceY = newDraggedPieceY;
@@ -179,13 +216,15 @@ export default {
     });
 
     watch([() => dndState.draggedPieceX], () => {
-      if (dndState.draggedPieceX === null)  draggedPieceLocationRatio.x = null;
-      else draggedPieceLocationRatio.x = getLocationRatio(dndState.draggedPieceX);
+      if (dndState.draggedPieceX === null) draggedPieceLocationRatio.x = null;
+      else
+        draggedPieceLocationRatio.x = getLocationRatio(dndState.draggedPieceX);
     });
 
     watch([() => dndState.draggedPieceY], () => {
-      if (dndState.draggedPieceY === null)  draggedPieceLocationRatio.y = null;
-      else draggedPieceLocationRatio.y = getLocationRatio(dndState.draggedPieceY);
+      if (dndState.draggedPieceY === null) draggedPieceLocationRatio.y = null;
+      else
+        draggedPieceLocationRatio.y = getLocationRatio(dndState.draggedPieceY);
     });
 
     startNewGame();

@@ -2,12 +2,44 @@ import Chess from "chess.js";
 import { ref, computed } from "vue";
 
 export default function useChessBoardLogic() {
+  const GAME_STATUS_IDLE = 0;
+  const GAME_STATUS_RUNNING = 1;
+  const GAME_STATUS_WHITE_WIN = 2;
+  const GAME_STATUS_BLACK_WIN = 4;
+  const GAME_STATUS_DRAW_STALEMATE = 8;
+  const GAME_STATUS_DRAW_THREE_FOLD_REPETITION = 16;
+  const GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL = 32;
+  const GAME_STATUS_DRAW_FIFTY_MOVES_RULE = 64;
+
   const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
+  const gameStatus = ref(GAME_STATUS_IDLE);
+
+  function getGameStatus() {
+    return gameStatus.value;
+  }
+
+  function updateGameStatusIfFinished() {
+    if (game.value.in_checkmate()) {
+      const isWhiteTurn = game.value.turn() === "w";
+      gameStatus.value = isWhiteTurn
+        ? GAME_STATUS_BLACK_WIN
+        : GAME_STATUS_WHITE_WIN;
+    } else if (game.value.in_stalemate()) {
+      gameStatus.value = GAME_STATUS_DRAW_STALEMATE;
+    } else if (game.value.in_threefold_repetition()) {
+      gameStatus.value = GAME_STATUS_DRAW_THREE_FOLD_REPETITION;
+    } else if (game.value.insufficient_material()) {
+      gameStatus.value = GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL;
+    } else if (game.value.in_draw()) {
+      gameStatus.value = GAME_STATUS_DRAW_FIFTY_MOVES_RULE;
+    }
+  }
 
   function startNewGame(
     startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   ) {
     game.value = new Chess(startPosition);
+    gameStatus.value = GAME_STATUS_RUNNING;
   }
 
   const piecesValues = computed(() => {
@@ -148,6 +180,7 @@ export default function useChessBoardLogic() {
     });
 
     game.value = new Chess(game.value.fen());
+    updateGameStatusIfFinished();
   }
 
   function isPromotionMove({ startFile, startRank, endRank }) {
@@ -157,7 +190,10 @@ export default function useChessBoardLogic() {
     const isMovingAPawn = movingPiece?.type === "p";
 
     if (!isMovingAPawn) return false;
-    return (isWhiteTurn.value && endRank === 7) || (!isWhiteTurn.value && endRank === 0);
+    return (
+      (isWhiteTurn.value && endRank === 7) ||
+      (!isWhiteTurn.value && endRank === 0)
+    );
   }
 
   return {
@@ -170,5 +206,14 @@ export default function useChessBoardLogic() {
     makeMove,
     isPromotionMove,
     startNewGame,
+    getGameStatus,
+    GAME_STATUS_IDLE,
+    GAME_STATUS_RUNNING,
+    GAME_STATUS_WHITE_WIN,
+    GAME_STATUS_BLACK_WIN,
+    GAME_STATUS_DRAW_STALEMATE,
+    GAME_STATUS_DRAW_THREE_FOLD_REPETITION,
+    GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL,
+    GAME_STATUS_DRAW_FIFTY_MOVES_RULE,
   };
 }

@@ -17,7 +17,16 @@
         :style="[{ width: sizePx, height: sizePx }, gameZoneStyle]"
       >
         <div class="chessboard" :style="chessboardStyle">
-          <ChessBoard :sizePx="size" :reversed="boardReversed" ref="boardComponent"/>
+          <ChessBoard
+            :sizePx="size"
+            :reversed="boardReversed"
+            ref="boardComponent"
+            @win="handleWin"
+            @stalemate="handleStalemate"
+            @three-fold-repetition="handleThreeFoldRepetition"
+            @insufficient-material="handleInsufficientMaterial"
+            @fifty-moves="handleFiftyMoves"
+          />
         </div>
         <div :style="metaStyle">
           <ion-icon
@@ -44,6 +53,7 @@ import {
   IonTitle,
   IonContent,
   IonIcon,
+  toastController,
 } from "@ionic/vue";
 import { swapVertical, gameControllerOutline } from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
@@ -62,7 +72,6 @@ export default {
     IonIcon,
   },
   setup() {
-
     const boardComponent = ref(null);
 
     const boardReversed = ref(false);
@@ -130,6 +139,35 @@ export default {
       return size.value + "px";
     });
 
+    async function showToast(message, duration = 1100) {
+      const toast = await toastController
+        .create({
+          message,
+          duration: duration,
+        })
+      return toast.present();
+    }
+
+    function handleWin(whiteSide) {
+      showToast(whiteSide ? 'White has won.' : 'Black has won');
+    }
+
+    function handleStalemate() {
+      showToast('Stalemate');
+    }
+
+    function handleThreeFoldRepetition() {
+      showToast('Draw by three-fold repetition');
+    }
+
+    function handleInsufficientMaterial() {
+      showToast('Draw by insufficient material');
+    }
+
+    function handleFiftyMoves() {
+      showToast('Draw by the fifty moves rule');
+    }
+
     function computeMetaZoneDirection() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
@@ -187,6 +225,11 @@ export default {
       boardReversed,
       boardComponent,
       startNewGame,
+      handleWin,
+      handleStalemate,
+      handleThreeFoldRepetition,
+      handleInsufficientMaterial,
+      handleFiftyMoves,
     };
   },
 };
