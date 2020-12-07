@@ -17,13 +17,18 @@
         :style="[{ width: sizePx, height: sizePx }, gameZoneStyle]"
       >
         <div class="chessboard" :style="chessboardStyle">
-          <ChessBoard :sizePx="size" :reversed="boardReversed" />
+          <ChessBoard :sizePx="size" :reversed="boardReversed" ref="boardComponent"/>
         </div>
         <div :style="metaStyle">
           <ion-icon
             :icon="swapVertical"
             :style="metaButtonStyle"
             @click="boardReversed = !boardReversed"
+          />
+          <ion-icon
+            :icon="gameControllerOutline"
+            :style="metaButtonStyle"
+            @click="startNewGame"
           />
         </div>
       </div>
@@ -40,7 +45,7 @@ import {
   IonContent,
   IonIcon,
 } from "@ionic/vue";
-import { swapVertical } from "ionicons/icons";
+import { swapVertical, gameControllerOutline } from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard.vue";
@@ -57,7 +62,14 @@ export default {
     IonIcon,
   },
   setup() {
+
+    const boardComponent = ref(null);
+
     const boardReversed = ref(false);
+
+    function startNewGame() {
+      boardComponent.value.startNewGame();
+    }
 
     function computeSize() {
       const orientationType = ScreenOrientation.type;
@@ -110,7 +122,7 @@ export default {
       color: "blue",
       width: "10%",
       height: "66%",
-      margin: "1.5% 5%",
+      margin: "1.5% 0.5%",
       border: "1px solid black",
     });
 
@@ -131,7 +143,7 @@ export default {
 
       const width = isPortrait ? "10%" : "60%";
       const height = isPortrait ? "66%" : "15%";
-      const margin = isPortrait ? "2% 5%" : "15% 18%";
+      const margin = isPortrait ? "2% 2%" : "8% 18%";
 
       return { width, height, margin };
     }
@@ -171,7 +183,10 @@ export default {
       metaStyle,
       metaButtonStyle,
       swapVertical,
+      gameControllerOutline,
       boardReversed,
+      boardComponent,
+      startNewGame,
     };
   },
 };

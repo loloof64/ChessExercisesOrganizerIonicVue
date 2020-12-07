@@ -209,6 +209,7 @@ export default {
       terminatePromotionMove,
       makeMove,
       resetDndState,
+      startNewGame,
     };
   },
 };
