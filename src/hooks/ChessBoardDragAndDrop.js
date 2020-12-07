@@ -58,6 +58,8 @@ export default function useChessBoardDragAndDrop() {
 
     dndState.startFile = file;
     dndState.startRank = rank;
+    dndState.endFile = file;
+    dndState.endRank = rank;
 
     dndState.draggedPieceX = x - cellsSize * 0.5;
     dndState.draggedPieceY = y - cellsSize * 0.5;
