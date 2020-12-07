@@ -41,7 +41,7 @@
 
 <script>
 import { createGesture } from "@ionic/vue";
-import { ref, onMounted, watch } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
@@ -73,6 +73,8 @@ export default {
 
     const promotionDialogOpen = ref(false);
     const promotionDialogWhitePlayer = ref(true);
+
+    const draggedPieceLocationRatio = reactive({x: null, y: null});
 
     const { sizePixels, cellsSizePixels } = useChessBoardGraphic();
 
@@ -160,8 +162,30 @@ export default {
       dndState.draggedPieceY = newDraggedPieceY;
     }
 
+    function adaptDraggedPieceLocationForResizedConfiguration() {
+      const newDraggedPieceX = getLocationPxFromRatio(draggedPieceLocationRatio.x);
+      const newDraggedPieceY = getLocationPxFromRatio(draggedPieceLocationRatio.y);
+
+      dndState.draggedPieceX = newDraggedPieceX;
+      dndState.draggedPieceY = newDraggedPieceY;
+    }
+
     watch([() => props.reversed], () => {
       adaptDraggedPieceLocationForReversedConfiguration();
+    });
+
+    watch([() => props.sizePx], () => {
+      adaptDraggedPieceLocationForResizedConfiguration();
+    });
+
+    watch([() => dndState.draggedPieceX], () => {
+      if (dndState.draggedPieceX === null)  draggedPieceLocationRatio.x = null;
+      else draggedPieceLocationRatio.x = getLocationRatio(dndState.draggedPieceX);
+    });
+
+    watch([() => dndState.draggedPieceY], () => {
+      if (dndState.draggedPieceY === null)  draggedPieceLocationRatio.y = null;
+      else draggedPieceLocationRatio.y = getLocationRatio(dndState.draggedPieceY);
     });
 
     startNewGame();
