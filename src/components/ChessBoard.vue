@@ -89,6 +89,7 @@ export default {
       isPromotionMove,
       startNewGame,
       getGameStatus,
+      GAME_STATUS_RUNNING,
       GAME_STATUS_WHITE_WIN,
       GAME_STATUS_BLACK_WIN,
       GAME_STATUS_DRAW_STALEMATE,
@@ -143,7 +144,8 @@ export default {
     onMounted(function () {
       const boardGesture = createGesture({
         el: document.querySelector(".board_dnd_layer"),
-        onStart: (detail) =>
+        onStart: (detail) => {
+          if (getGameStatus() !== GAME_STATUS_RUNNING) return;
           handleDragStart({
             detail,
             boardSizePx: props.sizePx,
@@ -151,8 +153,10 @@ export default {
             piecesValues,
             piecesPaths,
             whiteTurn: isWhiteTurn.value,
-          }),
+          });
+        },
         onEnd: () => {
+          if (getGameStatus() !== GAME_STATUS_RUNNING) return;
           handleDragEnd({
             isLegalMove,
             makeMove,
@@ -161,12 +165,14 @@ export default {
           });
           emitEndGameStatusIfAppropriate();
         },
-        onMove: (detail) =>
+        onMove: (detail) => {
+          if (getGameStatus() !== GAME_STATUS_RUNNING) return;
           handleDragMove({
             detail,
             boardSizePx: props.sizePx,
             reversed: props.reversed,
-          }),
+          });
+        },
         threshold: 0,
       });
 
