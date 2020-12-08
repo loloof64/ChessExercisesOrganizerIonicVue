@@ -13,6 +13,7 @@
     "@capacitor/android": "^2.4.2",
     "@capacitor/core": "2.4.2",
     "@ionic-native/core": "^5.29.0",
+    "@ionic-native/globalization": "^5.30.0",
     "@ionic-native/screen-orientation": "^5.29.0",
     "@ionic/lab": "^3.2.9",
     "@ionic/vue": "^5.4.0",
@@ -20,6 +21,7 @@
     "chess.js": "^0.11.0",
     "core-js": "^3.6.5",
     "vue": "^3.0.0-0",
+    "vue-i18n": "^9.0.0-beta.10",
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {

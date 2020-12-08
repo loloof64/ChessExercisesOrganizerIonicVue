@@ -57,6 +57,7 @@ import {
 } from "@ionic/vue";
 import { swapVertical, gameControllerOutline } from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
+import {useI18n} from 'vue-i18n';
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard.vue";
 
@@ -72,6 +73,8 @@ export default {
     IonIcon,
   },
   setup() {
+    const { t } = useI18n();
+
     const boardComponent = ref(null);
 
     const boardReversed = ref(false);
@@ -149,23 +152,23 @@ export default {
     }
 
     function handleWin(whiteSide) {
-      showToast(whiteSide ? 'White has won.' : 'Black has won');
+      showToast(whiteSide ? t('game.white_win') : t('game.black_win') );
     }
 
     function handleStalemate() {
-      showToast('Stalemate');
+      showToast(t('game.stalemate'));
     }
 
     function handleThreeFoldRepetition() {
-      showToast('Draw by three-fold repetition');
+      showToast(t('game.draw_three_fold'));
     }
 
     function handleInsufficientMaterial() {
-      showToast('Draw by insufficient material');
+      showToast(t('game.draw_missing_material'));
     }
 
     function handleFiftyMoves() {
-      showToast('Draw by the fifty moves rule');
+      showToast(t('game.draw_fifty_moves'));
     }
 
     function computeMetaZoneDirection() {
