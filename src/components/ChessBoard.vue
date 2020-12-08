@@ -255,6 +255,7 @@ export default {
       makeMove,
       resetDndState,
       startNewGame,
+      getGameStatus,
     };
   },
 };

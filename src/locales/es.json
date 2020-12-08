@@ -1,4 +1,8 @@
 {
+  "general": {
+    "ok_button": "Okay",
+    "cancel_button": "Cancelar"
+  },
   "game": {
     "white_win": "Los blancos ganaron.",
     "black_win": "Los negros ganaron.",
@@ -6,5 +10,9 @@
     "draw_three_fold": "Nulo por triple repetición de posición.",
     "draw_missing_material": "Nulo por falta de material.",
     "draw_fifty_moves": "Nulo por la regla de los cincuenta movimientos."
-  }
+  },
+  "game_page": {
+    "confirm_restart_title": "¿Confirmar reinicio?",
+    "confirm_restart_message": "¿De verdad quieres empezar un nuevo juego y dejar este?"
+  }   
 }

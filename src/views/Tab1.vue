@@ -54,6 +54,7 @@ import {
   IonContent,
   IonIcon,
   toastController,
+  alertController,
 } from "@ionic/vue";
 import { swapVertical, gameControllerOutline } from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
@@ -85,8 +86,35 @@ export default {
 
     const boardReversed = ref(false);
 
-    function startNewGame() {
-      boardComponent.value.startNewGame();
+    function getTranslation(key) {
+      return t(key, {}, { locale: locale.value });
+    }
+
+    async function startNewGame() {
+      const alert = await alertController.create({
+        cssClass: "confirmDialog",
+        header: getTranslation("game_page.confirm_restart_title"),
+        message: getTranslation("game_page.confirm_restart_message"),
+        buttons: [
+          {
+            text: getTranslation("general.cancel_button"),
+            role: "cancel",
+            cssClass: "secondaryButton",
+            handler: () => {
+              // Nothing to do here
+            },
+          },
+          {
+            text: getTranslation("general.ok_button"),
+            role: "primary",
+            cssClass: "primaryButton",
+            handler: () => {
+              boardComponent.value.startNewGame();
+            },
+          },
+        ],
+      });
+      return alert.present();
     }
 
     function computeSize() {
@@ -246,3 +274,21 @@ export default {
   },
 };
 </script>
+
+<style>
+.confirmDialog .alert-wrapper{
+  background-color: rgba(45, 211, 211, 0.6);
+}
+
+.primaryButton.alert-button{
+  background-color: green;
+  color: white;
+  border-radius: 20%;
+}
+
+.secondaryButton.alert-button{
+  background-color: red;
+  color: white;
+  border-radius: 20%;
+}
+</style>
