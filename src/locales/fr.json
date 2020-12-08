@@ -1,4 +1,4 @@
-export default {
+{
   "game": {
     "white_win": "Les Blancs ont gagné.",
     "black_win": "Les Noirs ont gagné.",

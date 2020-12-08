@@ -57,7 +57,7 @@ import {
 } from "@ionic/vue";
 import { swapVertical, gameControllerOutline } from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
-import {useI18n} from 'vue-i18n';
+import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard.vue";
 
@@ -73,7 +73,13 @@ export default {
     IonIcon,
   },
   setup() {
+    const locale = ref(null);
+
     const { t } = useI18n();
+
+    if (window.Intl && typeof window.Intl === "object") {
+      locale.value = navigator.language.substring(0, 2);
+    }
 
     const boardComponent = ref(null);
 
@@ -143,32 +149,35 @@ export default {
     });
 
     async function showToast(message, duration = 1100) {
-      const toast = await toastController
-        .create({
-          message,
-          duration: duration,
-        })
+      const toast = await toastController.create({
+        message,
+        duration: duration,
+      });
       return toast.present();
     }
 
     function handleWin(whiteSide) {
-      showToast(whiteSide ? t('game.white_win') : t('game.black_win') );
+      showToast(
+        whiteSide
+          ? t("game.white_win", {}, { locale: locale.value })
+          : t("game.black_win", {}, { locale: locale.value })
+      );
     }
 
     function handleStalemate() {
-      showToast(t('game.stalemate'));
+      showToast(t("game.stalemate", {}, { locale: locale.value }));
     }
 
     function handleThreeFoldRepetition() {
-      showToast(t('game.draw_three_fold'));
+      showToast(t("game.draw_three_fold", {}, { locale: locale.value }));
     }
 
     function handleInsufficientMaterial() {
-      showToast(t('game.draw_missing_material'));
+      showToast(t("game.draw_missing_material", {}, { locale: locale.value }));
     }
 
     function handleFiftyMoves() {
-      showToast(t('game.draw_fifty_moves'));
+      showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
     }
 
     function computeMetaZoneDirection() {

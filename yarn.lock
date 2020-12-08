@@ -960,13 +960,6 @@
   dependencies:
     "@types/cordova" latest
 
-"@ionic-native/globalization@^5.30.0":
-  version "5.30.0"
-  resolved "https://registry.yarnpkg.com/@ionic-native/globalization/-/globalization-5.30.0.tgz#2ddffd6b04222a65cb1e4ed48cbe661bae876e2a"
-  integrity sha512-HpBUrykqGjlU8Mkhk5MVflCYk56gV6tK91P0Xv0hSH2t3fsmaceWpJuegmWTMTx9SRifP+aLpJ0UmTVU72zc4w==
-  dependencies:
-    "@types/cordova" latest
-
 "@ionic-native/screen-orientation@^5.29.0":
   version "5.30.0"
   resolved "https://registry.yarnpkg.com/@ionic-native/screen-orientation/-/screen-orientation-5.30.0.tgz#9d8f5aab09b85fc3f321223ce8ef3b58e696495c"
