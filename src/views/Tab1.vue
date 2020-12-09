@@ -133,12 +133,12 @@ export default {
 
     function startNewGame() {
       if (boardComponent.value.gameIsIdle()) {
-        boardComponent.value.startNewGame();
+        doStartNewGame();
       } else {
         showConfirmDialog({
           title: getTranslation("game_page.confirm_restart_title"),
           message: getTranslation("game_page.confirm_restart_message"),
-          onConfirm: () => boardComponent.value.startNewGame(),
+          onConfirm: () => doStartNewGame(),
         });
       }
     }
@@ -151,6 +151,11 @@ export default {
           onConfirm: () => boardComponent.value.stopCurrentGame(),
         });
       }
+    }
+
+    function doStartNewGame() {
+      historyComponent.value.startNewGame();
+      boardComponent.value.startNewGame();
     }
 
     function computeSize() {

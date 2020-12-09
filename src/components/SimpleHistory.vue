@@ -12,7 +12,7 @@
       class="element"
       v-for="(singleElement, index) in elements"
       :key="index"
-      >{{ singleElement.fan }}</span
+      >{{ singleElement.text }}</span
     >
   </div>
 </template>
@@ -29,6 +29,11 @@ export default {
   setup(props) {
     const elements = reactive([]);
 
+    function startNewGame() {
+        elements.splice(0, elements.length);
+        elements.push({text: "1."});
+    }
+
     function historySize() {
       const { sizePx } = props;
       return sizePx;
@@ -40,7 +45,7 @@ export default {
     }
 
     function addMove(moveData) {
-      elements.push(moveData);
+      elements.push({text: moveData.fan});
     }
 
     return {
@@ -48,6 +53,7 @@ export default {
       sizePixels,
       elements,
       addMove,
+      startNewGame,
     };
   },
 };
@@ -61,7 +67,7 @@ export default {
 
 .element {
   color: blue;
-  margin: 0 0.4em;
+  margin: 0 0.2em;
   white-space:nowrap;
 }
 </style>
