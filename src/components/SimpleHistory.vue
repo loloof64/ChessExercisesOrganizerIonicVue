@@ -8,7 +8,7 @@
       },
     ]"
   >
-    <span v-for="(singleElement, index) in elements" :key="index">{{ singleElement.fan }}</span>
+    <span class="element" v-for="(singleElement, index) in elements" :key="index">{{ singleElement.fan }}</span>
   </div>
 </template>
 
@@ -52,5 +52,10 @@ export default {
 <style scoped>
 .simple_history_root {
   background-color: coral;
+}
+
+.element {
+    color: blue;
+    margin: 0 0.4em;
 }
 </style>
