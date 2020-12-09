@@ -8,7 +8,12 @@
       },
     ]"
   >
-    <span class="element" v-for="(singleElement, index) in elements" :key="index">{{ singleElement.fan }}</span>
+    <span
+      class="element"
+      v-for="(singleElement, index) in elements"
+      :key="index"
+      >{{ singleElement.fan }}</span
+    >
   </div>
 </template>
 
@@ -22,8 +27,7 @@ export default {
     },
   },
   setup(props) {
-
-      const elements = reactive([]);
+    const elements = reactive([]);
 
     function historySize() {
       const { sizePx } = props;
@@ -35,8 +39,8 @@ export default {
       return sizePx + "px";
     }
 
-    function addMove(moveData)  {
-        elements.push(moveData);
+    function addMove(moveData) {
+      elements.push(moveData);
     }
 
     return {
@@ -56,7 +60,8 @@ export default {
 }
 
 .element {
-    color: blue;
-    margin: 0 0.4em;
+  color: blue;
+  margin: 0 0.4em;
+  white-space:nowrap;
 }
 </style>
