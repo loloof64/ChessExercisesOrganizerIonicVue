@@ -52,6 +52,7 @@ export default {
 <style scoped>
 .simple_history_root {
   background-color: coral;
+  overflow: scroll;
 }
 
 .element {
