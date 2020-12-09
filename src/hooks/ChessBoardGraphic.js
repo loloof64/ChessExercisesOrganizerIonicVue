@@ -31,11 +31,11 @@ export default function useChessBoardGraphic() {
   }
 
   return {
-      sizePixels,
-      cellsSizePixels,
-      coordinatesFontSize,
-      topBottomCoordinateValue,
-      leftRightCoordinateValue,
-      cellBackgroundClass
+    sizePixels,
+    cellsSizePixels,
+    coordinatesFontSize,
+    topBottomCoordinateValue,
+    leftRightCoordinateValue,
+    cellBackgroundClass,
   };
 }

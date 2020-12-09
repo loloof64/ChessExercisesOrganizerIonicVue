@@ -143,8 +143,10 @@ export default {
 
     // If the game has been stopped for whatever reason, and so the user may need to review the moves.
     function gameIsStalled() {
-      const gameStatus =getGameStatus();
-      return (gameStatus != GAME_STATUS_IDLE) && (gameStatus != GAME_STATUS_RUNNING);
+      const gameStatus = getGameStatus();
+      return (
+        gameStatus != GAME_STATUS_IDLE && gameStatus != GAME_STATUS_RUNNING
+      );
     }
 
     function requestPromotionSelection() {

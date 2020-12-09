@@ -14,7 +14,7 @@
 
       <div
         class="game_zone"
-        :style="[{ width: sizePx, height: sizePx }, gameZoneStyle]"
+        :style="gameZoneStyle"
       >
         <div class="chessboard" :style="chessboardStyle">
           <ChessBoard
@@ -27,6 +27,9 @@
             @insufficient-material="handleInsufficientMaterial"
             @fifty-moves="handleFiftyMoves"
           />
+        </div>
+        <div class="history" :style="historyStyle">
+          <simple-history :sizePx="size" />
         </div>
         <div :style="metaStyle">
           <ion-icon
@@ -69,12 +72,14 @@ import {
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
-import ChessBoard from "@/components/ChessBoard.vue";
+import ChessBoard from "@/components/ChessBoard";
+import SimpleHistory from "@/components/SimpleHistory";
 
 export default {
   name: "Game",
   components: {
     ChessBoard,
+    SimpleHistory,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -152,7 +157,7 @@ export default {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
       const minSize = Math.min(window.innerWidth, window.innerHeight);
-      const sizeRatio = isPortrait ? 0.9 : 0.6;
+      const sizeRatio = isPortrait ? 0.6: 0.6;
       return Math.floor(sizeRatio * minSize);
     }
 
@@ -161,12 +166,12 @@ export default {
       const isPortrait = orientationType.includes("portrait");
 
       const oneDimension = "100%";
-      const twoDimensions = "85% 10%";
+      const threeDimensions = "42%  42% 10%";
 
       if (isPortrait) {
-        return [oneDimension, twoDimensions];
+        return [oneDimension, threeDimensions];
       } else {
-        return [twoDimensions, oneDimension];
+        return [threeDimensions, oneDimension];
       }
     }
 
@@ -177,13 +182,16 @@ export default {
       width: "100%",
       height: "100%",
       "grid-template-columns": "100%",
-      "grid-template-rows": "85% 10%",
+      "grid-template-rows": "42%  42% 10%",
       "flex-direction": "column",
       "justify-content": "center",
       "align-items": "center",
     });
 
     const chessboardStyle = reactive({
+      margin: "auto",
+    });
+    const historyStyle = reactive({
       margin: "auto",
     });
     const metaStyle = reactive({
@@ -289,6 +297,7 @@ export default {
       sizePx,
       gameZoneStyle,
       chessboardStyle,
+      historyStyle,
       metaStyle,
       metaButtonStyle,
       swapVertical,
@@ -308,7 +317,11 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.game_zone {
+  width: 100%;
+  height: 100%;
+}
 .confirmDialog .alert-wrapper {
   background-color: rgba(45, 211, 211, 0.6);
 }
