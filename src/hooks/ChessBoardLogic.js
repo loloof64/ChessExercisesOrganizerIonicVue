@@ -178,7 +178,7 @@ export default function useChessBoardLogic() {
       "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
     const toCellStr = "abcdefgh".charAt(endFile) + "12345678".charAt(endRank);
 
-    game.value.move({
+    const moveResult = game.value.move({
       from: fromCellStr,
       to: toCellStr,
       promotion,
@@ -186,6 +186,8 @@ export default function useChessBoardLogic() {
 
     game.value = new Chess(game.value.fen());
     updateGameStatusIfFinished();
+
+    return moveResult?.san || null;
   }
 
   function isPromotionMove({ startFile, startRank, endRank }) {

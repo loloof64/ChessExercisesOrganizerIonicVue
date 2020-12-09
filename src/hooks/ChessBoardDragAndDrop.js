@@ -73,6 +73,7 @@ export default function useChessBoardDragAndDrop() {
     isPromotionMove,
     requestPromotionSelection,
   }) {
+    let san;
     const moveObject = {
       startFile: dndState.startFile,
       startRank: dndState.startRank,
@@ -90,9 +91,10 @@ export default function useChessBoardDragAndDrop() {
         requestPromotionSelection();
         return;
       }
-      makeMove(moveObject);
+      san = makeMove(moveObject);
     }
     resetDndState();
+    return san;
   }
 
   function handleDragMove({ detail, boardSizePx, reversed }) {
@@ -116,7 +118,7 @@ export default function useChessBoardDragAndDrop() {
     dndState.draggedPieceY = y - cellsSize * 0.5;
   }
 
-  function terminatePromotionMove({type, makeMove}) {
+  function terminatePromotionMove({ type, makeMove, onPromotionMoveDone }) {
     const moveObject = {
       startFile: pendingPromotionMove.startFile,
       startRank: pendingPromotionMove.startRank,
@@ -130,7 +132,9 @@ export default function useChessBoardDragAndDrop() {
     pendingPromotionMove.endFile = undefined;
     pendingPromotionMove.endRank = undefined;
 
-    makeMove(moveObject);
+    const san = makeMove(moveObject);
+
+    if (onPromotionMoveDone) onPromotionMoveDone(san);
 
     resetDndState();
   }

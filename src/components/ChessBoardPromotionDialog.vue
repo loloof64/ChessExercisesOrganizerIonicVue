@@ -3,30 +3,54 @@
     <div id="content">
       <div>Select the promotion piece</div>
       <div id="buttons_zone">
-        <div class="single-button" :style="[{
-          width: buttonsSize,
-          height: buttonsSize,
-        }]" @click="commitPromotion('q')">
+        <div
+          class="single-button"
+          :style="[
+            {
+              width: buttonsSize,
+              height: buttonsSize,
+            },
+          ]"
+          @click="commitPromotion('q')"
+        >
           <ion-img :src="queenPath" />
         </div>
-        <div class="single-button" :style="[{
-          width: buttonsSize,
-          height: buttonsSize,
-        }]" @click="commitPromotion('r')">
+        <div
+          class="single-button"
+          :style="[
+            {
+              width: buttonsSize,
+              height: buttonsSize,
+            },
+          ]"
+          @click="commitPromotion('r')"
+        >
           <ion-img :src="rookPath" />
         </div>
 
-        <div class="single-button" :style="[{
-          width: buttonsSize,
-          height: buttonsSize,
-        }]" @click="commitPromotion('b')">
+        <div
+          class="single-button"
+          :style="[
+            {
+              width: buttonsSize,
+              height: buttonsSize,
+            },
+          ]"
+          @click="commitPromotion('b')"
+        >
           <ion-img :src="bishopPath" />
         </div>
 
-         <div class="single-button" :style="[{
-          width: buttonsSize,
-          height: buttonsSize,
-        }]" @click="commitPromotion('n')">
+        <div
+          class="single-button"
+          :style="[
+            {
+              width: buttonsSize,
+              height: buttonsSize,
+            },
+          ]"
+          @click="commitPromotion('n')"
+        >
           <ion-img :src="knightPath" />
         </div>
       </div>
@@ -93,11 +117,11 @@ export default {
     });
 
     function cancelMove() {
-      context.emit('cancel-move');
+      context.emit("cancel-move");
     }
 
     function commitPromotion(type) {
-      context.emit('commit-promotion', type);
+      context.emit("commit-promotion", type);
     }
 
     return {

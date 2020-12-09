@@ -34,7 +34,10 @@
       :sizePx="sizePx"
       :whitePlayer="promotionDialogWhitePlayer"
       @cancelMove="cancelPromotionSelection"
-      @commitPromotion="(type) => terminatePromotionMove({ type, makeMove })"
+      @commitPromotion="
+        (type) =>
+          terminatePromotionMove({ type, makeMove, onPromotionMoveDone })
+      "
     />
   </div>
 </template>
@@ -159,6 +162,36 @@ export default {
       promotionDialogOpen.value = false;
     }
 
+    function convertSanToFan({ moveSan, whiteTurn }) {
+      moveSan = moveSan
+        .replace(/K/g, whiteTurn ? "\u2654" : "\u265A")
+        .normalize("NFKC");
+      moveSan = moveSan
+        .replace(/Q/g, whiteTurn ? "\u2655" : "\u265B")
+        .normalize("NFKC");
+      moveSan = moveSan
+        .replace(/R/g, whiteTurn ? "\u2656" : "\u265C")
+        .normalize("NFKC");
+      moveSan = moveSan
+        .replace(/B/g, whiteTurn ? "\u2657" : "\u265D")
+        .normalize("NFKC");
+      moveSan = moveSan
+        .replace(/N/g, whiteTurn ? "\u2658" : "\u265E")
+        .normalize("NFKC");
+
+      return moveSan;
+    }
+
+    function onPromotionMoveDone(san) {
+      const whiteTurnBeforeMove = !isWhiteTurn.value;
+      const fan = convertSanToFan({
+        moveSan: san,
+        whiteTurn: whiteTurnBeforeMove,
+      });
+      context.emit("move-done", fan);
+      emitEndGameStatusIfAppropriate();
+    }
+
     onMounted(function () {
       const boardGesture = createGesture({
         el: document.querySelector(".board_dnd_layer"),
@@ -175,12 +208,20 @@ export default {
         },
         onEnd: () => {
           if (getGameStatus() !== GAME_STATUS_RUNNING) return;
-          handleDragEnd({
+          const whiteTurnBeforeMove = isWhiteTurn.value;
+          const san = handleDragEnd({
             isLegalMove,
             makeMove,
             isPromotionMove,
             requestPromotionSelection,
           });
+          if (san) {
+            const fan = convertSanToFan({
+              moveSan: san,
+              whiteTurn: whiteTurnBeforeMove,
+            });
+            context.emit("move-done", fan);
+          }
           emitEndGameStatusIfAppropriate();
         },
         onMove: (detail) => {
@@ -276,6 +317,7 @@ export default {
       gameIsInProgress,
       gameIsIdle,
       gameIsStalled,
+      onPromotionMoveDone,
     };
   },
 };

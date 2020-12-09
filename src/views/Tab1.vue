@@ -23,6 +23,7 @@
             @three-fold-repetition="handleThreeFoldRepetition"
             @insufficient-material="handleInsufficientMaterial"
             @fifty-moves="handleFiftyMoves"
+            @move-done="handleMoveDone"
           />
         </div>
         <div class="history" :style="historyStyle">
@@ -244,6 +245,10 @@ export default {
       showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
     }
 
+    function handleMoveDone(move) {
+      console.log("move", move);
+    }
+
     function computeMetaZoneDirection() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
@@ -309,6 +314,7 @@ export default {
       handleThreeFoldRepetition,
       handleInsufficientMaterial,
       handleFiftyMoves,
+      handleMoveDone,
     };
   },
 };
