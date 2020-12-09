@@ -12,10 +12,7 @@
         </ion-toolbar>
       </ion-header>
 
-      <div
-        class="game_zone"
-        :style="gameZoneStyle"
-      >
+      <div class="game_zone" :style="gameZoneStyle">
         <div class="chessboard" :style="chessboardStyle">
           <ChessBoard
             :sizePx="size"
@@ -157,7 +154,7 @@ export default {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
       const minSize = Math.min(window.innerWidth, window.innerHeight);
-      const sizeRatio = isPortrait ? 0.6: 0.6;
+      const sizeRatio = isPortrait ? 0.5 : 0.6;
       return Math.floor(sizeRatio * minSize);
     }
 
