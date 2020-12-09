@@ -7,10 +7,13 @@
         height: sizePixels(historySize()),
       },
     ]"
-  ></div>
+  >
+    <span v-for="(singleElement, index) in elements" :key="index">{{ singleElement.fan }}</span>
+  </div>
 </template>
 
 <script>
+import { reactive } from "vue";
 export default {
   props: {
     sizePx: {
@@ -19,6 +22,9 @@ export default {
     },
   },
   setup(props) {
+
+      const elements = reactive([]);
+
     function historySize() {
       const { sizePx } = props;
       return sizePx;
@@ -29,9 +35,15 @@ export default {
       return sizePx + "px";
     }
 
+    function addMove(moveData)  {
+        elements.push(moveData);
+    }
+
     return {
       historySize,
       sizePixels,
+      elements,
+      addMove,
     };
   },
 };

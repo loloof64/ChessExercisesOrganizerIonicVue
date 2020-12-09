@@ -27,7 +27,7 @@
           />
         </div>
         <div class="history" :style="historyStyle">
-          <simple-history :sizePx="size" />
+          <simple-history :sizePx="size" ref="historyComponent" />
         </div>
         <div :style="metaStyle">
           <ion-icon
@@ -97,6 +97,8 @@ export default {
     const boardComponent = ref(null);
 
     const boardReversed = ref(false);
+
+    const historyComponent = ref(null);
 
     function getTranslation(key) {
       return t(key, {}, { locale: locale.value });
@@ -246,7 +248,7 @@ export default {
     }
 
     function handleMoveDone(move) {
-      console.log("move", move);
+      historyComponent.value.addMove({fan: move});
     }
 
     function computeMetaZoneDirection() {
@@ -307,6 +309,7 @@ export default {
       stopCircleOutline,
       boardReversed,
       boardComponent,
+      historyComponent,
       startNewGame,
       stopGame,
       handleWin,
