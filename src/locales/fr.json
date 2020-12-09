@@ -13,6 +13,8 @@
   },
   "game_page": {
     "confirm_restart_title": "Confirmer la nouvelle partie ?",
-    "confirm_restart_message": "Souhaitez-vous vraiment démarrer une nouvelle partie et abandonner celle-ci ?"
+    "confirm_restart_message": "Souhaitez-vous vraiment démarrer une nouvelle partie et abandonner celle-ci ?",
+    "confirm_stop_title": "Arrêter ?",
+    "confirm_stop_message": "Souhaitez-vous vraiment arrêter la partie en cours ?"
   }   
 }

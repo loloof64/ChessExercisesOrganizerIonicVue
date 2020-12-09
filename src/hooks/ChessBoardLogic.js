@@ -10,6 +10,7 @@ export default function useChessBoardLogic() {
   const GAME_STATUS_DRAW_THREE_FOLD_REPETITION = 16;
   const GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL = 32;
   const GAME_STATUS_DRAW_FIFTY_MOVES_RULE = 64;
+  const GAME_STATUS_STOPPED = 128;
 
   const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
   const gameStatus = ref(GAME_STATUS_IDLE);
@@ -40,6 +41,10 @@ export default function useChessBoardLogic() {
   ) {
     game.value = new Chess(startPosition);
     gameStatus.value = GAME_STATUS_RUNNING;
+  }
+
+  function stopCurrentGame() {
+    gameStatus.value = GAME_STATUS_STOPPED;
   }
 
   const piecesValues = computed(() => {
@@ -206,6 +211,7 @@ export default function useChessBoardLogic() {
     makeMove,
     isPromotionMove,
     startNewGame,
+    stopCurrentGame,
     getGameStatus,
     GAME_STATUS_IDLE,
     GAME_STATUS_RUNNING,

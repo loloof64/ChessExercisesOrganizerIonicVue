@@ -13,6 +13,8 @@
   },
   "game_page": {
     "confirm_restart_title": "¿Confirmar reinicio?",
-    "confirm_restart_message": "¿De verdad quieres empezar un nuevo juego y dejar este?"
+    "confirm_restart_message": "¿De verdad quiere empezar un nuevo juego y dejar este?",
+    "confirm_stop_title": "¿Detener?",
+    "confirm_stop_message": "¿De verdad quiere detener el juego?"
   }   
 }

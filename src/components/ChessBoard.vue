@@ -88,7 +88,9 @@ export default {
       makeMove,
       isPromotionMove,
       startNewGame,
+      stopCurrentGame,
       getGameStatus,
+      GAME_STATUS_IDLE,
       GAME_STATUS_RUNNING,
       GAME_STATUS_WHITE_WIN,
       GAME_STATUS_BLACK_WIN,
@@ -129,6 +131,20 @@ export default {
           context.emit("fifty-moves");
           break;
       }
+    }
+
+    function gameIsInProgress() {
+      return getGameStatus() === GAME_STATUS_RUNNING;
+    }
+
+    function gameIsIdle() {
+      return getGameStatus() === GAME_STATUS_IDLE;
+    }
+
+    // If the game has been stopped for whatever reason, and so the user may need to review the moves.
+    function gameIsStalled() {
+      const gameStatus =getGameStatus();
+      return (gameStatus != GAME_STATUS_IDLE) && (gameStatus != GAME_STATUS_RUNNING);
     }
 
     function requestPromotionSelection() {
@@ -233,8 +249,6 @@ export default {
         draggedPieceLocationRatio.y = getLocationRatio(dndState.draggedPieceY);
     });
 
-    startNewGame();
-
     return {
       boardSize,
       sizePixels,
@@ -255,7 +269,11 @@ export default {
       makeMove,
       resetDndState,
       startNewGame,
+      stopCurrentGame,
       getGameStatus,
+      gameIsInProgress,
+      gameIsIdle,
+      gameIsStalled,
     };
   },
 };

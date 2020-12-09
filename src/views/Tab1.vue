@@ -39,6 +39,11 @@
             :style="metaButtonStyle"
             @click="startNewGame"
           />
+          <ion-icon
+            :icon="stopCircleOutline"
+            :style="metaButtonStyle"
+            @click="stopGame"
+          />
         </div>
       </div>
     </ion-content>
@@ -56,7 +61,11 @@ import {
   toastController,
   alertController,
 } from "@ionic/vue";
-import { swapVertical, gameControllerOutline } from "ionicons/icons";
+import {
+  swapVertical,
+  gameControllerOutline,
+  stopCircleOutline,
+} from "ionicons/icons";
 import { ref, reactive, computed, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
@@ -90,18 +99,18 @@ export default {
       return t(key, {}, { locale: locale.value });
     }
 
-    async function startNewGame() {
+    async function showConfirmDialog({ title, message, onCancel, onConfirm }) {
       const alert = await alertController.create({
         cssClass: "confirmDialog",
-        header: getTranslation("game_page.confirm_restart_title"),
-        message: getTranslation("game_page.confirm_restart_message"),
+        header: title,
+        message: message,
         buttons: [
           {
             text: getTranslation("general.cancel_button"),
             role: "cancel",
             cssClass: "secondaryButton",
             handler: () => {
-              // Nothing to do here
+              if (onCancel) onCancel();
             },
           },
           {
@@ -109,12 +118,34 @@ export default {
             role: "primary",
             cssClass: "primaryButton",
             handler: () => {
-              boardComponent.value.startNewGame();
+              if (onConfirm) onConfirm();
             },
           },
         ],
       });
-      return alert.present();
+      alert.present();
+    }
+
+    function startNewGame() {
+      if (boardComponent.value.gameIsIdle()) {
+        boardComponent.value.startNewGame();
+      } else {
+        showConfirmDialog({
+          title: getTranslation("game_page.confirm_restart_title"),
+          message: getTranslation("game_page.confirm_restart_message"),
+          onConfirm: () => boardComponent.value.startNewGame(),
+        });
+      }
+    }
+
+    function stopGame() {
+      if (boardComponent.value.gameIsInProgress()) {
+        showConfirmDialog({
+          title: getTranslation("game_page.confirm_stop_title"),
+          message: getTranslation("game_page.confirm_stop_message"),
+          onConfirm: () => boardComponent.value.stopCurrentGame(),
+        });
+      }
     }
 
     function computeSize() {
@@ -262,9 +293,11 @@ export default {
       metaButtonStyle,
       swapVertical,
       gameControllerOutline,
+      stopCircleOutline,
       boardReversed,
       boardComponent,
       startNewGame,
+      stopGame,
       handleWin,
       handleStalemate,
       handleThreeFoldRepetition,
@@ -276,17 +309,17 @@ export default {
 </script>
 
 <style>
-.confirmDialog .alert-wrapper{
+.confirmDialog .alert-wrapper {
   background-color: rgba(45, 211, 211, 0.6);
 }
 
-.primaryButton.alert-button{
+.primaryButton.alert-button {
   background-color: green;
   color: white;
   border-radius: 20%;
 }
 
-.secondaryButton.alert-button{
+.secondaryButton.alert-button {
   background-color: red;
   color: white;
   border-radius: 20%;

@@ -13,6 +13,8 @@
   },
   "game_page": {
     "confirm_restart_title": "Confirm restart ?",
-    "confirm_restart_message": "Do you really want to start a new game and leave this one ?"
+    "confirm_restart_message": "Do you really want to start a new game and leave this one ?",
+    "confirm_stop_title": "Stop ?",
+    "confirm_stop_message": "Do you really want to stop current game ?"
   }
 }
