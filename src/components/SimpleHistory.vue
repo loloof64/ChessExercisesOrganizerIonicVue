@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 export default {
   props: {
     sizePx: {
@@ -28,10 +28,13 @@ export default {
   },
   setup(props) {
     const elements = reactive([]);
+    const moveNumber = ref(-1);
 
     function startNewGame() {
+        moveNumber.value = 1;
+        const text = `${moveNumber.value}.`;
         elements.splice(0, elements.length);
-        elements.push({text: "1."});
+        elements.push({text});
     }
 
     function historySize() {
@@ -46,6 +49,11 @@ export default {
 
     function addMove(moveData) {
       elements.push({text: moveData.fan});
+      if (moveData.blackTurn) {
+          moveNumber.value += 1;
+          const text = `${moveNumber.value}.`;
+          elements.push({text});
+      }
     }
 
     return {

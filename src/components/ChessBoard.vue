@@ -220,7 +220,7 @@ export default {
               moveSan: san,
               whiteTurn: whiteTurnBeforeMove,
             });
-            context.emit("move-done", fan);
+            context.emit("move-done", {fan, blackTurn: isWhiteTurn.value});
           }
           emitEndGameStatusIfAppropriate();
         },

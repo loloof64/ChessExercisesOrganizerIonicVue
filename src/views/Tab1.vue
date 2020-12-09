@@ -252,8 +252,8 @@ export default {
       showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
     }
 
-    function handleMoveDone(move) {
-      historyComponent.value.addMove({ fan: move });
+    function handleMoveDone(moveData) {
+      historyComponent.value.addMove({ ...moveData});
     }
 
     function computeMetaZoneDirection() {
