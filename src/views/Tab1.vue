@@ -253,7 +253,7 @@ export default {
     }
 
     function handleMoveDone(move) {
-      historyComponent.value.addMove({fan: move});
+      historyComponent.value.addMove({ fan: move });
     }
 
     function computeMetaZoneDirection() {
@@ -328,22 +328,23 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .game_zone {
   width: 100%;
   height: 100%;
 }
+
 .confirmDialog .alert-wrapper {
   background-color: rgba(45, 211, 211, 0.6);
 }
 
-.primaryButton.alert-button {
+.confirmDialog .primaryButton.alert-button {
   background-color: green;
   color: white;
   border-radius: 20%;
 }
 
-.secondaryButton.alert-button {
+.confirmDialog .secondaryButton.alert-button {
   background-color: red;
   color: white;
   border-radius: 20%;
