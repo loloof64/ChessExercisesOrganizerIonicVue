@@ -12,6 +12,7 @@
       class="element"
       v-for="(singleElement, index) in elements"
       :key="index"
+      @click="handleSelection(index)"
       >{{ singleElement.text }}</span
     >
   </div>
@@ -26,15 +27,15 @@ export default {
       default: 60,
     },
   },
-  setup(props) {
+  setup(props, context) {
     const elements = reactive([]);
     const moveNumber = ref(-1);
 
     function startNewGame() {
-        moveNumber.value = 1;
-        const text = `${moveNumber.value}.`;
-        elements.splice(0, elements.length);
-        elements.push({text});
+      moveNumber.value = 1;
+      const text = `${moveNumber.value}.`;
+      elements.splice(0, elements.length);
+      elements.push({ text });
     }
 
     function historySize() {
@@ -48,11 +49,22 @@ export default {
     }
 
     function addMove(moveData) {
-      elements.push({text: moveData.fan});
-      if (moveData.blackTurn) {
-          moveNumber.value += 1;
-          const text = `${moveNumber.value}.`;
-          elements.push({text});
+      elements.push({ text: moveData.fan, fen: moveData.fen });
+      if (moveData.blackTurnBeforeMove) {
+        moveNumber.value += 1;
+        const text = `${moveNumber.value}.`;
+        elements.push({ text });
+      }
+    }
+
+    function handleSelection(elementIndex) {
+      const element = elements[elementIndex];
+      const isAMoveElement = element.fen !== undefined;
+      if (isAMoveElement) {
+        context.emit("selection-request", {
+          index: elementIndex,
+          fen: element.fen,
+        });
       }
     }
 
@@ -62,6 +74,7 @@ export default {
       elements,
       addMove,
       startNewGame,
+      handleSelection,
     };
   },
 };
@@ -76,6 +89,6 @@ export default {
 .element {
   color: blue;
   margin: 0 0.2em;
-  white-space:nowrap;
+  white-space: nowrap;
 }
 </style>

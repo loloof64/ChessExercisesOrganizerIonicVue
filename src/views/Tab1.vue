@@ -27,7 +27,11 @@
           />
         </div>
         <div class="history" :style="historyStyle">
-          <simple-history :sizePx="size" ref="historyComponent" />
+          <simple-history
+            :sizePx="size"
+            ref="historyComponent"
+            @selection-request="handleHistorySelectionRequest"
+          />
         </div>
         <div :style="metaStyle">
           <ion-icon
@@ -253,7 +257,15 @@ export default {
     }
 
     function handleMoveDone(moveData) {
-      historyComponent.value.addMove({ ...moveData});
+      historyComponent.value.addMove({ ...moveData });
+    }
+
+    function handleHistorySelectionRequest(data) {
+      const success = boardComponent.value.tryToLoadPosition(data.fen);
+      if (success) {
+        //todo replace by move highliting on hystory
+        console.log(data.index);
+      }
     }
 
     function computeMetaZoneDirection() {
@@ -323,6 +335,7 @@ export default {
       handleInsufficientMaterial,
       handleFiftyMoves,
       handleMoveDone,
+      handleHistorySelectionRequest,
     };
   },
 };

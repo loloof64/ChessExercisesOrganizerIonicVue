@@ -203,6 +203,25 @@ export default function useChessBoardLogic() {
     );
   }
 
+  function getPositionFen() {
+    return game.value.fen();
+  }
+
+  function tryToSetupPositionFen(fen) {
+    const allowedToLoadPosition =
+      gameStatus.value != GAME_STATUS_IDLE &&
+      gameStatus.value != GAME_STATUS_RUNNING;
+    if (allowedToLoadPosition) {
+      const newGame = new Chess();
+      if (newGame.load(fen)) {
+        game.value = newGame;
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
   return {
     getRank,
     getFile,
@@ -215,6 +234,8 @@ export default function useChessBoardLogic() {
     startNewGame,
     stopCurrentGame,
     getGameStatus,
+    getPositionFen,
+    tryToSetupPositionFen,
     GAME_STATUS_IDLE,
     GAME_STATUS_RUNNING,
     GAME_STATUS_WHITE_WIN,

@@ -93,6 +93,8 @@ export default {
       startNewGame,
       stopCurrentGame,
       getGameStatus,
+      getPositionFen,
+      tryToSetupPositionFen,
       GAME_STATUS_IDLE,
       GAME_STATUS_RUNNING,
       GAME_STATUS_WHITE_WIN,
@@ -188,8 +190,17 @@ export default {
         moveSan: san,
         whiteTurn: whiteTurnBeforeMove,
       });
-      context.emit("move-done", fan);
+      const positionFen = getPositionFen();
+      context.emit("move-done", {
+        fan,
+        positionFen,
+        blackTurnBeforeMove: !whiteTurnBeforeMove,
+      });
       emitEndGameStatusIfAppropriate();
+    }
+
+    function tryToLoadPosition(fen) {
+      return tryToSetupPositionFen(fen);
     }
 
     onMounted(function () {
@@ -220,7 +231,12 @@ export default {
               moveSan: san,
               whiteTurn: whiteTurnBeforeMove,
             });
-            context.emit("move-done", {fan, blackTurn: isWhiteTurn.value});
+            const positionFen = getPositionFen();
+            context.emit("move-done", {
+              fan,
+              fen: positionFen,
+              blackTurnBeforeMove: isWhiteTurn.value,
+            });
           }
           emitEndGameStatusIfAppropriate();
         },
@@ -318,6 +334,7 @@ export default {
       gameIsIdle,
       gameIsStalled,
       onPromotionMoveDone,
+      tryToLoadPosition,
     };
   },
 };
