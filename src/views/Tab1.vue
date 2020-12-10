@@ -272,6 +272,15 @@ export default {
       const success = boardComponent.value.tryToLoadPosition(data.fen);
       if (success) {
         historyComponent.value.commitSelection(data.index);
+        const lastMoveArrow = historyComponent.value.getSelectedMoveArrow();
+        if (lastMoveArrow !== undefined) {
+          boardComponent.value.tryToSetLastMoveArrow({
+            startFile: lastMoveArrow.fromFile,
+            startRank: lastMoveArrow.fromRank,
+            endFile: lastMoveArrow.toFile,
+            endRank: lastMoveArrow.toRank
+          });
+        }
       }
     }
 

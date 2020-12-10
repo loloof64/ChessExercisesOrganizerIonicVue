@@ -54,7 +54,7 @@ export default {
     }
 
     function addMove(moveData) {
-      elements.push({ text: moveData.fan, fen: moveData.fen });
+      elements.push({ text: moveData.fan, fen: moveData.fen, lastMoveArrow: moveData.lastMoveArrow });
       if (moveData.blackTurnBeforeMove) {
         moveNumber.value += 1;
         const text = `${moveNumber.value}.`;
@@ -86,6 +86,12 @@ export default {
       }
     }
 
+    function getSelectedMoveArrow() {
+      if (selectedIndex.value < 0) return undefined;
+      const selectedElement = elements[selectedIndex.value];
+      return selectedElement.lastMoveArrow;
+    }
+
     return {
       historySize,
       sizePixels,
@@ -96,6 +102,7 @@ export default {
       commitSelection,
       selectedIndex,
       selectLastHistoryMoveIfThereIsOne,
+      getSelectedMoveArrow,
     };
   },
 };

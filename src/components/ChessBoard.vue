@@ -228,6 +228,15 @@ export default {
       return tryToSetupPositionFen(fen);
     }
 
+    function tryToSetLastMoveArrow({startFile, startRank, endFile, endRank}) {
+      if (gameIsStalled()) {
+        arrowFromFile.value = startFile;
+        arrowFromRank.value = startRank;
+        arrowToFile.value = endFile;
+        arrowToRank.value = endRank;
+      }
+    }
+
     onMounted(function () {
       const boardGesture = createGesture({
         el: document.querySelector(".board_dnd_layer"),
@@ -380,6 +389,7 @@ export default {
       gameIsStalled,
       onPromotionMoveDone,
       tryToLoadPosition,
+      tryToSetLastMoveArrow,
       arrowFromFile,
       arrowFromRank,
       arrowToFile,
