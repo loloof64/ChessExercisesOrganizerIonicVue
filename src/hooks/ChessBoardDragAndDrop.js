@@ -88,8 +88,16 @@ export default function useChessBoardDragAndDrop() {
         pendingPromotionMove.startRank = moveObject.startRank;
         pendingPromotionMove.endFile = moveObject.endFile;
         pendingPromotionMove.endRank = moveObject.endRank;
+
+        const lastMoveCoordinates = {
+          startFile: moveObject.startFile,
+          startRank: moveObject.startRank,
+          endFile: moveObject.endFile,
+          endRank: moveObject.endRank,
+        };
+
         requestPromotionSelection();
-        return;
+        return { san: undefined, lastMoveCoordinates, isPromotion: true };
       }
       san = makeMove(moveObject);
     }

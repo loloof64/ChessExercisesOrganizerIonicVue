@@ -214,6 +214,10 @@ export default {
         toRank: arrowToRank.value,
       };
 
+      //////////////////////////////
+      console.log("lastMoveArrow", lastMoveArrow);
+      ///////////////////////////////
+
       context.emit("move-done", {
         fan,
         positionFen,
@@ -244,7 +248,7 @@ export default {
         onEnd: () => {
           if (getGameStatus() !== GAME_STATUS_RUNNING) return;
           const whiteTurnBeforeMove = isWhiteTurn.value;
-          const { san, lastMoveCoordinates } = handleDragEnd({
+          const { san, lastMoveCoordinates, isPromotion } = handleDragEnd({
             isLegalMove,
             makeMove,
             isPromotionMove,
@@ -276,6 +280,11 @@ export default {
               blackTurnBeforeMove: isWhiteTurn.value,
               lastMoveArrow,
             });
+          } else if (isPromotion) {
+            arrowFromFile.value = lastMoveCoordinates.startFile;
+            arrowFromRank.value = lastMoveCoordinates.startRank;
+            arrowToFile.value = lastMoveCoordinates.endFile;
+            arrowToRank.value = lastMoveCoordinates.endRank;
           }
           emitEndGameStatusIfAppropriate();
         },
