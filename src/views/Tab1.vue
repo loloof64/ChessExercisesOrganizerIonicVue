@@ -152,7 +152,10 @@ export default {
         showConfirmDialog({
           title: getTranslation("game_page.confirm_stop_title"),
           message: getTranslation("game_page.confirm_stop_message"),
-          onConfirm: () => boardComponent.value.stopCurrentGame(),
+          onConfirm: () => {
+            boardComponent.value.stopCurrentGame();
+            historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+          },
         });
       }
     }
@@ -233,6 +236,7 @@ export default {
     }
 
     function handleWin(whiteSide) {
+      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       showToast(
         whiteSide
           ? t("game.white_win", {}, { locale: locale.value })
@@ -241,18 +245,22 @@ export default {
     }
 
     function handleStalemate() {
+      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       showToast(t("game.stalemate", {}, { locale: locale.value }));
     }
 
     function handleThreeFoldRepetition() {
+      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       showToast(t("game.draw_three_fold", {}, { locale: locale.value }));
     }
 
     function handleInsufficientMaterial() {
+      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       showToast(t("game.draw_missing_material", {}, { locale: locale.value }));
     }
 
     function handleFiftyMoves() {
+      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
     }
 

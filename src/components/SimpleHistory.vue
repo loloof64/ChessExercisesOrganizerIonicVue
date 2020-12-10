@@ -11,7 +11,7 @@
     <span
       class="element"
       :class="{
-          highlighted: selectedIndex === index,
+        highlighted: selectedIndex === index,
       }"
       v-for="(singleElement, index) in elements"
       :key="index"
@@ -74,7 +74,16 @@ export default {
     }
 
     function commitSelection(elementIndex) {
-        selectedIndex.value = elementIndex;
+      selectedIndex.value = elementIndex;
+    }
+
+    function selectLastHistoryMoveIfThereIsOne() {
+      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      if (historyMoves.length > 0) {
+        const lastHistoryElement = historyMoves[historyMoves.length - 1];
+        const lastHistoryIndex = elements.indexOf(lastHistoryElement);
+        selectedIndex.value = lastHistoryIndex;
+      }
     }
 
     return {
@@ -86,6 +95,7 @@ export default {
       handleSelection,
       commitSelection,
       selectedIndex,
+      selectLastHistoryMoveIfThereIsOne,
     };
   },
 };
@@ -103,7 +113,7 @@ export default {
   white-space: nowrap;
 }
 
-.element.highlighted{
-    background-color: yellow;
+.element.highlighted {
+  background-color: yellow;
 }
 </style>
