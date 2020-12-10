@@ -19,16 +19,16 @@
     >
       <ion-icon
         :icon="playSkipBackCircleOutline"
-        class="singleNavigationButton"
+        :style="singleNavigationButtonStyle"
       />
-      <ion-icon :icon="playBackCircleOutline" class="singleNavigationButton" />
+      <ion-icon :icon="playBackCircleOutline" :style="singleNavigationButtonStyle" />
       <ion-icon
         :icon="playForwardCircleOutline"
-        class="singleNavigationButton"
+        :style="singleNavigationButtonStyle"
       />
       <ion-icon
         :icon="playSkipForwardCircleOutline"
-        class="singleNavigationButton"
+        :style="singleNavigationButtonStyle"
       />
     </div>
 
@@ -56,8 +56,9 @@
 </template>
 
 <script>
-import { reactive, ref, computed } from "vue";
+import { reactive, ref,  computed, onBeforeUnmount } from "vue";
 import { IonIcon } from "@ionic/vue";
+import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import {
   playBackCircleOutline,
   playSkipBackCircleOutline,
@@ -78,6 +79,10 @@ export default {
     const elements = reactive([]);
     const moveNumber = ref(-1);
     const selectedIndex = ref(-1);
+
+    const singleNavigationButtonStyle = reactive({
+      'background-color': 'yellowgreen',
+    });
 
     function startNewGame() {
       moveNumber.value = 1;
@@ -140,6 +145,19 @@ export default {
       return selectedElement.lastMoveArrow;
     }
 
+    function computeNavigationButtonsStyle() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+      if (isPortrait) {
+        singleNavigationButtonStyle.width = '6 vw';
+        singleNavigationButtonStyle.height = '6 vw';
+      }
+      else {
+        singleNavigationButtonStyle.width = '6.2 vh';
+        singleNavigationButtonStyle.height = '6.2 vh';
+      }
+    }
+
     const navigationHeight = computed(() => {
       return props.sizePx * 0.1;
     });
@@ -147,6 +165,14 @@ export default {
     const movesZoneHeight = computed(() => {
       return props.sizePx * 0.85;
     });
+
+    window.addEventListener("orientationchange", computeNavigationButtonsStyle);
+
+    onBeforeUnmount(function () {
+      window.removeEventListener("orientationchange", computeNavigationButtonsStyle);
+    });
+
+    computeNavigationButtonsStyle();
 
     return {
       historySize,
@@ -166,6 +192,7 @@ export default {
       playSkipForwardCircleOutline,
       navigationHeight,
       movesZoneHeight,
+      singleNavigationButtonStyle,
     };
   },
 };
@@ -196,9 +223,5 @@ export default {
   justify-content: space-around;
   align-items: center;
   background-color: rgba(57, 16, 243);
-}
-
-.singleNavigationButton {
-  background-color: yellowgreen;
 }
 </style>
