@@ -8,27 +8,71 @@
       },
     ]"
   >
-    <span
-      class="element"
-      :class="{
-        highlighted: selectedIndex === index,
-      }"
-      v-for="(singleElement, index) in elements"
-      :key="index"
-      @click="handleSelection(index)"
-      >{{ singleElement.text }}</span
+    <div
+      class="navigationButtons"
+      :style="[
+        {
+          width: sizePixels(historySize()),
+          height: sizePixels(navigationHeight),
+        },
+      ]"
     >
+      <ion-icon
+        :icon="playSkipBackCircleOutline"
+        class="singleNavigationButton"
+      />
+      <ion-icon :icon="playBackCircleOutline" class="singleNavigationButton" />
+      <ion-icon
+        :icon="playForwardCircleOutline"
+        class="singleNavigationButton"
+      />
+      <ion-icon
+        :icon="playSkipForwardCircleOutline"
+        class="singleNavigationButton"
+      />
+    </div>
+
+    <div
+      class="movesZone"
+      :style="[
+        {
+          width: sizePixels(historySize()),
+          height: sizePixels(movesZoneHeight),
+        },
+      ]"
+    >
+      <span
+        class="element"
+        :class="{
+          highlighted: selectedIndex === index,
+        }"
+        v-for="(singleElement, index) in elements"
+        :key="index"
+        @click="handleSelection(index)"
+        >{{ singleElement.text }}</span
+      >
+    </div>
   </div>
 </template>
 
 <script>
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
+import { IonIcon } from "@ionic/vue";
+import {
+  playBackCircleOutline,
+  playSkipBackCircleOutline,
+  playForwardCircleOutline,
+  playSkipForwardCircleOutline,
+} from "ionicons/icons";
 export default {
   props: {
     sizePx: {
       type: Number,
       default: 60,
     },
+  },
+  components: {
+    IonIcon,
   },
   setup(props, context) {
     const elements = reactive([]);
@@ -54,7 +98,11 @@ export default {
     }
 
     function addMove(moveData) {
-      elements.push({ text: moveData.fan, fen: moveData.fen, lastMoveArrow: moveData.lastMoveArrow });
+      elements.push({
+        text: moveData.fan,
+        fen: moveData.fen,
+        lastMoveArrow: moveData.lastMoveArrow,
+      });
       if (moveData.blackTurnBeforeMove) {
         moveNumber.value += 1;
         const text = `${moveNumber.value}.`;
@@ -92,6 +140,14 @@ export default {
       return selectedElement.lastMoveArrow;
     }
 
+    const navigationHeight = computed(() => {
+      return props.sizePx * 0.1;
+    });
+
+    const movesZoneHeight = computed(() => {
+      return props.sizePx * 0.85;
+    });
+
     return {
       historySize,
       sizePixels,
@@ -103,6 +159,13 @@ export default {
       selectedIndex,
       selectLastHistoryMoveIfThereIsOne,
       getSelectedMoveArrow,
+      IonIcon,
+      playBackCircleOutline,
+      playSkipBackCircleOutline,
+      playForwardCircleOutline,
+      playSkipForwardCircleOutline,
+      navigationHeight,
+      movesZoneHeight,
     };
   },
 };
@@ -110,6 +173,9 @@ export default {
 
 <style scoped>
 .simple_history_root {
+}
+
+.movesZone {
   background-color: coral;
   overflow: scroll;
 }
@@ -122,5 +188,16 @@ export default {
 
 .element.highlighted {
   background-color: yellow;
+}
+
+.navigationButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  background-color: rgba(57, 16, 243);
+}
+
+.singleNavigationButton {
 }
 </style>
