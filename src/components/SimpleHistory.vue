@@ -199,5 +199,6 @@ export default {
 }
 
 .singleNavigationButton {
+  background-color: yellowgreen;
 }
 </style>
