@@ -94,7 +94,13 @@ export default function useChessBoardDragAndDrop() {
       san = makeMove(moveObject);
     }
     resetDndState();
-    return san;
+    const lastMoveCoordinates = {
+      fromFile: moveObject.startFile,
+      fromRank: moveObject.startRank,
+      toFile: moveObject.endFile,
+      toRank: moveObject.endRank,
+    };
+    return { san, lastMoveCoordinates };
   }
 
   function handleDragMove({ detail, boardSizePx, reversed }) {

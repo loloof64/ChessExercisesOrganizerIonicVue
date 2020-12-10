@@ -22,6 +22,15 @@
       :piecesPaths="piecesPaths"
     />
 
+    <ChessBoardArrowLayer
+      :sizePx="sizePx"
+      :reversed="reversed"
+      :fromFile="arrowFromFile"
+      :fromRank="arrowFromRank"
+      :toFile="arrowToFile"
+      :toRank="arrowToRank"
+    />
+
     <ChessBoardDndLayer
       :sizePx="sizePx"
       :reversed="reversed"
@@ -49,6 +58,7 @@ import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
 import ChessBoardMainLayer from "@/components/ChessBoardMainLayer";
+import ChessBoardArrowLayer from "@/components/ChessBoardArrowLayer";
 import ChessBoardDndLayer from "@/components/ChessBoardDndLayer";
 import ChessBoardPromotionDialog from "@/components/ChessBoardPromotionDialog";
 
@@ -65,6 +75,7 @@ export default {
   },
   components: {
     ChessBoardMainLayer,
+    ChessBoardArrowLayer,
     ChessBoardDndLayer,
     ChessBoardPromotionDialog,
   },
@@ -76,6 +87,11 @@ export default {
 
     const promotionDialogOpen = ref(false);
     const promotionDialogWhitePlayer = ref(true);
+
+    const arrowFromFile = ref(-100);
+    const arrowFromRank = ref(-100);
+    const arrowToFile = ref(-100);
+    const arrowToRank = ref(-100);
 
     const draggedPieceLocationRatio = reactive({ x: null, y: null });
 
@@ -191,10 +207,18 @@ export default {
         whiteTurn: whiteTurnBeforeMove,
       });
       const positionFen = getPositionFen();
+      const lastMoveArrow = {
+        fromFile: arrowFromFile.value,
+        fromRank: arrowFromRank.value,
+        toFile: arrowToFile.value,
+        toRank: arrowToRank.value,
+      };
+
       context.emit("move-done", {
         fan,
         positionFen,
         blackTurnBeforeMove: !whiteTurnBeforeMove,
+        lastMoveArrow,
       });
       emitEndGameStatusIfAppropriate();
     }
@@ -220,22 +244,37 @@ export default {
         onEnd: () => {
           if (getGameStatus() !== GAME_STATUS_RUNNING) return;
           const whiteTurnBeforeMove = isWhiteTurn.value;
-          const san = handleDragEnd({
+          const { san, lastMoveCoordinates } = handleDragEnd({
             isLegalMove,
             makeMove,
             isPromotionMove,
             requestPromotionSelection,
           });
-          if (san) {
+
+          const moveValidated = san !== undefined;
+          if (moveValidated) {
             const fan = convertSanToFan({
               moveSan: san,
               whiteTurn: whiteTurnBeforeMove,
             });
             const positionFen = getPositionFen();
+
+            arrowFromFile.value = lastMoveCoordinates.fromFile;
+            arrowFromRank.value = lastMoveCoordinates.fromRank;
+            arrowToFile.value = lastMoveCoordinates.toFile;
+            arrowToRank.value = lastMoveCoordinates.toRank;
+
+            const lastMoveArrow = {
+              fromFile: arrowFromFile.value,
+              fromRank: arrowFromRank.value,
+              toFile: arrowToFile.value,
+              toRank: arrowToRank.value,
+            };
             context.emit("move-done", {
               fan,
               fen: positionFen,
               blackTurnBeforeMove: isWhiteTurn.value,
+              lastMoveArrow,
             });
           }
           emitEndGameStatusIfAppropriate();
@@ -335,6 +374,10 @@ export default {
       gameIsStalled,
       onPromotionMoveDone,
       tryToLoadPosition,
+      arrowFromFile,
+      arrowFromRank,
+      arrowToFile,
+      arrowToRank,
     };
   },
 };
