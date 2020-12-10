@@ -154,6 +154,15 @@ export default {
       }
     }
 
+    function letUserStartANewGame() {
+      arrowFromFile.value = -100;
+      arrowFromRank.value = -100;
+      arrowToFile.value = -100;
+      arrowToRank.value = -100;
+
+      startNewGame();
+    }
+
     function gameIsInProgress() {
       return getGameStatus() === GAME_STATUS_RUNNING;
     }
@@ -228,7 +237,7 @@ export default {
       return tryToSetupPositionFen(fen);
     }
 
-    function tryToSetLastMoveArrow({startFile, startRank, endFile, endRank}) {
+    function tryToSetLastMoveArrow({ startFile, startRank, endFile, endRank }) {
       if (gameIsStalled()) {
         arrowFromFile.value = startFile;
         arrowFromRank.value = startRank;
@@ -381,7 +390,7 @@ export default {
       terminatePromotionMove,
       makeMove,
       resetDndState,
-      startNewGame,
+      letUserStartANewGame,
       stopCurrentGame,
       getGameStatus,
       gameIsInProgress,

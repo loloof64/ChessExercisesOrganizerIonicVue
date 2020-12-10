@@ -162,7 +162,7 @@ export default {
 
     function doStartNewGame() {
       historyComponent.value.startNewGame();
-      boardComponent.value.startNewGame();
+      boardComponent.value.letUserStartANewGame();
     }
 
     function computeSize() {
