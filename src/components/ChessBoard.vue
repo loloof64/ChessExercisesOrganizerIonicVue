@@ -207,6 +207,7 @@ export default {
         whiteTurn: whiteTurnBeforeMove,
       });
       const positionFen = getPositionFen();
+
       const lastMoveArrow = {
         fromFile: arrowFromFile.value,
         fromRank: arrowFromRank.value,
@@ -214,13 +215,9 @@ export default {
         toRank: arrowToRank.value,
       };
 
-      //////////////////////////////
-      console.log("lastMoveArrow", lastMoveArrow);
-      ///////////////////////////////
-
       context.emit("move-done", {
         fan,
-        positionFen,
+        fen: positionFen,
         blackTurnBeforeMove: !whiteTurnBeforeMove,
         lastMoveArrow,
       });
