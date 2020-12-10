@@ -10,6 +10,9 @@
   >
     <span
       class="element"
+      :class="{
+          highlighted: selectedIndex === index,
+      }"
       v-for="(singleElement, index) in elements"
       :key="index"
       @click="handleSelection(index)"
@@ -30,9 +33,11 @@ export default {
   setup(props, context) {
     const elements = reactive([]);
     const moveNumber = ref(-1);
+    const selectedIndex = ref(-1);
 
     function startNewGame() {
       moveNumber.value = 1;
+      selectedIndex.value = -1;
       const text = `${moveNumber.value}.`;
       elements.splice(0, elements.length);
       elements.push({ text });
@@ -68,6 +73,10 @@ export default {
       }
     }
 
+    function commitSelection(elementIndex) {
+        selectedIndex.value = elementIndex;
+    }
+
     return {
       historySize,
       sizePixels,
@@ -75,6 +84,8 @@ export default {
       addMove,
       startNewGame,
       handleSelection,
+      commitSelection,
+      selectedIndex,
     };
   },
 };
@@ -90,5 +101,9 @@ export default {
   color: blue;
   margin: 0 0.2em;
   white-space: nowrap;
+}
+
+.element.highlighted{
+    background-color: yellow;
 }
 </style>

@@ -263,8 +263,7 @@ export default {
     function handleHistorySelectionRequest(data) {
       const success = boardComponent.value.tryToLoadPosition(data.fen);
       if (success) {
-        //todo replace by move highliting on hystory
-        console.log(data.index);
+        historyComponent.value.commitSelection(data.index);
       }
     }
 
