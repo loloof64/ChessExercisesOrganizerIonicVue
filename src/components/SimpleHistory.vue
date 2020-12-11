@@ -163,7 +163,7 @@ export default {
     });
 
     const movesZoneHeight = computed(() => {
-      return props.sizePx * 0.85;
+      return props.sizePx * 0.9;
     });
 
     window.addEventListener("orientationchange", computeNavigationButtonsStyle);

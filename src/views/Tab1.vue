@@ -12,7 +12,7 @@
         </ion-toolbar>
       </ion-header>
 
-      <div class="game_zone" :style="gameZoneStyle">
+      <div class="game_zone" :style="gameZoneStyle" slot="fixed">
         <div class="chessboard" :style="chessboardStyle">
           <ChessBoard
             :sizePx="size"
@@ -169,7 +169,7 @@ export default {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
       const minSize = Math.min(window.innerWidth, window.innerHeight);
-      const sizeRatio = isPortrait ? 0.5 : 0.6;
+      const sizeRatio = isPortrait ? 0.6 : 0.6;
       return Math.floor(sizeRatio * minSize);
     }
 
@@ -190,13 +190,11 @@ export default {
     const size = ref(computeSize());
     const gameZoneStyle = reactive({
       margin: "0 auto",
-      display: "grid",
+      display: "flex",
       width: "100%",
       height: "100%",
-      "grid-template-columns": "100%",
-      "grid-template-rows": "42%  42% 10%",
       "flex-direction": "column",
-      "justify-content": "center",
+      "justify-content": "space-evenly",
       "align-items": "center",
     });
 
@@ -284,6 +282,13 @@ export default {
       }
     }
 
+    function computeGameZoneDirection() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+
+      return isPortrait ? "column" : "row";
+    }
+
     function computeMetaZoneDirection() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
@@ -291,12 +296,25 @@ export default {
       return isPortrait ? "row" : "column";
     }
 
+    function computeMetaZoneDimensions() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+
+      return isPortrait ? {
+        width: "100%",
+        height: "8%",
+      } : {
+        width: "8%",
+        height: "100%"
+      }
+    }
+
     function computeMetaButtonDimension() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
 
       const width = isPortrait ? "10%" : "60%";
-      const height = isPortrait ? "66%" : "15%";
+      const height = isPortrait ? "66%" : "10%";
       const margin = isPortrait ? "2% 2%" : "8% 18%";
 
       return { width, height, margin };
@@ -305,16 +323,22 @@ export default {
     function updateSizeAndLayout() {
       size.value = computeSize();
       const [columnsLayout, rowsLayout] = computeLayout();
+
+      const {width: metaZoneWidth, height: metaZoneHeight} = computeMetaZoneDimensions();
+
       const {
         width: buttonWidth,
         height: buttonHeight,
         margin: buttonMargin,
       } = computeMetaButtonDimension();
 
+      gameZoneStyle ["flex-direction"] = computeGameZoneDirection();
       gameZoneStyle["grid-template-columns"] = columnsLayout;
       gameZoneStyle["grid-template-rows"] = rowsLayout;
 
       metaStyle["flex-direction"] = computeMetaZoneDirection();
+      metaStyle["width"] = metaZoneWidth;
+      metaStyle ["height"] = metaZoneHeight;
 
       metaButtonStyle["width"] = buttonWidth;
       metaButtonStyle["height"] = buttonHeight;
