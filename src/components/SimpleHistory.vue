@@ -134,10 +134,12 @@ export default {
       }
 
       // Scroll in order to show last element.
-      const nodeToShow = document.querySelector('.simple_history_root .movesZone .last');
-      nodeToShow.setAttribute('tabindex', -1);
-      nodeToShow.focus();
-      nodeToShow.removeAttribute('tabindex');
+      const nodeToShow = document.querySelector(
+        ".simple_history_root .movesZone .last"
+      );
+      if (nodeToShow) {
+        nodeToShow.scrollIntoView({behavior: 'smooth', block: 'center'});
+      }
     }
 
     function handleSelection(elementIndex) {
@@ -238,10 +240,12 @@ export default {
       selectedIndex.value = elementIndex;
 
       // Scroll in order to show selected element.
-      const nodeToShow = document.querySelector('.simple_history_root .movesZone .highlighted');
-      nodeToShow.setAttribute('tabindex', -1);
-      nodeToShow.focus();
-      nodeToShow.removeAttribute('tabindex');
+      const nodeToShow = document.querySelector(
+        ".simple_history_root .movesZone .highlighted"
+      );
+      if (nodeToShow) {
+        nodeToShow.scrollIntoView({behavior: 'smooth', block: 'center'});
+      }
     }
 
     function selectLastHistoryMoveIfThereIsOne() {
@@ -253,7 +257,7 @@ export default {
       }
     }
 
-    function isLastElement(nodeIndex)  {
+    function isLastElement(nodeIndex) {
       return nodeIndex === elements.length - 1;
     }
 
@@ -330,6 +334,7 @@ export default {
 }
 
 .element {
+  display: inline-block;
   color: blue;
   margin: 0 0.2em;
   white-space: nowrap;

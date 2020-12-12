@@ -5,14 +5,14 @@
         <ion-title>Game</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" :scrollY="false">
+    <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">Game</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div class="game_zone" :style="gameZoneStyle">
+      <div class="game_zone" :style="gameZoneStyle" slot="fixed">
           <ChessBoard
             :sizePx="boardAndHistorySize"
             :reversed="boardReversed"
