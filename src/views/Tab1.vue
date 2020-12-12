@@ -14,7 +14,7 @@
 
       <div class="game_zone" :style="gameZoneStyle">
           <ChessBoard
-            :sizePx="size"
+            :sizePx="boardAndHistorySize"
             :reversed="boardReversed"
             ref="boardComponent"
             @win="handleWin"
@@ -25,7 +25,7 @@
             @move-done="handleMoveDone"
           />
           <simple-history
-            :sizePx="size"
+            :sizePx="boardAndHistorySize"
             ref="historyComponent"
             @selection-request="handleHistorySelectionRequest"
           />
@@ -67,7 +67,7 @@ import {
   gameControllerOutline,
   stopCircleOutline,
 } from "ionicons/icons";
-import { ref, reactive, computed, onBeforeUnmount } from "vue";
+import { ref, reactive, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
@@ -161,11 +161,11 @@ export default {
       boardComponent.value.letUserStartANewGame();
     }
 
-    function computeSize() {
+    function computeBoardAndHistorySize() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
       const minSize = Math.min(window.innerWidth, window.innerHeight);
-      const sizeRatio = isPortrait ? 0.6 : 0.6;
+      const sizeRatio = isPortrait ? 0.55 : 0.62;
       return Math.floor(sizeRatio * minSize);
     }
 
@@ -183,14 +183,14 @@ export default {
       }
     }
 
-    const size = ref(computeSize());
+    const boardAndHistorySize = ref(computeBoardAndHistorySize());
     const gameZoneStyle = reactive({
       margin: "0 auto",
       display: "flex",
       width: "100%",
       height: "100%",
       "flex-direction": "column",
-      "justify-content": "space-evenly",
+      "justify-content": "space-between",
       "align-items": "center",
     });
 
@@ -209,10 +209,6 @@ export default {
       height: "66%",
       margin: "1.5% 0.5%",
       border: "1px solid black",
-    });
-
-    const sizePx = computed(function () {
-      return size.value + "px";
     });
 
     async function showToast(message, duration = 1100) {
@@ -311,7 +307,7 @@ export default {
     }
 
     function updateSizeAndLayout() {
-      size.value = computeSize();
+      boardAndHistorySize.value = computeBoardAndHistorySize();
       const [columnsLayout, rowsLayout] = computeLayout();
 
       const {width: metaZoneWidth, height: metaZoneHeight} = computeMetaZoneDimensions();
@@ -344,8 +340,7 @@ export default {
     updateSizeAndLayout();
 
     return {
-      size,
-      sizePx,
+      boardAndHistorySize,
       gameZoneStyle,
       metaStyle,
       metaButtonStyle,
