@@ -181,6 +181,9 @@ export default {
 
 <style>
 .board_main_layer {
+  position: absolute;
+  left: 0;
+  top: 0;
   background-color: rgb(124, 124, 124);
   display: grid;
   grid-template-rows: 1fr repeat(8, 2fr) 1fr;

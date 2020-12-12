@@ -33,9 +33,15 @@ export default function useChessBoardDragAndDrop() {
     piecesPaths,
     whiteTurn,
   }) {
-    const rootEl = document.querySelector(".board_root");
-    const x = detail.currentX - rootEl.offsetLeft;
-    const y = detail.currentY - rootEl.offsetTop;
+    const rootElt = document.querySelector(".board_root");
+    const x = detail.startX - rootElt.offsetLeft;
+    const y = detail.startY - rootElt.offsetTop;
+
+    ////////////////////////////////////////////////////
+    console.log("------------------------")
+    console.log(rootElt.offsetLeft, rootElt.offsetTop)
+    console.log(x, y)
+    /////////////////////////////////////////////////////
 
     const cellsSize = boardSizePx / 9.0;
     const col = Math.floor((x - cellsSize * 0.5) / cellsSize);

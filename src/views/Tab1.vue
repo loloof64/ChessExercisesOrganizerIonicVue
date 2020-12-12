@@ -5,15 +5,14 @@
         <ion-title>Game</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scrollY="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">Game</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div class="game_zone" :style="gameZoneStyle" slot="fixed">
-        <div class="chessboard" :style="chessboardStyle">
+      <div class="game_zone" :style="gameZoneStyle">
           <ChessBoard
             :sizePx="size"
             :reversed="boardReversed"
@@ -25,14 +24,11 @@
             @fifty-moves="handleFiftyMoves"
             @move-done="handleMoveDone"
           />
-        </div>
-        <div class="history" :style="historyStyle">
           <simple-history
             :sizePx="size"
             ref="historyComponent"
             @selection-request="handleHistorySelectionRequest"
           />
-        </div>
         <div :style="metaStyle">
           <ion-icon
             :icon="swapVertical"
@@ -198,12 +194,6 @@ export default {
       "align-items": "center",
     });
 
-    const chessboardStyle = reactive({
-      margin: "auto",
-    });
-    const historyStyle = reactive({
-      margin: "auto",
-    });
     const metaStyle = reactive({
       width: "100%",
       height: "100%",
@@ -357,8 +347,6 @@ export default {
       size,
       sizePx,
       gameZoneStyle,
-      chessboardStyle,
-      historyStyle,
       metaStyle,
       metaButtonStyle,
       swapVertical,
