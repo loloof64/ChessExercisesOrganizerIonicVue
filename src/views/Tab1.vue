@@ -265,6 +265,15 @@ export default {
             endRank: lastMoveArrow.toRank
           });
         }
+        else {
+          const eraseCoordinate = -100;
+          boardComponent.value.tryToSetLastMoveArrow({
+            startFile:eraseCoordinate,
+            startRank:eraseCoordinate,
+            endFile:eraseCoordinate,
+            endRank:eraseCoordinate
+          });
+        }
       }
     }
 

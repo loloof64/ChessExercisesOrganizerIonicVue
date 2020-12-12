@@ -20,6 +20,7 @@
       <ion-icon
         :icon="playSkipBackCircleOutline"
         :style="singleNavigationButtonStyle"
+        @click="navigateToStartPosition"
       />
       <ion-icon
         :icon="playBackCircleOutline"
@@ -84,14 +85,16 @@ export default {
     const moveNumber = ref(-1);
     const selectedIndex = ref(-1);
     const nextElementToAddIndex = ref(0);
+    const gameStartFen = ref('error');
 
     const singleNavigationButtonStyle = reactive({
       "background-color": "yellowgreen",
     });
 
-    function startNewGame() {
+    function startNewGame(startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {
       moveNumber.value = 1;
       selectedIndex.value = -1;
+      gameStartFen.value = startFen;
       nextElementToAddIndex.value = 0;
       const text = `${moveNumber.value}.`;
       elements.splice(0, elements.length);
@@ -141,8 +144,13 @@ export default {
       const historyMoves = elements.filter((item) => item.fen !== undefined);
       if (historyMoves.length > 0) {
         const lastHistoryElement = historyMoves[historyMoves.length - 1];
-        context.emit("selection-request", { ...lastHistoryElement });
+        const lastHistoryIndex = elements.indexOf(lastHistoryElement);
+        context.emit("selection-request", { ...lastHistoryElement, index: lastHistoryIndex });
       }
+    }
+
+    function navigateToStartPosition() {
+      context.emit("selection-request", { fen: gameStartFen.value, index: -1});
     }
 
     function commitSelection(elementIndex) {
@@ -215,15 +223,13 @@ export default {
       movesZoneHeight,
       singleNavigationButtonStyle,
       navigateToLastMoveIfPossible,
+      navigateToStartPosition,
     };
   },
 };
 </script>
 
 <style scoped>
-.simple_history_root {
-}
-
 .movesZone {
   background-color: coral;
   overflow: scroll;
