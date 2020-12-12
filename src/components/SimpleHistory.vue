@@ -52,6 +52,7 @@
         class="element"
         :class="{
           highlighted: selectedIndex === index,
+          last: isLastElement(index),
         }"
         v-for="(singleElement, index) in elements"
         :key="index"
@@ -132,10 +133,11 @@ export default {
         pushElementAndUpdateIndex({ text });
       }
 
-      // Scroll to bottom
-      const movesZone = document.querySelector('.simple_history_root .movesZone');
-      const movesZoneHeight = movesZone.clientHeight;
-      movesZone.scroll(0, movesZoneHeight);
+      // Scroll in order to show last element.
+      const nodeToShow = document.querySelector('.simple_history_root .movesZone .last');
+      nodeToShow.setAttribute('tabindex', -1);
+      nodeToShow.focus();
+      nodeToShow.removeAttribute('tabindex');
     }
 
     function handleSelection(elementIndex) {
@@ -234,6 +236,12 @@ export default {
 
     function commitSelection(elementIndex) {
       selectedIndex.value = elementIndex;
+
+      // Scroll in order to show selected element.
+      const nodeToShow = document.querySelector('.simple_history_root .movesZone .highlighted');
+      nodeToShow.setAttribute('tabindex', -1);
+      nodeToShow.focus();
+      nodeToShow.removeAttribute('tabindex');
     }
 
     function selectLastHistoryMoveIfThereIsOne() {
@@ -243,6 +251,10 @@ export default {
         const lastHistoryIndex = elements.indexOf(lastHistoryElement);
         selectedIndex.value = lastHistoryIndex;
       }
+    }
+
+    function isLastElement(nodeIndex)  {
+      return nodeIndex === elements.length - 1;
     }
 
     function getSelectedMoveArrow() {
@@ -305,6 +317,7 @@ export default {
       navigateToPreviousHistoryMoveIfPossible,
       navigateToNextMoveIfPossible,
       navigateToLastMoveIfPossible,
+      isLastElement,
     };
   },
 };
