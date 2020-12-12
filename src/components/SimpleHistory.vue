@@ -20,7 +20,7 @@
       <ion-icon
         :icon="playSkipBackCircleOutline"
         :style="singleNavigationButtonStyle"
-        @click="navigateToStartPosition"
+        @click="navigateToStartPositionIfPossible"
       />
       <ion-icon
         :icon="playBackCircleOutline"
@@ -29,6 +29,7 @@
       <ion-icon
         :icon="playForwardCircleOutline"
         :style="singleNavigationButtonStyle"
+        @click="navigateToNextMoveIfPossible"
       />
       <ion-icon
         :icon="playSkipForwardCircleOutline"
@@ -85,13 +86,15 @@ export default {
     const moveNumber = ref(-1);
     const selectedIndex = ref(-1);
     const nextElementToAddIndex = ref(0);
-    const gameStartFen = ref('error');
+    const gameStartFen = ref("error");
 
     const singleNavigationButtonStyle = reactive({
       "background-color": "yellowgreen",
     });
 
-    function startNewGame(startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {
+    function startNewGame(
+      startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    ) {
       moveNumber.value = 1;
       selectedIndex.value = -1;
       gameStartFen.value = startFen;
@@ -145,12 +148,48 @@ export default {
       if (historyMoves.length > 0) {
         const lastHistoryElement = historyMoves[historyMoves.length - 1];
         const lastHistoryIndex = elements.indexOf(lastHistoryElement);
-        context.emit("selection-request", { ...lastHistoryElement, index: lastHistoryIndex });
+        context.emit("selection-request", {
+          ...lastHistoryElement,
+          index: lastHistoryIndex,
+        });
       }
     }
 
-    function navigateToStartPosition() {
-      context.emit("selection-request", { fen: gameStartFen.value, index: -1});
+    function navigateToStartPositionIfPossible() {
+      context.emit("selection-request", { fen: gameStartFen.value, index: -1 });
+    }
+
+    function navigateToNextMoveIfPossible() {
+      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      if (selectedIndex.value < 0) {
+        if (historyMoves.length === 0) return;
+        const nextHistoryMoveElement = historyMoves[0];
+        context.emit("selection-request", { ...nextHistoryMoveElement });
+      } else {
+        const currentOverallElement = elements[selectedIndex.value];
+        const currentHistoryMovesElementIndex = historyMoves.findIndex(
+          (item) => {
+            return (
+              item.fen === currentOverallElement.fen &&
+              item.text === currentOverallElement.text &&
+              item.lastMoveArrow === currentOverallElement.lastMoveArrow &&
+              item.index === currentOverallElement.index
+            );
+          }
+        );
+
+        const elementNotFoundInHistoryMoves =
+          currentHistoryMovesElementIndex < 0;
+        if (elementNotFoundInHistoryMoves) return;
+
+        const noMoreElementInHistoryMoves =
+          currentHistoryMovesElementIndex >= historyMoves.length - 1;
+        if (noMoreElementInHistoryMoves) return;
+
+        const nextHistoryMoveElement =
+          historyMoves[currentHistoryMovesElementIndex + 1];
+        context.emit("selection-request", { ...nextHistoryMoveElement });
+      }
     }
 
     function commitSelection(elementIndex) {
@@ -223,7 +262,8 @@ export default {
       movesZoneHeight,
       singleNavigationButtonStyle,
       navigateToLastMoveIfPossible,
-      navigateToStartPosition,
+      navigateToStartPositionIfPossible,
+      navigateToNextMoveIfPossible,
     };
   },
 };
