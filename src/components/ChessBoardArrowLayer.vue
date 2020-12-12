@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, onBeforeUnmount } from "vue";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 
 export default {
@@ -252,6 +252,12 @@ export default {
 
     updateActiveState();
     updateArrow();
+
+    window.addEventListener("orientationchange", updateArrow);
+
+    onBeforeUnmount(function () {
+      window.removeEventListener("orientationchange", updateArrow);
+    });
 
     return {
       boardSize,
