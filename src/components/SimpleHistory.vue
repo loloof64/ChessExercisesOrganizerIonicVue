@@ -25,6 +25,7 @@
       <ion-icon
         :icon="playBackCircleOutline"
         :style="singleNavigationButtonStyle"
+        @click="navigateToPreviousHistoryMoveIfPossible"
       />
       <ion-icon
         :icon="playForwardCircleOutline"
@@ -191,6 +192,40 @@ export default {
         context.emit("selection-request", { ...nextHistoryMoveElement });
       }
     }
+    function navigateToPreviousHistoryMoveIfPossible() {
+      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      const currentlyOnTheFirstNodeOrAtStart = selectedIndex.value <= 1;
+      if (currentlyOnTheFirstNodeOrAtStart) {
+        context.emit("selection-request", {
+          fen: gameStartFen.value,
+          index: -1,
+        });
+      } else {
+        const currentOverallElement = elements[selectedIndex.value];
+        const currentHistoryMovesElementIndex = historyMoves.findIndex(
+          (item) => {
+            return (
+              item.fen === currentOverallElement.fen &&
+              item.text === currentOverallElement.text &&
+              item.lastMoveArrow === currentOverallElement.lastMoveArrow &&
+              item.index === currentOverallElement.index
+            );
+          }
+        );
+
+        const elementNotFoundInHistoryMoves =
+          currentHistoryMovesElementIndex < 0;
+        if (elementNotFoundInHistoryMoves) return;
+
+        const noMoreElementInHistoryMoves =
+          currentHistoryMovesElementIndex <= 0;
+        if (noMoreElementInHistoryMoves) return;
+
+        const previousHistoryMoveElement =
+          historyMoves[currentHistoryMovesElementIndex - 1];
+        context.emit("selection-request", { ...previousHistoryMoveElement });
+      }
+    }
 
     function commitSelection(elementIndex) {
       selectedIndex.value = elementIndex;
@@ -261,9 +296,10 @@ export default {
       navigationHeight,
       movesZoneHeight,
       singleNavigationButtonStyle,
-      navigateToLastMoveIfPossible,
       navigateToStartPositionIfPossible,
+      navigateToPreviousHistoryMoveIfPossible,
       navigateToNextMoveIfPossible,
+      navigateToLastMoveIfPossible,
     };
   },
 };
