@@ -131,6 +131,11 @@ export default {
         const text = `${moveNumber.value}.`;
         pushElementAndUpdateIndex({ text });
       }
+
+      // Scroll to bottom
+      const movesZone = document.querySelector('.simple_history_root .movesZone');
+      const movesZoneHeight = movesZone.clientHeight;
+      movesZone.scroll(0, movesZoneHeight);
     }
 
     function handleSelection(elementIndex) {
