@@ -243,6 +243,7 @@ export default {
         () => props.fromRank,
         () => props.toFile,
         () => props.toRank,
+        () => props.reversed,
       ],
       () => {
         updateActiveState();
