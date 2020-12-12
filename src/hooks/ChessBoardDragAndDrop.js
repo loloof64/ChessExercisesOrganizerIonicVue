@@ -37,12 +37,6 @@ export default function useChessBoardDragAndDrop() {
     const x = detail.startX - rootElt.offsetLeft;
     const y = detail.startY - rootElt.offsetTop;
 
-    ////////////////////////////////////////////////////
-    console.log("------------------------")
-    console.log(rootElt.offsetLeft, rootElt.offsetTop)
-    console.log(x, y)
-    /////////////////////////////////////////////////////
-
     const cellsSize = boardSizePx / 9.0;
     const col = Math.floor((x - cellsSize * 0.5) / cellsSize);
     const row = Math.floor((y - cellsSize * 0.5) / cellsSize);

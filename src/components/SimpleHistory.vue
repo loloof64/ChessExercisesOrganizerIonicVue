@@ -21,7 +21,10 @@
         :icon="playSkipBackCircleOutline"
         :style="singleNavigationButtonStyle"
       />
-      <ion-icon :icon="playBackCircleOutline" :style="singleNavigationButtonStyle" />
+      <ion-icon
+        :icon="playBackCircleOutline"
+        :style="singleNavigationButtonStyle"
+      />
       <ion-icon
         :icon="playForwardCircleOutline"
         :style="singleNavigationButtonStyle"
@@ -29,6 +32,7 @@
       <ion-icon
         :icon="playSkipForwardCircleOutline"
         :style="singleNavigationButtonStyle"
+        @click="navigateToLastMoveIfPossible"
       />
     </div>
 
@@ -56,7 +60,7 @@
 </template>
 
 <script>
-import { reactive, ref,  computed, onBeforeUnmount } from "vue";
+import { reactive, ref, computed, onBeforeUnmount } from "vue";
 import { IonIcon } from "@ionic/vue";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import {
@@ -79,17 +83,19 @@ export default {
     const elements = reactive([]);
     const moveNumber = ref(-1);
     const selectedIndex = ref(-1);
+    const nextElementToAddIndex = ref(0);
 
     const singleNavigationButtonStyle = reactive({
-      'background-color': 'yellowgreen',
+      "background-color": "yellowgreen",
     });
 
     function startNewGame() {
       moveNumber.value = 1;
       selectedIndex.value = -1;
+      nextElementToAddIndex.value = 0;
       const text = `${moveNumber.value}.`;
       elements.splice(0, elements.length);
-      elements.push({ text });
+      pushElementAndUpdateIndex({ text });
     }
 
     function historySize() {
@@ -102,8 +108,13 @@ export default {
       return sizePx + "px";
     }
 
+    function pushElementAndUpdateIndex(elementToAdd) {
+      elements.push({ ...elementToAdd, index: nextElementToAddIndex.value });
+      nextElementToAddIndex.value += 1;
+    }
+
     function addMove(moveData) {
-      elements.push({
+      pushElementAndUpdateIndex({
         text: moveData.fan,
         fen: moveData.fen,
         lastMoveArrow: moveData.lastMoveArrow,
@@ -111,7 +122,7 @@ export default {
       if (moveData.blackTurnBeforeMove) {
         moveNumber.value += 1;
         const text = `${moveNumber.value}.`;
-        elements.push({ text });
+        pushElementAndUpdateIndex({ text });
       }
     }
 
@@ -123,6 +134,14 @@ export default {
           index: elementIndex,
           fen: element.fen,
         });
+      }
+    }
+
+    function navigateToLastMoveIfPossible() {
+      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      if (historyMoves.length > 0) {
+        const lastHistoryElement = historyMoves[historyMoves.length - 1];
+        context.emit("selection-request", { ...lastHistoryElement });
       }
     }
 
@@ -149,12 +168,11 @@ export default {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
       if (isPortrait) {
-        singleNavigationButtonStyle.width = '6 vw';
-        singleNavigationButtonStyle.height = '6 vw';
-      }
-      else {
-        singleNavigationButtonStyle.width = '6.2 vh';
-        singleNavigationButtonStyle.height = '6.2 vh';
+        singleNavigationButtonStyle.width = "6 vw";
+        singleNavigationButtonStyle.height = "6 vw";
+      } else {
+        singleNavigationButtonStyle.width = "6.2 vh";
+        singleNavigationButtonStyle.height = "6.2 vh";
       }
     }
 
@@ -169,7 +187,10 @@ export default {
     window.addEventListener("orientationchange", computeNavigationButtonsStyle);
 
     onBeforeUnmount(function () {
-      window.removeEventListener("orientationchange", computeNavigationButtonsStyle);
+      window.removeEventListener(
+        "orientationchange",
+        computeNavigationButtonsStyle
+      );
     });
 
     computeNavigationButtonsStyle();
@@ -193,6 +214,7 @@ export default {
       navigationHeight,
       movesZoneHeight,
       singleNavigationButtonStyle,
+      navigateToLastMoveIfPossible,
     };
   },
 };
