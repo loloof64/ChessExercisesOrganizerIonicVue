@@ -5,7 +5,7 @@
         <ion-title>Game</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scrollY="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">Game</ion-title>

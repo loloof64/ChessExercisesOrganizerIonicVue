@@ -138,7 +138,9 @@ export default {
         ".simple_history_root .movesZone .last"
       );
       if (nodeToShow) {
-        nodeToShow.scrollIntoView({behavior: 'smooth', block: 'center'});
+        nodeToShow.setAttribute("tabindex", "-1");
+        nodeToShow.focus();
+        nodeToShow.removeAttribute("tabindex");
       }
     }
 
@@ -244,7 +246,9 @@ export default {
         ".simple_history_root .movesZone .highlighted"
       );
       if (nodeToShow) {
-        nodeToShow.scrollIntoView({behavior: 'smooth', block: 'center'});
+        nodeToShow.setAttribute("tabindex", "-1");
+        nodeToShow.focus();
+        nodeToShow.removeAttribute("tabindex");
       }
     }
 
