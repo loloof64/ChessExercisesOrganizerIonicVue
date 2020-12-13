@@ -53,7 +53,7 @@
 
 <script>
 import Hammer from "hammerjs";
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, reactive, onMounted, watch, onBeforeUnmount } from "vue";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
@@ -388,6 +388,18 @@ export default {
       if (dndState.draggedPieceY === null) draggedPieceLocationRatio.y = null;
       else
         draggedPieceLocationRatio.y = getLocationRatio(dndState.draggedPieceY);
+    });
+
+     function clearDraggedImage() {
+      dndState.draggedPieceSrc = null;
+      dndState.draggedPieceX = null;
+      dndState.draggedPieceY = null;
+    }
+
+    window.addEventListener("orientationchange", clearDraggedImage);
+
+    onBeforeUnmount(function () {
+      window.removeEventListener("orientationchange", clearDraggedImage);
     });
 
     return {
