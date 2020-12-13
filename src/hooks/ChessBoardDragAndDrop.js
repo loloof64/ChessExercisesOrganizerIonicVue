@@ -33,9 +33,9 @@ export default function useChessBoardDragAndDrop() {
     piecesPaths,
     whiteTurn,
   }) {
-    const rootElt = document.querySelector(".board_root");
-    const x = detail.startX - rootElt.offsetLeft;
-    const y = detail.startY - rootElt.offsetTop;
+
+    const x = detail.srcEvent.offsetX;
+    const y = detail.srcEvent.offsetY;
 
     const cellsSize = boardSizePx / 9.0;
     const col = Math.floor((x - cellsSize * 0.5) / cellsSize);
@@ -111,12 +111,15 @@ export default function useChessBoardDragAndDrop() {
     return { san, lastMoveCoordinates };
   }
 
+  function handleDragCancel() {
+    resetDndState();
+  }
+
   function handleDragMove({ detail, boardSizePx, reversed }) {
     if (!dndState.started) return;
 
-    const rootEl = document.querySelector(".board_root");
-    const x = detail.currentX - rootEl.offsetLeft;
-    const y = detail.currentY - rootEl.offsetTop;
+    const x = detail.srcEvent.offsetX;
+    const y = detail.srcEvent.offsetY;
 
     const cellsSize = boardSizePx / 9.0;
     const col = Math.floor((x - cellsSize * 0.5) / cellsSize);
@@ -159,6 +162,7 @@ export default function useChessBoardDragAndDrop() {
     handleDragStart,
     handleDragEnd,
     handleDragMove,
+    handleDragCancel,
     terminatePromotionMove,
   };
 }

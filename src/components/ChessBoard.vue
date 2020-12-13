@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { createGesture } from "@ionic/vue";
+import Hammer from "hammerjs";
 import { ref, reactive, onMounted, watch } from "vue";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
@@ -127,6 +127,7 @@ export default {
       handleDragStart,
       handleDragMove,
       handleDragEnd,
+      handleDragCancel,
       terminatePromotionMove,
     } = useChessBoardDragAndDrop();
 
@@ -246,75 +247,93 @@ export default {
       }
     }
 
-    onMounted(function () {
-      const boardGesture = createGesture({
-        el: document.querySelector(".board_dnd_layer"),
-        onStart: (detail) => {
-          if (getGameStatus() !== GAME_STATUS_RUNNING) return;
-          handleDragStart({
-            detail,
-            boardSizePx: props.sizePx,
-            reversed: props.reversed,
-            piecesValues,
-            piecesPaths,
-            whiteTurn: isWhiteTurn.value,
-          });
-        },
-        onEnd: () => {
-          if (getGameStatus() !== GAME_STATUS_RUNNING) return;
-          const whiteTurnBeforeMove = isWhiteTurn.value;
-          const { san, lastMoveCoordinates, isPromotion } = handleDragEnd({
-            isLegalMove,
-            makeMove,
-            isPromotionMove,
-            requestPromotionSelection,
-          });
+    function onPanStart(detail) {
+      if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      handleDragStart({
+        detail,
+        boardSizePx: props.sizePx,
+        reversed: props.reversed,
+        piecesValues,
+        piecesPaths,
+        whiteTurn: isWhiteTurn.value,
+      });
+    }
 
-          const moveValidated = san !== undefined;
-          if (moveValidated) {
-            const fan = convertSanToFan({
-              moveSan: san,
-              whiteTurn: whiteTurnBeforeMove,
-            });
-            const positionFen = getPositionFen();
+    function onPanMove(detail) {
+      if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      handleDragMove({
+        detail,
+        boardSizePx: props.sizePx,
+        reversed: props.reversed,
+      });
+    }
 
-            arrowFromFile.value = lastMoveCoordinates.fromFile;
-            arrowFromRank.value = lastMoveCoordinates.fromRank;
-            arrowToFile.value = lastMoveCoordinates.toFile;
-            arrowToRank.value = lastMoveCoordinates.toRank;
-
-            const lastMoveArrow = {
-              fromFile: arrowFromFile.value,
-              fromRank: arrowFromRank.value,
-              toFile: arrowToFile.value,
-              toRank: arrowToRank.value,
-            };
-            context.emit("move-done", {
-              fan,
-              fen: positionFen,
-              blackTurnBeforeMove: isWhiteTurn.value,
-              lastMoveArrow,
-            });
-          } else if (isPromotion) {
-            arrowFromFile.value = lastMoveCoordinates.startFile;
-            arrowFromRank.value = lastMoveCoordinates.startRank;
-            arrowToFile.value = lastMoveCoordinates.endFile;
-            arrowToRank.value = lastMoveCoordinates.endRank;
-          }
-          emitEndGameStatusIfAppropriate();
-        },
-        onMove: (detail) => {
-          if (getGameStatus() !== GAME_STATUS_RUNNING) return;
-          handleDragMove({
-            detail,
-            boardSizePx: props.sizePx,
-            reversed: props.reversed,
-          });
-        },
-        threshold: 0,
+    function onPanEnd() {
+      if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      const whiteTurnBeforeMove = isWhiteTurn.value;
+      const { san, lastMoveCoordinates, isPromotion } = handleDragEnd({
+        isLegalMove,
+        makeMove,
+        isPromotionMove,
+        requestPromotionSelection,
       });
 
-      boardGesture.enable();
+      const moveValidated = san !== undefined;
+      if (moveValidated) {
+        const fan = convertSanToFan({
+          moveSan: san,
+          whiteTurn: whiteTurnBeforeMove,
+        });
+        const positionFen = getPositionFen();
+
+        arrowFromFile.value = lastMoveCoordinates.fromFile;
+        arrowFromRank.value = lastMoveCoordinates.fromRank;
+        arrowToFile.value = lastMoveCoordinates.toFile;
+        arrowToRank.value = lastMoveCoordinates.toRank;
+
+        const lastMoveArrow = {
+          fromFile: arrowFromFile.value,
+          fromRank: arrowFromRank.value,
+          toFile: arrowToFile.value,
+          toRank: arrowToRank.value,
+        };
+        context.emit("move-done", {
+          fan,
+          fen: positionFen,
+          blackTurnBeforeMove: isWhiteTurn.value,
+          lastMoveArrow,
+        });
+      } else if (isPromotion) {
+        arrowFromFile.value = lastMoveCoordinates.startFile;
+        arrowFromRank.value = lastMoveCoordinates.startRank;
+        arrowToFile.value = lastMoveCoordinates.endFile;
+        arrowToRank.value = lastMoveCoordinates.endRank;
+      }
+      emitEndGameStatusIfAppropriate();
+    }
+
+    function onPanCancel() {
+      if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      handleDragCancel();
+    }
+
+    onMounted(function () {
+      const boardGesture = new Hammer(
+        document.querySelector(".board_dnd_layer")
+      );
+
+      boardGesture.get("tap").set({ enable: false });
+      boardGesture.get("rotate").set({ enable: false });
+      boardGesture.get("pinch").set({ enable: false });
+      boardGesture.get("swipe").set({ enable: false });
+
+      boardGesture
+        .get("pan")
+        .set({ direction: Hammer.DIRECTION_ALL, threshold: 0 });
+      boardGesture.on("panstart", onPanStart);
+      boardGesture.on("panleft panright panup pandown", onPanMove);
+      boardGesture.on("panend", onPanEnd);
+      boardGesture.on("pancancel", onPanCancel)
     });
 
     function getLocationRatio(locationPx) {
