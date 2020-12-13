@@ -8,20 +8,17 @@
       },
     ]"
   >
-    <div
-      class="board_dragged_piece_zone"
+    <ion-img
+      class="board_dragged_piece"
+      v-if="mustShowDraggedPiece()"
+      :src="dndState.draggedPieceSrc"
       :style="{
         width: cellsSizePixels(boardSize()),
         height: cellsSizePixels(boardSize()),
         left: dndState.draggedPieceX + 'px',
         top: dndState.draggedPieceY + 'px',
       }"
-    >
-      <ion-img
-        v-if="mustShowDraggedPiece()"
-        :src="dndState.draggedPieceSrc"
-      ></ion-img>
-    </div>
+    ></ion-img>
   </div>
 </template>
 
@@ -79,7 +76,7 @@ export default {
   top: 0;
 }
 
-.board_dragged_piece_zone {
+.board_dragged_piece {
   position: absolute;
 }
 </style>

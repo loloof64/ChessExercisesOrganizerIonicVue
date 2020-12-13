@@ -43,6 +43,7 @@ export default function useChessBoardDragAndDrop() {
 
     const file = reversed ? 7 - col : col;
     const rank = reversed ? row : 7 - row;
+
     if (file < 0 || file > 7 || rank < 0 || rank > 7) return;
     const cellValue = piecesValues.value[rank][file];
 
