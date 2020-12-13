@@ -26,6 +26,7 @@
           />
           <simple-history
             :sizePx="boardAndHistorySize"
+            :navigationBarVisible="historyNavigationBarVisible"
             ref="historyComponent"
             @selection-request="handleHistorySelectionRequest"
           />
@@ -100,6 +101,10 @@ export default {
 
     const historyComponent = ref(null);
 
+    const historyNavigationBarVisible = ref(false);
+
+    
+
     function getTranslation(key) {
       return t(key, {}, { locale: locale.value });
     }
@@ -151,12 +156,14 @@ export default {
           onConfirm: () => {
             boardComponent.value.stopCurrentGame();
             historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+            historyNavigationBarVisible.value = true;
           },
         });
       }
     }
 
     function doStartNewGame() {
+      historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame();
       boardComponent.value.letUserStartANewGame();
     }
@@ -221,6 +228,7 @@ export default {
 
     function handleWin(whiteSide) {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+      historyNavigationBarVisible.value = true;
       showToast(
         whiteSide
           ? t("game.white_win", {}, { locale: locale.value })
@@ -230,21 +238,25 @@ export default {
 
     function handleStalemate() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+      historyNavigationBarVisible.value = true;
       showToast(t("game.stalemate", {}, { locale: locale.value }));
     }
 
     function handleThreeFoldRepetition() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+      historyNavigationBarVisible.value = true;
       showToast(t("game.draw_three_fold", {}, { locale: locale.value }));
     }
 
     function handleInsufficientMaterial() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+      historyNavigationBarVisible.value = true;
       showToast(t("game.draw_missing_material", {}, { locale: locale.value }));
     }
 
     function handleFiftyMoves() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
+      historyNavigationBarVisible.value = true;
       showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
     }
 
@@ -368,6 +380,7 @@ export default {
       handleFiftyMoves,
       handleMoveDone,
       handleHistorySelectionRequest,
+      historyNavigationBarVisible,
     };
   },
 };

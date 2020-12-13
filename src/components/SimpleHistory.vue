@@ -14,6 +14,7 @@
         {
           width: sizePixels(historySize()),
           height: sizePixels(navigationHeight),
+          display: buttonsDisplay,
         },
       ]"
     >
@@ -78,6 +79,10 @@ export default {
     sizePx: {
       type: Number,
       default: 60,
+    },
+    navigationBarVisible: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -291,6 +296,10 @@ export default {
       return props.sizePx * 0.9;
     });
 
+    const buttonsDisplay = computed(() => {
+      return props.navigationBarVisible ? "flex" : "none";
+    });
+
     window.addEventListener("orientationchange", computeNavigationButtonsStyle);
 
     onBeforeUnmount(function () {
@@ -326,6 +335,7 @@ export default {
       navigateToNextMoveIfPossible,
       navigateToLastMoveIfPossible,
       isLastElement,
+      buttonsDisplay,
     };
   },
 };
