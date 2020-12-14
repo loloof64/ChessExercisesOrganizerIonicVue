@@ -64,7 +64,7 @@ export default function useChessBoardLogic() {
     blackPlayerType.value = PLAYER_TYPE_NONE;
   }
 
-  function makeExternalMove({ startFile, startRank, endFile, endRank, promotion, moveValidatedCallback }) {
+  function makeExternalMove({ startFile, startRank, endFile, endRank, promotion }) {
     if (!isExternalTurn()) return;
     if (!isLegalMove({startFile, startRank, endFile, endRank })) return;
     const positionFenBeforeMove = game.value.fen();
@@ -74,7 +74,6 @@ export default function useChessBoardLogic() {
       console.error(`Bad external move : ${{ startFile, startRank, endFile, endRank, promotion }}`)
       return;
     }
-    if (moveValidatedCallback) moveValidatedCallback();
     const positionFen = game.value.fen();
     const lastMoveArrow = {
       fromFile: startFile,

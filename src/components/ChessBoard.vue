@@ -276,8 +276,10 @@ export default {
         endFile,
         endRank,
         promotion,
-        moveValidatedCallback: () => emitEndGameStatusIfAppropriate(),
       });
+      const invalidMove = san === undefined;
+      if (invalidMove) return;
+
       const fan = convertSanToFan({
         moveSan: san,
         whiteTurn: !isWhiteTurn.value,
@@ -288,6 +290,7 @@ export default {
         blackTurnBeforeMove: isWhiteTurn.value,
         lastMoveArrow,
       });
+      emitEndGameStatusIfAppropriate();
     }
 
     function tryToLoadPosition(fen) {
