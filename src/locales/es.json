@@ -15,6 +15,7 @@
     "confirm_restart_title": "¿Confirmar reinicio?",
     "confirm_restart_message": "¿De verdad quiere empezar un nuevo juego y dejar este?",
     "confirm_stop_title": "¿Detener?",
-    "confirm_stop_message": "¿De verdad quiere detener el juego?"
+    "confirm_stop_message": "¿De verdad quiere detener el juego?",
+    "failed_loading_stockfish_title": "Error al cargar el motor de ajedrez."
   }   
 }

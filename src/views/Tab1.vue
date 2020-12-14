@@ -109,12 +109,32 @@ export default {
       );
       engineCommunication.value = engineCommunicationLayer;
     } catch (engineLoadingError) {
-      
       console.error(engineLoadingError);
+      showErrorDialog({
+        title: getTranslation('game_page.failed_loading_stockfish_title'),
+        message: engineLoadingError,
+      });
     }
 
     function getTranslation(key) {
       return t(key, {}, { locale: locale.value });
+    }
+
+    async function showErrorDialog({title, message}) {
+       const alert = await alertController.create({
+        cssClass: "confirmDialog",
+        header: title,
+        message: message,
+        buttons: [
+          {
+            text: getTranslation("general.ok_button"),
+            role: "primary",
+            cssClass: "primaryButton",
+            handler: () => {},
+          },
+        ],
+      });
+      alert.present();
     }
 
     async function showConfirmDialog({ title, message, onCancel, onConfirm }) {
@@ -406,6 +426,10 @@ export default {
 
 .confirmDialog .alert-wrapper {
   background-color: rgba(45, 211, 211, 0.6);
+}
+
+.confirmDialog .alert-wrapper .alert-message {
+  color: blue;
 }
 
 .confirmDialog .primaryButton.alert-button {
