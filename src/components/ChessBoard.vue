@@ -113,7 +113,7 @@ export default {
       tryToSetupPositionFen,
       resetPlayerTypes,
       isHumanTurn,
-       isExternalTurn,
+      isExternalTurn,
       makeExternalMove,
       GAME_STATUS_IDLE,
       GAME_STATUS_RUNNING,
@@ -200,7 +200,7 @@ export default {
     function emitExternalTurnIfAppropriate() {
       if (isExternalTurn()) {
         const currentPositionFen = getPositionFen();
-        context.emit('external-turn', currentPositionFen);
+        context.emit("external-turn", currentPositionFen);
       }
     }
 
@@ -265,13 +265,23 @@ export default {
       endRank,
       promotion,
     }) {
-      makeExternalMove({
+      const { san, positionFen, lastMoveArrow } = makeExternalMove({
         startFile,
         startRank,
         endFile,
         endRank,
         promotion,
         moveValidatedCallback: () => emitEndGameStatusIfAppropriate(),
+      });
+      const fan = convertSanToFan({
+        moveSan: san,
+        whiteTurn: !isWhiteTurn.value,
+      });
+      context.emit("move-done", {
+        fan,
+        fen: positionFen,
+        blackTurnBeforeMove: isWhiteTurn.value,
+        lastMoveArrow,
       });
     }
 

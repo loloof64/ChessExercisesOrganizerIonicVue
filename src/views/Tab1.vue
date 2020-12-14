@@ -168,6 +168,8 @@ export default {
             promotion,
           } = moveParams;
           // These two instructions order should remain as is !!!
+          // Because we can only set last move arrow if game is stalled
+          // or it is external turn.
           boardComponent.value.tryToSetLastMoveArrow({
             startFile,
             startRank,

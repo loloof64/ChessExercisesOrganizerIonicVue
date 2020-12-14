@@ -67,6 +67,7 @@ export default function useChessBoardLogic() {
   function makeExternalMove({ startFile, startRank, endFile, endRank, promotion, moveValidatedCallback }) {
     if (!isExternalTurn()) return;
     if (!isLegalMove({startFile, startRank, endFile, endRank })) return;
+    const positionFenBeforeMove = game.value.fen();
     const moveResult = makeMove({ startFile, startRank, endFile, endRank, promotion });
     const notValidated = moveResult === undefined;
     if (notValidated) {
@@ -74,6 +75,23 @@ export default function useChessBoardLogic() {
       return;
     }
     if (moveValidatedCallback) moveValidatedCallback();
+    const positionFen = game.value.fen();
+    const lastMoveArrow = {
+      fromFile: startFile,
+      fromRank: startRank,
+      toFile: endFile,
+      toRank: endRank,
+    };
+
+    const from =
+      "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
+    const to= "abcdefgh".charAt(endFile) + "12345678".charAt(endRank);
+    const logicBeforeMove = new Chess(positionFenBeforeMove);
+    const san = logicBeforeMove.move({
+      from, to
+    }).san;
+    
+    return  { san, positionFen, lastMoveArrow };
   }
 
   const piecesValues = computed(() => {
