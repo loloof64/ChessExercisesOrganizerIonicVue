@@ -103,7 +103,10 @@ export default {
 
     const { t } = useI18n();
 
-    const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
+    const {
+      //PLAYER_TYPE_HUMAN,
+      PLAYER_TYPE_EXTERNAL,
+    } = useChessBoardLogic();
 
     if (window.Intl && typeof window.Intl === "object") {
       locale.value = navigator.language.substring(0, 2);
@@ -311,7 +314,7 @@ export default {
       const startPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
       const whiteType = PLAYER_TYPE_EXTERNAL;
-      const blackType = PLAYER_TYPE_HUMAN;
+      const blackType = PLAYER_TYPE_EXTERNAL;
       historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame(startPosition);
       boardComponent.value.letUserStartANewGame(
