@@ -111,6 +111,10 @@ export default {
       getGameStatus,
       getPositionFen,
       tryToSetupPositionFen,
+      resetPlayerTypes,
+      isHumanTurn,
+       isExternalTurn,
+      makeExternalMove,
       GAME_STATUS_IDLE,
       GAME_STATUS_RUNNING,
       GAME_STATUS_WHITE_WIN,
@@ -119,6 +123,7 @@ export default {
       GAME_STATUS_DRAW_THREE_FOLD_REPETITION,
       GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL,
       GAME_STATUS_DRAW_FIFTY_MOVES_RULE,
+      PLAYER_TYPE_HUMAN,
     } = useChessBoardLogic();
 
     const {
@@ -135,33 +140,45 @@ export default {
       const currentStatus = getGameStatus();
       switch (currentStatus) {
         case GAME_STATUS_WHITE_WIN:
+          resetPlayerTypes();
           context.emit("win", true);
           break;
         case GAME_STATUS_BLACK_WIN:
+          resetPlayerTypes();
           context.emit("win", false);
           break;
         case GAME_STATUS_DRAW_STALEMATE:
+          resetPlayerTypes();
           context.emit("stalemate");
           break;
         case GAME_STATUS_DRAW_THREE_FOLD_REPETITION:
+          resetPlayerTypes();
           context.emit("three-fold-repetition");
           break;
         case GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL:
+          resetPlayerTypes();
           context.emit("insufficient-material");
           break;
         case GAME_STATUS_DRAW_FIFTY_MOVES_RULE:
+          resetPlayerTypes();
           context.emit("fifty-moves");
           break;
+        default:
+          emitExternalTurnIfAppropriate();
       }
     }
 
-    function letUserStartANewGame() {
+    function letUserStartANewGame(
+      startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      whitePlayerType = PLAYER_TYPE_HUMAN,
+      blackPlayerType = PLAYER_TYPE_HUMAN
+    ) {
       arrowFromFile.value = -100;
       arrowFromRank.value = -100;
       arrowToFile.value = -100;
       arrowToRank.value = -100;
 
-      startNewGame();
+      startNewGame(startPosition, whitePlayerType, blackPlayerType);
     }
 
     function gameIsInProgress() {
@@ -178,6 +195,13 @@ export default {
       return (
         gameStatus != GAME_STATUS_IDLE && gameStatus != GAME_STATUS_RUNNING
       );
+    }
+
+    function emitExternalTurnIfAppropriate() {
+      if (isExternalTurn()) {
+        const currentPositionFen = getPositionFen();
+        context.emit('external-turn', currentPositionFen);
+      }
     }
 
     function requestPromotionSelection() {
@@ -234,6 +258,23 @@ export default {
       emitEndGameStatusIfAppropriate();
     }
 
+    function tryToMakeExternalMove({
+      startFile,
+      startRank,
+      endFile,
+      endRank,
+      promotion,
+    }) {
+      makeExternalMove({
+        startFile,
+        startRank,
+        endFile,
+        endRank,
+        promotion,
+        moveValidatedCallback: () => emitEndGameStatusIfAppropriate(),
+      });
+    }
+
     function tryToLoadPosition(fen) {
       return tryToSetupPositionFen(fen);
     }
@@ -249,6 +290,7 @@ export default {
 
     function onPanStart(detail) {
       if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      if (!isHumanTurn()) return;
       handleDragStart({
         detail,
         boardSizePx: props.sizePx,
@@ -261,6 +303,7 @@ export default {
 
     function onPanMove(detail) {
       if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      if (!isHumanTurn()) return;
       handleDragMove({
         detail,
         boardSizePx: props.sizePx,
@@ -270,6 +313,7 @@ export default {
 
     function onPanEnd() {
       if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      if (!isHumanTurn()) return;
       const whiteTurnBeforeMove = isWhiteTurn.value;
       const { san, lastMoveCoordinates, isPromotion } = handleDragEnd({
         isLegalMove,
@@ -314,6 +358,7 @@ export default {
 
     function onPanCancel() {
       if (getGameStatus() !== GAME_STATUS_RUNNING) return;
+      if (!isHumanTurn()) return;
       handleDragCancel();
     }
 
@@ -333,7 +378,7 @@ export default {
       boardGesture.on("panstart", onPanStart);
       boardGesture.on("panleft panright panup pandown", onPanMove);
       boardGesture.on("panend", onPanEnd);
-      boardGesture.on("pancancel", onPanCancel)
+      boardGesture.on("pancancel", onPanCancel);
     });
 
     function getLocationRatio(locationPx) {
@@ -390,7 +435,7 @@ export default {
         draggedPieceLocationRatio.y = getLocationRatio(dndState.draggedPieceY);
     });
 
-     function clearDraggedImage() {
+    function clearDraggedImage() {
       dndState.draggedPieceSrc = null;
       dndState.draggedPieceX = null;
       dndState.draggedPieceY = null;
@@ -434,6 +479,7 @@ export default {
       arrowFromRank,
       arrowToFile,
       arrowToRank,
+      tryToMakeExternalMove,
     };
   },
 };

@@ -13,7 +13,7 @@
       </ion-header>
 
       <div class="game_zone" :style="gameZoneStyle" slot="fixed">
-        <ChessBoard
+        <chess-board
           :sizePx="boardAndHistorySize"
           :reversed="boardReversed"
           ref="boardComponent"
@@ -23,6 +23,7 @@
           @insufficient-material="handleInsufficientMaterial"
           @fifty-moves="handleFiftyMoves"
           @move-done="handleMoveDone"
+          @external-turn="handleExternalTurn"
         />
         <simple-history
           :sizePx="boardAndHistorySize"
@@ -74,6 +75,7 @@ import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
+import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 
 export default {
   name: "Game",
@@ -92,6 +94,8 @@ export default {
 
     const { t } = useI18n();
 
+    const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
+
     if (window.Intl && typeof window.Intl === "object") {
       locale.value = navigator.language.substring(0, 2);
     }
@@ -101,27 +105,116 @@ export default {
     const historyComponent = ref(null);
     const historyNavigationBarVisible = ref(false);
     const engineCommunication = ref({});
+    const engineReady = ref(false);
+    const pendingPositionToSendToEngine = ref(null);
+
+    let engineReadyTimer;
 
     try {
-      const messageReceivedCallBack = (msg) => console.log(msg);
       const engineCommunicationLayer = new ChessEngineCommunication(
-        messageReceivedCallBack
+        processEngineMessage
       );
       engineCommunication.value = engineCommunicationLayer;
     } catch (engineLoadingError) {
+      engineCommunication.value = null;
       console.error(engineLoadingError);
       showErrorDialog({
-        title: getTranslation('game_page.failed_loading_stockfish_title'),
+        title: getTranslation("game_page.failed_loading_stockfish_title"),
         message: engineLoadingError,
       });
+    }
+
+    function sendCommandToEngine(cmd) {
+      if (engineCommunication.value) {
+        engineCommunication.value.sendCommand(cmd);
+      }
+    }
+
+    function checkEngineReady() {
+      const ENGINE_SEARCH_DEPTH = 13;
+      if (engineReady.value === true) {
+        clearInterval(engineReadyTimer);
+        sendCommandToEngine(
+          `position fen ${pendingPositionToSendToEngine.value}`
+        );
+        pendingPositionToSendToEngine.value = null;
+        sendCommandToEngine(`go depth ${ENGINE_SEARCH_DEPTH}`);
+      }
+    }
+
+    function handleExternalTurn(currentPositionFen) {
+      const CHECK_ENGINE_READY_INTERVAL_MS = 100;
+      engineReady.value = false;
+      pendingPositionToSendToEngine.value = currentPositionFen;
+      sendCommandToEngine("isready");
+
+      engineReadyTimer = setInterval(
+        checkEngineReady,
+        CHECK_ENGINE_READY_INTERVAL_MS
+      );
+    }
+
+    function processEngineMessage(message) {
+      console.log(message);
+      if (message === "readyok") {
+        engineReady.value = true;
+      } else if (message.startsWith("bestmove")) {
+        const moveParams = parseEngineMoveMessage(message);
+        if (moveParams) {
+          const {
+            startFile,
+            startRank,
+            endFile,
+            endRank,
+            promotion,
+          } = moveParams;
+          boardComponent.value.tryToMakeExternalMove({
+            startFile,
+            startRank,
+            endFile,
+            endRank,
+            promotion,
+          });
+        }
+        else {
+          console.error('Bad move parameters got from engine !');
+        }
+      }
+    }
+
+    function parseFile(str) {
+      return str.charCodeAt(0) - "a".charCodeAt(0);
+    }
+
+    function parseRank(str) {
+      return str.charCodeAt(0) - "1".charCodeAt(0);
+    }
+
+    function parseEngineMoveMessage(moveStr) {
+      const match = moveStr.match(
+        /^bestmove ([a-h][1-8])([a-h][1-8])([qrbn])?/
+      );
+      if (match) {
+        const from = match[1];
+        const to = match[2];
+        const promotion = match[3];
+
+        const startFile = parseFile(from.charAt(0));
+        const startRank = parseRank(from.charAt(1));
+
+        const endFile = parseFile(to.charAt(0));
+        const endRank = parseRank(to.charAt(1));
+
+        return { startFile, startRank, endFile, endRank, promotion };
+      } else return null;
     }
 
     function getTranslation(key) {
       return t(key, {}, { locale: locale.value });
     }
 
-    async function showErrorDialog({title, message}) {
-       const alert = await alertController.create({
+    async function showErrorDialog({ title, message }) {
+      const alert = await alertController.create({
         cssClass: "confirmDialog",
         header: title,
         message: message,
@@ -191,9 +284,17 @@ export default {
     }
 
     function doStartNewGame() {
+      const startPosition =
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+      const whiteType = PLAYER_TYPE_HUMAN;
+      const blackType = PLAYER_TYPE_EXTERNAL;
       historyNavigationBarVisible.value = false;
-      historyComponent.value.startNewGame();
-      boardComponent.value.letUserStartANewGame();
+      historyComponent.value.startNewGame(startPosition);
+      boardComponent.value.letUserStartANewGame(
+        startPosition,
+        whiteType,
+        blackType
+      );
     }
 
     function computeBoardAndHistorySize() {
@@ -412,6 +513,7 @@ export default {
       handleFiftyMoves,
       handleMoveDone,
       handleHistorySelectionRequest,
+      handleExternalTurn,
       historyNavigationBarVisible,
     };
   },

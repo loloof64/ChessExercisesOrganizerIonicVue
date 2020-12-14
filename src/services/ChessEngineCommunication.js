@@ -17,4 +17,8 @@ export default class ChessEngineCommunication {
     });
     this.stockfish.postMessage("uci");
   }
+
+  sendCommand(cmd) {
+    this.stockfish.postMessage(cmd);
+  }
 }

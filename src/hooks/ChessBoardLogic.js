@@ -12,8 +12,15 @@ export default function useChessBoardLogic() {
   const GAME_STATUS_DRAW_FIFTY_MOVES_RULE = 64;
   const GAME_STATUS_STOPPED = 128;
 
+  const PLAYER_TYPE_NONE = 0;
+  const PLAYER_TYPE_HUMAN = 1;
+  const PLAYER_TYPE_EXTERNAL = 2;
+
   const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
   const gameStatus = ref(GAME_STATUS_IDLE);
+
+  const whitePlayerType = ref(PLAYER_TYPE_NONE);
+  const blackPlayerType = ref(PLAYER_TYPE_NONE);
 
   function getGameStatus() {
     return gameStatus.value;
@@ -37,14 +44,36 @@ export default function useChessBoardLogic() {
   }
 
   function startNewGame(
-    startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    whiteType = PLAYER_TYPE_HUMAN,
+    blackType = PLAYER_TYPE_HUMAN
   ) {
     game.value = new Chess(startPosition);
+    whitePlayerType.value = whiteType;
+    blackPlayerType.value = blackType;
     gameStatus.value = GAME_STATUS_RUNNING;
   }
 
   function stopCurrentGame() {
     gameStatus.value = GAME_STATUS_STOPPED;
+    resetPlayerTypes();
+  }
+
+  function resetPlayerTypes() {
+    whitePlayerType.value = PLAYER_TYPE_NONE;
+    blackPlayerType.value = PLAYER_TYPE_NONE;
+  }
+
+  function makeExternalMove({ startFile, startRank, endFile, endRank, promotion, moveValidatedCallback }) {
+    if (!isExternalTurn()) return;
+    if (!isLegalMove({startFile, startRank, endFile, endRank })) return;
+    const moveResult = makeMove({ startFile, startRank, endFile, endRank, promotion });
+    const notValidated = moveResult === undefined;
+    if (notValidated) {
+      console.error(`Bad external move : ${{ startFile, startRank, endFile, endRank, promotion }}`)
+      return;
+    }
+    if (moveValidatedCallback) moveValidatedCallback();
   }
 
   const piecesValues = computed(() => {
@@ -222,6 +251,20 @@ export default function useChessBoardLogic() {
     return false;
   }
 
+  function isHumanTurn() {
+    return (
+      (isWhiteTurn.value && whitePlayerType.value === PLAYER_TYPE_HUMAN) ||
+      (!isWhiteTurn.value && blackPlayerType.value === PLAYER_TYPE_HUMAN)
+    );
+  }
+
+  function isExternalTurn() {
+    return (
+      (isWhiteTurn.value && whitePlayerType.value === PLAYER_TYPE_EXTERNAL) ||
+      (!isWhiteTurn.value && blackPlayerType.value === PLAYER_TYPE_EXTERNAL)
+    );
+  }
+
   return {
     getRank,
     getFile,
@@ -236,6 +279,10 @@ export default function useChessBoardLogic() {
     getGameStatus,
     getPositionFen,
     tryToSetupPositionFen,
+    resetPlayerTypes,
+    isHumanTurn,
+    isExternalTurn,
+    makeExternalMove,
     GAME_STATUS_IDLE,
     GAME_STATUS_RUNNING,
     GAME_STATUS_WHITE_WIN,
@@ -244,5 +291,7 @@ export default function useChessBoardLogic() {
     GAME_STATUS_DRAW_THREE_FOLD_REPETITION,
     GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL,
     GAME_STATUS_DRAW_FIFTY_MOVES_RULE,
+    PLAYER_TYPE_HUMAN,
+    PLAYER_TYPE_EXTERNAL,
   };
 }
