@@ -49,6 +49,13 @@
           />
         </div>
       </div>
+
+      <ion-spinner
+        class="engine_move_spinner"
+        color="tertiary"
+        v-if="waitingEngineMove"
+        :style="waitingSpinnerStyle"
+      ></ion-spinner>
     </ion-content>
   </ion-page>
 </template>
@@ -61,6 +68,7 @@ import {
   IonTitle,
   IonContent,
   IonIcon,
+  IonSpinner,
   toastController,
   alertController,
 } from "@ionic/vue";
@@ -69,7 +77,7 @@ import {
   gameControllerOutline,
   stopCircleOutline,
 } from "ionicons/icons";
-import { ref, reactive, onBeforeUnmount } from "vue";
+import { ref, reactive, onBeforeUnmount, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
@@ -88,6 +96,7 @@ export default {
     IonContent,
     IonPage,
     IonIcon,
+    IonSpinner,
   },
   setup() {
     const locale = ref(null);
@@ -107,6 +116,14 @@ export default {
     const engineCommunication = ref({});
     const engineReady = ref(false);
     const pendingPositionToSendToEngine = ref(null);
+
+    const waitingSpinnerStyle = reactive({
+      transform: "scale(3)",
+      position: "absolute",
+      top: 30,
+      left: 30,
+      "z-index": 1,
+    });
 
     let engineReadyTimer;
 
@@ -183,9 +200,8 @@ export default {
             endRank,
             promotion,
           });
-        }
-        else {
-          console.error('Bad move parameters got from engine !');
+        } else {
+          console.error("Bad move parameters got from engine !");
         }
       }
     }
@@ -491,7 +507,17 @@ export default {
       metaButtonStyle["width"] = buttonWidth;
       metaButtonStyle["height"] = buttonHeight;
       metaButtonStyle["margin"] = buttonMargin;
+
+      const cellsSize = boardAndHistorySize.value * 0.1111;
+      waitingSpinnerStyle["transform"] = `scale(${0.25 * cellsSize})`;
+      waitingSpinnerStyle["left"] = `${7 * cellsSize}px`;
+      waitingSpinnerStyle["top"] = `${7 * cellsSize}px`;
     }
+
+    const waitingEngineMove = computed(() => {
+      if (!boardComponent.value) return false;
+      return boardComponent.value.externalTurn();
+    });
 
     window.addEventListener("orientationchange", updateSizeAndLayout);
 
@@ -523,6 +549,8 @@ export default {
       handleHistorySelectionRequest,
       handleExternalTurn,
       historyNavigationBarVisible,
+      waitingEngineMove,
+      waitingSpinnerStyle,
     };
   },
 };

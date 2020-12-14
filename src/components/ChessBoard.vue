@@ -198,6 +198,10 @@ export default {
       );
     }
 
+    function externalTurn() {
+      return isExternalTurn();
+    }
+
     function emitExternalTurnIfAppropriate() {
       if (isExternalTurn()) {
         const currentPositionFen = getPositionFen();
@@ -491,6 +495,7 @@ export default {
       arrowToFile,
       arrowToRank,
       tryToMakeExternalMove,
+      externalTurn,
     };
   },
 };
