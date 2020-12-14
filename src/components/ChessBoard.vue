@@ -280,7 +280,7 @@ export default {
     }
 
     function tryToSetLastMoveArrow({ startFile, startRank, endFile, endRank }) {
-      if (gameIsStalled()) {
+      if (gameIsStalled() || isExternalTurn()) {
         arrowFromFile.value = startFile;
         arrowFromRank.value = startRank;
         arrowToFile.value = endFile;

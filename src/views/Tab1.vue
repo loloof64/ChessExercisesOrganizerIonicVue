@@ -155,7 +155,6 @@ export default {
     }
 
     function processEngineMessage(message) {
-      console.log(message);
       if (message === "readyok") {
         engineReady.value = true;
       } else if (message.startsWith("bestmove")) {
@@ -168,6 +167,13 @@ export default {
             endRank,
             promotion,
           } = moveParams;
+          // These two instructions order should remain as is !!!
+          boardComponent.value.tryToSetLastMoveArrow({
+            startFile,
+            startRank,
+            endFile,
+            endRank,
+          });
           boardComponent.value.tryToMakeExternalMove({
             startFile,
             startRank,
