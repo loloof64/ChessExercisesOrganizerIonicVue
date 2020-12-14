@@ -115,6 +115,8 @@ export default {
       isHumanTurn,
       isExternalTurn,
       makeExternalMove,
+      addPositionFenToOccurences,
+      getGamePgn,
       GAME_STATUS_IDLE,
       GAME_STATUS_RUNNING,
       GAME_STATUS_WHITE_WIN,
@@ -254,6 +256,7 @@ export default {
         toRank: arrowToRank.value,
       };
 
+      addPositionFenToOccurences(positionFen);
       context.emit("move-done", {
         fan,
         fen: positionFen,
@@ -270,26 +273,31 @@ export default {
       endRank,
       promotion,
     }) {
-      const { san, positionFen, lastMoveArrow } = makeExternalMove({
+      const moveResult= makeExternalMove({
         startFile,
         startRank,
         endFile,
         endRank,
         promotion,
       });
-      const invalidMove = san === undefined;
-      if (invalidMove) return;
+      if (!moveResult) return;
+      const { san, positionFen, lastMoveArrow }  = moveResult;
+      if (!san) return;
+
 
       const fan = convertSanToFan({
         moveSan: san,
         whiteTurn: !isWhiteTurn.value,
       });
+
+      addPositionFenToOccurences(positionFen);
       context.emit("move-done", {
         fan,
         fen: positionFen,
         blackTurnBeforeMove: isWhiteTurn.value,
         lastMoveArrow,
       });
+
       emitEndGameStatusIfAppropriate();
     }
 
@@ -359,6 +367,7 @@ export default {
           toFile: arrowToFile.value,
           toRank: arrowToRank.value,
         };
+        addPositionFenToOccurences(positionFen);
         context.emit("move-done", {
           fan,
           fen: positionFen,
@@ -398,6 +407,10 @@ export default {
       boardGesture.on("panend", onPanEnd);
       boardGesture.on("pancancel", onPanCancel);
     });
+
+    function tryToGetGamePgn() {
+      return getGamePgn();
+    }
 
     function getLocationRatio(locationPx) {
       return locationPx / props.sizePx;
@@ -499,6 +512,7 @@ export default {
       arrowToRank,
       tryToMakeExternalMove,
       externalTurn,
+      tryToGetGamePgn,
     };
   },
 };

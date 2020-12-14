@@ -47,6 +47,11 @@
             :style="metaButtonStyle"
             @click="stopGame"
           />
+          <ion-icon
+            :icon="saveOutline"
+            :style="metaButtonStyle"
+            @click="saveGameInPgn"
+          />
         </div>
       </div>
 
@@ -76,6 +81,7 @@ import {
   swapVertical,
   gameControllerOutline,
   stopCircleOutline,
+  saveOutline,
 } from "ionicons/icons";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -484,6 +490,14 @@ export default {
       return { width, height, margin };
     }
 
+    function saveGameInPgn() {
+      const gamePgn = boardComponent.value.tryToGetGamePgn();
+      if (!gamePgn) return;
+      //////////////////////////////////////////
+      console.log(gamePgn);
+      /////////////////////////////////////////
+    }
+
     function updateSizeAndLayout() {
       boardAndHistorySize.value = computeBoardAndHistorySize();
       const [columnsLayout, rowsLayout] = computeLayout();
@@ -538,6 +552,7 @@ export default {
       swapVertical,
       gameControllerOutline,
       stopCircleOutline,
+      saveOutline,
       boardReversed,
       boardComponent,
       historyComponent,
@@ -554,6 +569,7 @@ export default {
       historyNavigationBarVisible,
       waitingEngineMove,
       waitingSpinnerStyle,
+      saveGameInPgn,
     };
   },
 };

@@ -1,5 +1,6 @@
 import Chess from "chess.js";
 import { ref, computed } from "vue";
+import moment from "moment";
 
 export default function useChessBoardLogic() {
   const GAME_STATUS_IDLE = 0;
@@ -17,6 +18,7 @@ export default function useChessBoardLogic() {
   const PLAYER_TYPE_EXTERNAL = 2;
 
   const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
+  const positions_occurences = ref({});
   const gameStatus = ref(GAME_STATUS_IDLE);
 
   const whitePlayerType = ref(PLAYER_TYPE_NONE);
@@ -27,6 +29,13 @@ export default function useChessBoardLogic() {
   }
 
   function updateGameStatusIfFinished() {
+    const positionFenWithoutNoise = game.value
+      .fen()
+      .split(" ")
+      .splice(0, 4)
+      .join(" ");
+    const gameInThreeFoldRepetitions =
+      positions_occurences.value[positionFenWithoutNoise] >= 3;
     if (game.value.in_checkmate()) {
       const isWhiteTurn = game.value.turn() === "w";
       gameStatus.value = isWhiteTurn
@@ -34,7 +43,7 @@ export default function useChessBoardLogic() {
         : GAME_STATUS_WHITE_WIN;
     } else if (game.value.in_stalemate()) {
       gameStatus.value = GAME_STATUS_DRAW_STALEMATE;
-    } else if (game.value.in_threefold_repetition()) {
+    } else if (gameInThreeFoldRepetitions) {
       gameStatus.value = GAME_STATUS_DRAW_THREE_FOLD_REPETITION;
     } else if (game.value.insufficient_material()) {
       gameStatus.value = GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL;
@@ -48,6 +57,7 @@ export default function useChessBoardLogic() {
     whiteType = PLAYER_TYPE_HUMAN,
     blackType = PLAYER_TYPE_HUMAN
   ) {
+    positions_occurences.value = {};
     game.value = new Chess(startPosition);
     whitePlayerType.value = whiteType;
     blackPlayerType.value = blackType;
@@ -64,14 +74,44 @@ export default function useChessBoardLogic() {
     blackPlayerType.value = PLAYER_TYPE_NONE;
   }
 
-  function makeExternalMove({ startFile, startRank, endFile, endRank, promotion }) {
+  function addPositionFenToOccurences(positionFen) {
+    const positionFenWithoutNoise = positionFen
+      .split(" ")
+      .splice(0, 4)
+      .join(" ");
+    if (!positions_occurences.value[positionFenWithoutNoise])
+      positions_occurences.value[positionFenWithoutNoise] = 0;
+    positions_occurences.value[positionFenWithoutNoise] += 1;
+  }
+
+  function makeExternalMove({
+    startFile,
+    startRank,
+    endFile,
+    endRank,
+    promotion,
+  }) {
     if (!isExternalTurn()) return;
-    if (!isLegalMove({startFile, startRank, endFile, endRank })) return;
+    if (!isLegalMove({ startFile, startRank, endFile, endRank })) return;
     const positionFenBeforeMove = game.value.fen();
-    const moveResult = makeMove({ startFile, startRank, endFile, endRank, promotion });
+    const moveResult = makeMove({
+      startFile,
+      startRank,
+      endFile,
+      endRank,
+      promotion,
+    });
     const notValidated = moveResult === undefined;
     if (notValidated) {
-      console.error(`Bad external move : ${{ startFile, startRank, endFile, endRank, promotion }}`)
+      console.error(
+        `Bad external move : ${{
+          startFile,
+          startRank,
+          endFile,
+          endRank,
+          promotion,
+        }}`
+      );
       return;
     }
     const positionFen = game.value.fen();
@@ -82,15 +122,15 @@ export default function useChessBoardLogic() {
       toRank: endRank,
     };
 
-    const from =
-      "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
-    const to= "abcdefgh".charAt(endFile) + "12345678".charAt(endRank);
+    const from = "abcdefgh".charAt(startFile) + "12345678".charAt(startRank);
+    const to = "abcdefgh".charAt(endFile) + "12345678".charAt(endRank);
     const logicBeforeMove = new Chess(positionFenBeforeMove);
     const san = logicBeforeMove.move({
-      from, to
+      from,
+      to,
     }).san;
-    
-    return  { san, positionFen, lastMoveArrow };
+
+    return { san, positionFen, lastMoveArrow };
   }
 
   const piecesValues = computed(() => {
@@ -282,6 +322,26 @@ export default function useChessBoardLogic() {
     );
   }
 
+  function getGamePgn() {
+    const gameNotStalled =
+      gameStatus.value === GAME_STATUS_IDLE ||
+      gameStatus.value === GAME_STATUS_RUNNING;
+    if (gameNotStalled) return;
+    const whiteHeader =
+      whitePlayerType.value === PLAYER_TYPE_HUMAN ? "Player" : "Computer";
+    const blackHeader =
+      blackPlayerType.value === PLAYER_TYPE_HUMAN ? "Player" : "Computer";
+    const date = moment().format("YYYY.MM.DD");
+
+    game.value.header("Event", "Chess Exercises Organizer");
+    game.value.header("Site", "?");
+    game.value.header("Date", date);
+    game.value.header("White", whiteHeader);
+    game.value.header("Black", blackHeader);
+
+    return game.value.pgn();
+  }
+
   return {
     getRank,
     getFile,
@@ -300,6 +360,8 @@ export default function useChessBoardLogic() {
     isHumanTurn,
     isExternalTurn,
     makeExternalMove,
+    addPositionFenToOccurences,
+    getGamePgn,
     GAME_STATUS_IDLE,
     GAME_STATUS_RUNNING,
     GAME_STATUS_WHITE_WIN,
