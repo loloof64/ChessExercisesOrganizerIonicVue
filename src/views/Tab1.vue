@@ -13,23 +13,23 @@
       </ion-header>
 
       <div class="game_zone" :style="gameZoneStyle" slot="fixed">
-          <ChessBoard
-            :sizePx="boardAndHistorySize"
-            :reversed="boardReversed"
-            ref="boardComponent"
-            @win="handleWin"
-            @stalemate="handleStalemate"
-            @three-fold-repetition="handleThreeFoldRepetition"
-            @insufficient-material="handleInsufficientMaterial"
-            @fifty-moves="handleFiftyMoves"
-            @move-done="handleMoveDone"
-          />
-          <simple-history
-            :sizePx="boardAndHistorySize"
-            :navigationBarVisible="historyNavigationBarVisible"
-            ref="historyComponent"
-            @selection-request="handleHistorySelectionRequest"
-          />
+        <ChessBoard
+          :sizePx="boardAndHistorySize"
+          :reversed="boardReversed"
+          ref="boardComponent"
+          @win="handleWin"
+          @stalemate="handleStalemate"
+          @three-fold-repetition="handleThreeFoldRepetition"
+          @insufficient-material="handleInsufficientMaterial"
+          @fifty-moves="handleFiftyMoves"
+          @move-done="handleMoveDone"
+        />
+        <simple-history
+          :sizePx="boardAndHistorySize"
+          :navigationBarVisible="historyNavigationBarVisible"
+          ref="historyComponent"
+          @selection-request="handleHistorySelectionRequest"
+        />
         <div :style="metaStyle">
           <ion-icon
             :icon="swapVertical"
@@ -73,6 +73,7 @@ import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
+import ChessEngineCommunication from "../services/ChessEngineCommunication";
 
 export default {
   name: "Game",
@@ -96,14 +97,21 @@ export default {
     }
 
     const boardComponent = ref(null);
-
     const boardReversed = ref(false);
-
     const historyComponent = ref(null);
-
     const historyNavigationBarVisible = ref(false);
+    const engineCommunication = ref({});
 
-    
+    try {
+      const messageReceivedCallBack = (msg) => console.log(msg);
+      const engineCommunicationLayer = new ChessEngineCommunication(
+        messageReceivedCallBack
+      );
+      engineCommunication.value = engineCommunicationLayer;
+    } catch (engineLoadingError) {
+      
+      console.error(engineLoadingError);
+    }
 
     function getTranslation(key) {
       return t(key, {}, { locale: locale.value });
@@ -274,16 +282,15 @@ export default {
             startFile: lastMoveArrow.fromFile,
             startRank: lastMoveArrow.fromRank,
             endFile: lastMoveArrow.toFile,
-            endRank: lastMoveArrow.toRank
+            endRank: lastMoveArrow.toRank,
           });
-        }
-        else {
+        } else {
           const eraseCoordinate = -100;
           boardComponent.value.tryToSetLastMoveArrow({
-            startFile:eraseCoordinate,
-            startRank:eraseCoordinate,
-            endFile:eraseCoordinate,
-            endRank:eraseCoordinate
+            startFile: eraseCoordinate,
+            startRank: eraseCoordinate,
+            endFile: eraseCoordinate,
+            endRank: eraseCoordinate,
           });
         }
       }
@@ -307,13 +314,15 @@ export default {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
 
-      return isPortrait ? {
-        width: "100%",
-        height: "8%",
-      } : {
-        width: "8%",
-        height: "100%"
-      }
+      return isPortrait
+        ? {
+            width: "100%",
+            height: "8%",
+          }
+        : {
+            width: "8%",
+            height: "100%",
+          };
     }
 
     function computeMetaButtonDimension() {
@@ -331,7 +340,10 @@ export default {
       boardAndHistorySize.value = computeBoardAndHistorySize();
       const [columnsLayout, rowsLayout] = computeLayout();
 
-      const {width: metaZoneWidth, height: metaZoneHeight} = computeMetaZoneDimensions();
+      const {
+        width: metaZoneWidth,
+        height: metaZoneHeight,
+      } = computeMetaZoneDimensions();
 
       const {
         width: buttonWidth,
@@ -339,13 +351,13 @@ export default {
         margin: buttonMargin,
       } = computeMetaButtonDimension();
 
-      gameZoneStyle ["flex-direction"] = computeGameZoneDirection();
+      gameZoneStyle["flex-direction"] = computeGameZoneDirection();
       gameZoneStyle["grid-template-columns"] = columnsLayout;
       gameZoneStyle["grid-template-rows"] = rowsLayout;
 
       metaStyle["flex-direction"] = computeMetaZoneDirection();
       metaStyle["width"] = metaZoneWidth;
-      metaStyle ["height"] = metaZoneHeight;
+      metaStyle["height"] = metaZoneHeight;
 
       metaButtonStyle["width"] = buttonWidth;
       metaButtonStyle["height"] = buttonHeight;

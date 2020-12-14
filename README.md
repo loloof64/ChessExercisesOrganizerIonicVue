@@ -2,6 +2,10 @@
 
 Manage your chess exercises and train yourself with them against the device.
 
+## Credits
+
+Using compiled Stockfish WebAssembly from project [Stockfish.js](https://github.com/nmrugg/stockfish.js/tree/master/src).
+
 ## Developers
 
 ### Setup
