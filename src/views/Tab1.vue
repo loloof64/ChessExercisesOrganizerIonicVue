@@ -294,8 +294,8 @@ export default {
     function doStartNewGame() {
       const startPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-      const whiteType = PLAYER_TYPE_HUMAN;
-      const blackType = PLAYER_TYPE_EXTERNAL;
+      const whiteType = PLAYER_TYPE_EXTERNAL;
+      const blackType = PLAYER_TYPE_HUMAN;
       historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame(startPosition);
       boardComponent.value.letUserStartANewGame(

@@ -179,6 +179,7 @@ export default {
       arrowToRank.value = -100;
 
       startNewGame(startPosition, whitePlayerType, blackPlayerType);
+      emitExternalTurnIfAppropriate();
     }
 
     function gameIsInProgress() {
