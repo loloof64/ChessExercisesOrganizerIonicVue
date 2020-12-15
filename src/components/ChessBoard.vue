@@ -299,19 +299,19 @@ export default {
       });
 
       emitEndGameStatusIfAppropriate();
+
+      return true;
     }
 
     function tryToLoadPosition(fen) {
       return tryToSetupPositionFen(fen);
     }
 
-    function tryToSetLastMoveArrow({ startFile, startRank, endFile, endRank }) {
-      if (gameIsStalled() || isExternalTurn()) {
+    function setLastMoveArrow({ startFile, startRank, endFile, endRank }) {
         arrowFromFile.value = startFile;
         arrowFromRank.value = startRank;
         arrowToFile.value = endFile;
         arrowToRank.value = endRank;
-      }
     }
 
     function onPanStart(detail) {
@@ -505,7 +505,7 @@ export default {
       gameIsStalled,
       onPromotionMoveDone,
       tryToLoadPosition,
-      tryToSetLastMoveArrow,
+      setLastMoveArrow,
       arrowFromFile,
       arrowFromRank,
       arrowToFile,

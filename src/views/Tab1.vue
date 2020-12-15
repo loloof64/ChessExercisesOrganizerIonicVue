@@ -193,22 +193,23 @@ export default {
             endRank,
             promotion,
           } = moveParams;
-          // These two instructions order should remain as is !!!
-          // Because we can only set last move arrow if game is stalled
-          // or it is external turn.
-          boardComponent.value.tryToSetLastMoveArrow({
-            startFile,
-            startRank,
-            endFile,
-            endRank,
-          });
-          boardComponent.value.tryToMakeExternalMove({
+         
+          const moveValidated = boardComponent.value.tryToMakeExternalMove({
             startFile,
             startRank,
             endFile,
             endRank,
             promotion,
           });
+
+          if (moveValidated) {
+            boardComponent.value.setLastMoveArrow({
+            startFile,
+            startRank,
+            endFile,
+            endRank,
+          });
+          }
         } else {
           console.error("Bad move parameters got from engine !");
         }
@@ -432,7 +433,7 @@ export default {
         historyComponent.value.commitSelection(data.index);
         const lastMoveArrow = historyComponent.value.getSelectedMoveArrow();
         if (lastMoveArrow !== undefined) {
-          boardComponent.value.tryToSetLastMoveArrow({
+          boardComponent.value.setLastMoveArrow({
             startFile: lastMoveArrow.fromFile,
             startRank: lastMoveArrow.fromRank,
             endFile: lastMoveArrow.toFile,
@@ -440,7 +441,7 @@ export default {
           });
         } else {
           const eraseCoordinate = -100;
-          boardComponent.value.tryToSetLastMoveArrow({
+          boardComponent.value.setLastMoveArrow({
             startFile: eraseCoordinate,
             startRank: eraseCoordinate,
             endFile: eraseCoordinate,
