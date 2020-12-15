@@ -314,12 +314,8 @@ export default function useChessBoardLogic() {
       gameStatus.value != GAME_STATUS_IDLE &&
       gameStatus.value != GAME_STATUS_RUNNING;
     if (allowedToLoadPosition) {
-      const newGame = new Chess();
-      if (newGame.load(fen)) {
-        game.value = newGame;
-        return true;
-      }
-      return false;
+      gameCurrentFen.value =fen;
+      return true;
     }
     return false;
   }

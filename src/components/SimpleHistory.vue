@@ -152,6 +152,7 @@ export default {
     function handleSelection(elementIndex) {
       const element = elements[elementIndex];
       const isAMoveElement = element.fen !== undefined;
+      
       if (isAMoveElement) {
         context.emit("selection-request", {
           index: elementIndex,
