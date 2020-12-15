@@ -90,6 +90,13 @@ import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
+import {
+  Plugins,
+  FilesystemDirectory,
+  FilesystemEncoding,
+} from "@capacitor/core";
+
+const { Filesystem } = Plugins;
 
 export default {
   name: "Game",
@@ -193,7 +200,7 @@ export default {
             endRank,
             promotion,
           } = moveParams;
-         
+
           const moveValidated = boardComponent.value.tryToMakeExternalMove({
             startFile,
             startRank,
@@ -204,11 +211,11 @@ export default {
 
           if (moveValidated) {
             boardComponent.value.setLastMoveArrow({
-            startFile,
-            startRank,
-            endFile,
-            endRank,
-          });
+              startFile,
+              startRank,
+              endFile,
+              endRank,
+            });
           }
         } else {
           console.error("Bad move parameters got from engine !");
@@ -318,8 +325,7 @@ export default {
     }
 
     function doStartNewGame() {
-      const startPosition =
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+      const startPosition = "8/8/8/3k4/8/8/8/1B1K2B1 w - - 0 1";
       const whiteType = PLAYER_TYPE_EXTERNAL;
       const blackType = PLAYER_TYPE_EXTERNAL;
       historyNavigationBarVisible.value = false;
@@ -491,12 +497,28 @@ export default {
       return { width, height, margin };
     }
 
-    function saveGameInPgn() {
+    async function saveGameInPgn() {
       const gamePgn = boardComponent.value.tryToGetGamePgn();
       if (!gamePgn) return;
-      //////////////////////////////////////////
-      console.log(gamePgn);
-      /////////////////////////////////////////
+
+      try {
+        await Filesystem.writeFile({
+          path: "outputPgnFiles/output.pgn",
+          data: gamePgn,
+          directory: FilesystemDirectory.Documents,
+          encoding: FilesystemEncoding.ASCII,
+          recursive: true,
+        });
+        showToast(
+          t("game_page.pgn_saved_message", {}, { locale: locale.value })
+        );
+      } catch (loadingError) {
+        console.error(loadingError);
+        showErrorDialog({
+          title: getTranslation("game_page.error_saving_pgn_title"),
+          message: loadingError,
+        });
+      }
     }
 
     function updateSizeAndLayout() {

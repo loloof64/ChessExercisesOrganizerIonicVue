@@ -16,6 +16,8 @@
     "confirm_restart_message": "Do you really want to start a new game and leave this one ?",
     "confirm_stop_title": "Stop ?",
     "confirm_stop_message": "Do you really want to stop current game ?",
-    "failed_loading_stockfish_title": "Error loading chess engine."
+    "failed_loading_stockfish_title": "Error loading chess engine.",
+    "pgn_saved_message": "Pgn file saved successfully.",
+    "error_saving_pgn_title": "Failed to save pgn file."
   }
 }
