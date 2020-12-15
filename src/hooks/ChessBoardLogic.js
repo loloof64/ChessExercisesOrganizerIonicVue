@@ -20,6 +20,8 @@ export default function useChessBoardLogic() {
   const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
   const positions_occurences = ref({});
   const gameStatus = ref(GAME_STATUS_IDLE);
+  const gamePgnText = ref(null);
+  const gameCurrentFen = ref(game.value.fen());
 
   const whitePlayerType = ref(PLAYER_TYPE_NONE);
   const blackPlayerType = ref(PLAYER_TYPE_NONE);
@@ -37,17 +39,22 @@ export default function useChessBoardLogic() {
     const gameInThreeFoldRepetitions =
       positions_occurences.value[positionFenWithoutNoise] >= 3;
     if (game.value.in_checkmate()) {
+      fillGamePgn();
       const isWhiteTurn = game.value.turn() === "w";
       gameStatus.value = isWhiteTurn
         ? GAME_STATUS_BLACK_WIN
         : GAME_STATUS_WHITE_WIN;
     } else if (game.value.in_stalemate()) {
+      fillGamePgn();
       gameStatus.value = GAME_STATUS_DRAW_STALEMATE;
     } else if (gameInThreeFoldRepetitions) {
+      fillGamePgn();
       gameStatus.value = GAME_STATUS_DRAW_THREE_FOLD_REPETITION;
     } else if (game.value.insufficient_material()) {
+      fillGamePgn();
       gameStatus.value = GAME_STATUS_DRAW_INSUFFICIENT_MATERIAL;
     } else if (game.value.in_draw()) {
+      fillGamePgn();
       gameStatus.value = GAME_STATUS_DRAW_FIFTY_MOVES_RULE;
     }
   }
@@ -66,6 +73,7 @@ export default function useChessBoardLogic() {
 
   function stopCurrentGame() {
     gameStatus.value = GAME_STATUS_STOPPED;
+    fillGamePgn();
     resetPlayerTypes();
   }
 
@@ -115,6 +123,7 @@ export default function useChessBoardLogic() {
       return;
     }
     const positionFen = game.value.fen();
+    gameCurrentFen.value = positionFen;
     const lastMoveArrow = {
       fromFile: startFile,
       fromRank: startRank,
@@ -134,7 +143,7 @@ export default function useChessBoardLogic() {
   }
 
   const piecesValues = computed(() => {
-    const currentPosition = game.value.fen();
+    const currentPosition = gameCurrentFen.value;
     const boardValues = currentPosition
       .split(" ")[0]
       .split("/")
@@ -270,7 +279,8 @@ export default function useChessBoardLogic() {
       promotion,
     });
 
-    game.value = new Chess(game.value.fen());
+    gameCurrentFen.value = game.value.fen();
+
     updateGameStatusIfFinished();
 
     return moveResult?.san || null;
@@ -322,11 +332,7 @@ export default function useChessBoardLogic() {
     );
   }
 
-  function getGamePgn() {
-    const gameNotStalled =
-      gameStatus.value === GAME_STATUS_IDLE ||
-      gameStatus.value === GAME_STATUS_RUNNING;
-    if (gameNotStalled) return;
+  function fillGamePgn(){
     const whiteHeader =
       whitePlayerType.value === PLAYER_TYPE_HUMAN ? "Player" : "Computer";
     const blackHeader =
@@ -339,7 +345,11 @@ export default function useChessBoardLogic() {
     game.value.header("White", whiteHeader);
     game.value.header("Black", blackHeader);
 
-    return game.value.pgn();
+    gamePgnText.value = game.value.pgn();
+  }
+
+  function getGamePgn() {
+    return gamePgnText.value;
   }
 
   return {

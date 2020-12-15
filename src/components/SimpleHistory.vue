@@ -246,34 +246,34 @@ export default {
     function commitSelection(elementIndex) {
       selectedIndex.value = elementIndex;
 
-      function scrollToSelectedElement()  {
+      function scrollToSelectedElement() {
         // Scroll in order to show selected element.
-      const nodeToShow = document.querySelector(
-        ".simple_history_root .movesZone .highlighted"
-      );
-      const movesZone = document.querySelector(".movesZone");
-      if (elementIndex > 0) {
-        if (nodeToShow) {
-          nodeToShow.setAttribute("tabindex", "-1");
-          nodeToShow.focus();
-          nodeToShow.removeAttribute("tabindex");
+        const nodeToShow = document.querySelector(
+          ".simple_history_root .movesZone .highlighted"
+        );
+        const movesZone = document.querySelector(".movesZone");
+        if (elementIndex > 0) {
+          if (nodeToShow) {
+            nodeToShow.setAttribute("tabindex", "-1");
+            nodeToShow.focus();
+            nodeToShow.removeAttribute("tabindex");
+          } else {
+            movesZone.scrollTo({
+              left: 0,
+              top: movesZoneHeight,
+              behavior: "smooth",
+            });
+          }
         } else {
           movesZone.scrollTo({
             left: 0,
-            top: movesZoneHeight,
+            top: 0,
             behavior: "smooth",
           });
         }
-      } else {
-        movesZone.scrollTo({
-          left: 0,
-          top: 0,
-          behavior: "smooth",
-        });
-      }
       }
 
-      setTimeout(scrollToSelectedElement, 90);      
+      scrollToSelectedElement();
     }
 
     function selectLastHistoryMoveIfThereIsOne() {
