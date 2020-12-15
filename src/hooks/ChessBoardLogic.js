@@ -66,6 +66,7 @@ export default function useChessBoardLogic() {
   ) {
     positions_occurences.value = {};
     game.value = new Chess(startPosition);
+    gameCurrentFen.value = startPosition;
     whitePlayerType.value = whiteType;
     blackPlayerType.value = blackType;
     gameStatus.value = GAME_STATUS_RUNNING;
