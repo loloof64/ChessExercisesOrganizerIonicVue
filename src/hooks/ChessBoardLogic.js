@@ -17,6 +17,11 @@ export default function useChessBoardLogic() {
   const PLAYER_TYPE_HUMAN = 1;
   const PLAYER_TYPE_EXTERNAL = 2;
 
+  const PGN_GAME_IN_PROGRESS_STR = "*";
+  const PGN_WHITE_WIN_STR = "1-0";
+  const PGN_BLACK_WIN_STR = "0-1";
+  const PGN_DRAW_STR = "1/2-1/2";
+
   const game = ref(new Chess("8/8/8/8/8/8/8/8 w - - 0 1"));
   const positions_occurences = ref({});
   const gameStatus = ref(GAME_STATUS_IDLE);
@@ -333,7 +338,25 @@ export default function useChessBoardLogic() {
     );
   }
 
-  function fillGamePgn(){
+  function fillGamePgn() {
+    let result;
+    if (game.value.in_checkmate()) {
+      const whiteTurn = game.value.turn() === 'w';
+      result = whiteTurn ? PGN_BLACK_WIN_STR : PGN_WHITE_WIN_STR;
+    }
+    else if (game.value.in_threefold_repetition()) {
+      result =PGN_DRAW_STR;
+    }
+    else if (game.value.in_stalemate()) {
+      result =PGN_DRAW_STR;
+    }
+    else if (game.value.in_draw()) {
+      result =PGN_DRAW_STR;
+    }
+    else {
+      result = PGN_GAME_IN_PROGRESS_STR;
+    }
+
     const whiteHeader =
       whitePlayerType.value === PLAYER_TYPE_HUMAN ? "Player" : "Computer";
     const blackHeader =
@@ -345,6 +368,7 @@ export default function useChessBoardLogic() {
     game.value.header("Date", date);
     game.value.header("White", whiteHeader);
     game.value.header("Black", blackHeader);
+    game.value.header("Result", result);
 
     gamePgnText.value = game.value.pgn();
   }
