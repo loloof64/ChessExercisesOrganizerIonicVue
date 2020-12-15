@@ -115,7 +115,6 @@ export default {
       isHumanTurn,
       isExternalTurn,
       makeExternalMove,
-      addPositionFenToOccurences,
       getGamePgn,
       GAME_STATUS_IDLE,
       GAME_STATUS_RUNNING,
@@ -256,7 +255,6 @@ export default {
         toRank: arrowToRank.value,
       };
 
-      addPositionFenToOccurences(positionFen);
       context.emit("move-done", {
         fan,
         fen: positionFen,
@@ -290,7 +288,6 @@ export default {
         whiteTurn: !isWhiteTurn.value,
       });
 
-      addPositionFenToOccurences(positionFen);
       context.emit("move-done", {
         fan,
         fen: positionFen,
@@ -367,7 +364,7 @@ export default {
           toFile: arrowToFile.value,
           toRank: arrowToRank.value,
         };
-        addPositionFenToOccurences(positionFen);
+
         context.emit("move-done", {
           fan,
           fen: positionFen,

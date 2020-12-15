@@ -36,14 +36,22 @@ export default function useChessBoardLogic() {
     return gameStatus.value;
   }
 
+  /*
+  Be careful : only call this method once after each move done,
+  otherwise the positions FEN occurences counter will be messed.
+  */
   function updateGameStatusIfFinished() {
     const positionFenWithoutNoise = game.value
       .fen()
       .split(" ")
       .splice(0, 4)
       .join(" ");
+
+    addPositionFenToOccurences(positionFenWithoutNoise);
+
     const gameInThreeFoldRepetitions =
       positions_occurences.value[positionFenWithoutNoise] >= 3;
+
     if (game.value.in_checkmate()) {
       fillGamePgn();
       const isWhiteTurn = game.value.turn() === "w";
@@ -73,7 +81,7 @@ export default function useChessBoardLogic() {
     positions_occurences.value = {};
     game.value = new Chess(startPosition);
     gameCurrentFen.value = startPosition;
-    currentTurnIsWhite.value = game.value.turn() === 'w';
+    currentTurnIsWhite.value = game.value.turn() === "w";
     whitePlayerType.value = whiteType;
     blackPlayerType.value = blackType;
     gameStatus.value = GAME_STATUS_RUNNING;
@@ -95,8 +103,10 @@ export default function useChessBoardLogic() {
       .split(" ")
       .splice(0, 4)
       .join(" ");
-    if (!positions_occurences.value[positionFenWithoutNoise])
+
+    if (!positions_occurences.value[positionFenWithoutNoise]) {
       positions_occurences.value[positionFenWithoutNoise] = 0;
+    }
     positions_occurences.value[positionFenWithoutNoise] += 1;
   }
 
@@ -132,7 +142,7 @@ export default function useChessBoardLogic() {
     }
     const positionFen = game.value.fen();
     gameCurrentFen.value = positionFen;
-    currentTurnIsWhite.value = game.value.turn() === 'w';
+    currentTurnIsWhite.value = game.value.turn() === "w";
     const lastMoveArrow = {
       fromFile: startFile,
       fromRank: startRank,
@@ -285,7 +295,7 @@ export default function useChessBoardLogic() {
     });
 
     gameCurrentFen.value = game.value.fen();
-    currentTurnIsWhite.value = game.value.turn() === 'w';
+    currentTurnIsWhite.value = game.value.turn() === "w";
 
     updateGameStatusIfFinished();
 
@@ -314,7 +324,7 @@ export default function useChessBoardLogic() {
       gameStatus.value != GAME_STATUS_IDLE &&
       gameStatus.value != GAME_STATUS_RUNNING;
     if (allowedToLoadPosition) {
-      gameCurrentFen.value =fen;
+      gameCurrentFen.value = fen;
       return true;
     }
     return false;
@@ -322,34 +332,33 @@ export default function useChessBoardLogic() {
 
   function isHumanTurn() {
     return (
-      (currentTurnIsWhite.value && whitePlayerType.value === PLAYER_TYPE_HUMAN) ||
+      (currentTurnIsWhite.value &&
+        whitePlayerType.value === PLAYER_TYPE_HUMAN) ||
       (!currentTurnIsWhite.value && blackPlayerType.value === PLAYER_TYPE_HUMAN)
     );
   }
 
   function isExternalTurn() {
     return (
-      (currentTurnIsWhite.value && whitePlayerType.value === PLAYER_TYPE_EXTERNAL) ||
-      (!currentTurnIsWhite.value && blackPlayerType.value === PLAYER_TYPE_EXTERNAL)
+      (currentTurnIsWhite.value &&
+        whitePlayerType.value === PLAYER_TYPE_EXTERNAL) ||
+      (!currentTurnIsWhite.value &&
+        blackPlayerType.value === PLAYER_TYPE_EXTERNAL)
     );
   }
 
   function fillGamePgn() {
     let result;
     if (game.value.in_checkmate()) {
-      const whiteTurn = game.value.turn() === 'w';
+      const whiteTurn = game.value.turn() === "w";
       result = whiteTurn ? PGN_BLACK_WIN_STR : PGN_WHITE_WIN_STR;
-    }
-    else if (game.value.in_threefold_repetition()) {
-      result =PGN_DRAW_STR;
-    }
-    else if (game.value.in_stalemate()) {
-      result =PGN_DRAW_STR;
-    }
-    else if (game.value.in_draw()) {
-      result =PGN_DRAW_STR;
-    }
-    else {
+    } else if (game.value.in_threefold_repetition()) {
+      result = PGN_DRAW_STR;
+    } else if (game.value.in_stalemate()) {
+      result = PGN_DRAW_STR;
+    } else if (game.value.in_draw()) {
+      result = PGN_DRAW_STR;
+    } else {
       result = PGN_GAME_IN_PROGRESS_STR;
     }
 
