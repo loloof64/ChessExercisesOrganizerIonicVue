@@ -95,6 +95,7 @@ import {
   FilesystemDirectory,
   FilesystemEncoding,
 } from "@capacitor/core";
+import moment from "moment";
 
 const { Filesystem } = Plugins;
 
@@ -151,7 +152,7 @@ export default {
     } catch (engineLoadingError) {
       engineCommunication.value = null;
       console.error(engineLoadingError);
-      showErrorDialog({
+      showMessageDialog({
         title: getTranslation("game_page.failed_loading_stockfish_title"),
         message: engineLoadingError,
       });
@@ -254,7 +255,7 @@ export default {
       return t(key, {}, { locale: locale.value });
     }
 
-    async function showErrorDialog({ title, message }) {
+    async function showMessageDialog({ title, message }) {
       const alert = await alertController.create({
         cssClass: "confirmDialog",
         header: title,
@@ -502,19 +503,22 @@ export default {
       if (!gamePgn) return;
 
       try {
+        const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");
+        const filePath = "chess_exercises_organizer/pgn_" + fileDateStr + ".pgn";
         await Filesystem.writeFile({
-          path: "outputPgnFiles/output.pgn",
+          path: filePath,
           data: gamePgn,
           directory: FilesystemDirectory.Documents,
           encoding: FilesystemEncoding.ASCII,
           recursive: true,
         });
-        showToast(
-          t("game_page.pgn_saved_message", {}, { locale: locale.value })
-        );
+        showMessageDialog({
+          title: getTranslation("game_page.pgn_saved_title"),
+          message: t('game_page.pgn_saved_message', {filePath: filePath}, { locale: locale.value }),
+        });
       } catch (loadingError) {
         console.error(loadingError);
-        showErrorDialog({
+        showMessageDialog({
           title: getTranslation("game_page.error_saving_pgn_title"),
           message: loadingError,
         });

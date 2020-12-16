@@ -17,7 +17,8 @@
     "confirm_stop_title": "¿Detener?",
     "confirm_stop_message": "¿De verdad quiere detener el juego?",
     "failed_loading_stockfish_title": "Error al cargar el motor de ajedrez.",
-    "pgn_saved_message": "Archivo pgn guardado correctamente.",
+    "pgn_saved_title": "Archivo pgn guardado correctamente.",
+    "pgn_saved_message": "Archivo pgn guardado al interiorde la carpeta de documentos: {filePath}.",
     "error_saving_pgn_title": "No se pudo guardar el archivo pgn."
   }   
 }

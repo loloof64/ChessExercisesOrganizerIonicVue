@@ -17,7 +17,8 @@
     "confirm_stop_title": "Arrêter ?",
     "confirm_stop_message": "Souhaitez-vous vraiment arrêter la partie en cours ?",
     "failed_loading_stockfish_title": "Erreur de chargement du moteur d'échecs.",
-    "pgn_saved_message": "Fichier pgn sauvegardé avec succès.",
+    "pgn_saved_title": "Fichier pgn sauvegardé avec succès.",
+    "pgn_saved_message": "Fichier pgn sauvegardé à l'intérieur du dossier documents : {filePath}.",
     "error_saving_pgn_title": "Echec de sauvegarde du fichier pgn."
   }   
 }
