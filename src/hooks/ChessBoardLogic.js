@@ -27,7 +27,7 @@ export default function useChessBoardLogic() {
   const gameStatus = ref(GAME_STATUS_IDLE);
   const gamePgnText = ref(null);
   const gameCurrentFen = ref(game.value.fen());
-  const currentTurnIsWhite = ref(false);
+  const isWhiteTurn = ref(true);
 
   const whitePlayerType = ref(PLAYER_TYPE_NONE);
   const blackPlayerType = ref(PLAYER_TYPE_NONE);
@@ -81,7 +81,7 @@ export default function useChessBoardLogic() {
     positions_occurences.value = {};
     game.value = new Chess(startPosition);
     gameCurrentFen.value = startPosition;
-    currentTurnIsWhite.value = game.value.turn() === "w";
+    isWhiteTurn.value = game.value.turn() === "w";
     whitePlayerType.value = whiteType;
     blackPlayerType.value = blackType;
     gameStatus.value = GAME_STATUS_RUNNING;
@@ -142,7 +142,7 @@ export default function useChessBoardLogic() {
     }
     const positionFen = game.value.fen();
     gameCurrentFen.value = positionFen;
-    currentTurnIsWhite.value = game.value.turn() === "w";
+    isWhiteTurn.value = game.value.turn() === "w";
     const lastMoveArrow = {
       fromFile: startFile,
       fromRank: startRank,
@@ -295,7 +295,7 @@ export default function useChessBoardLogic() {
     });
 
     gameCurrentFen.value = game.value.fen();
-    currentTurnIsWhite.value = game.value.turn() === "w";
+    isWhiteTurn.value = game.value.turn() === "w";
 
     updateGameStatusIfFinished();
 
@@ -310,8 +310,8 @@ export default function useChessBoardLogic() {
 
     if (!isMovingAPawn) return false;
     return (
-      (currentTurnIsWhite.value && endRank === 7) ||
-      (!currentTurnIsWhite.value && endRank === 0)
+      (isWhiteTurn.value && endRank === 7) ||
+      (!isWhiteTurn.value && endRank === 0)
     );
   }
 
@@ -325,6 +325,7 @@ export default function useChessBoardLogic() {
       gameStatus.value != GAME_STATUS_RUNNING;
     if (allowedToLoadPosition) {
       gameCurrentFen.value = fen;
+      isWhiteTurn.value = fen.split(' ')[1] === 'w';
       return true;
     }
     return false;
@@ -332,17 +333,17 @@ export default function useChessBoardLogic() {
 
   function isHumanTurn() {
     return (
-      (currentTurnIsWhite.value &&
+      (isWhiteTurn.value &&
         whitePlayerType.value === PLAYER_TYPE_HUMAN) ||
-      (!currentTurnIsWhite.value && blackPlayerType.value === PLAYER_TYPE_HUMAN)
+      (!isWhiteTurn.value && blackPlayerType.value === PLAYER_TYPE_HUMAN)
     );
   }
 
   function isExternalTurn() {
     return (
-      (currentTurnIsWhite.value &&
+      (isWhiteTurn.value &&
         whitePlayerType.value === PLAYER_TYPE_EXTERNAL) ||
-      (!currentTurnIsWhite.value &&
+      (!isWhiteTurn.value &&
         blackPlayerType.value === PLAYER_TYPE_EXTERNAL)
     );
   }
@@ -381,8 +382,6 @@ export default function useChessBoardLogic() {
   function getGamePgn() {
     return gamePgnText.value;
   }
-
-  const isWhiteTurn = computed(() => currentTurnIsWhite.value);
 
   return {
     getRank,
