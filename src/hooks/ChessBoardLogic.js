@@ -156,6 +156,7 @@ export default function useChessBoardLogic() {
     const san = logicBeforeMove.move({
       from,
       to,
+      promotion,
     }).san;
 
     return { san, positionFen, lastMoveArrow };

@@ -118,7 +118,7 @@ export default {
     const { t } = useI18n();
 
     const {
-      //PLAYER_TYPE_HUMAN,
+      PLAYER_TYPE_HUMAN,
       PLAYER_TYPE_EXTERNAL,
     } = useChessBoardLogic();
 
@@ -326,9 +326,10 @@ export default {
     }
 
     function doStartNewGame() {
-      const startPosition = "8/8/8/3k4/8/8/8/1B1K2B1 w - - 0 1";
+      //const defaultPosition = "8/8/8/3k4/8/8/8/1B1K2B1 w - - 0 1";
+      const startPosition = "7k/1R6/P7/8/8/8/8/7K w - - 0 1"
       const whiteType = PLAYER_TYPE_EXTERNAL;
-      const blackType = PLAYER_TYPE_EXTERNAL;
+      const blackType = PLAYER_TYPE_HUMAN;
       historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame(startPosition);
       boardComponent.value.letUserStartANewGame(
