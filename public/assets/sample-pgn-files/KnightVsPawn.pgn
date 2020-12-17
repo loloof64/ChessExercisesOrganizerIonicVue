@@ -1,0 +1,82 @@
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "8/K7/8/8/8/1k6/1N1p4/8 w - - 0 1"]
+
+1.Nd1 Kc2 2.Nf2 ( 2.Ne3+ ) 2...Kc3 3.Ka6 Kd4 4.Kb5 Ke3 5.Nd1+ Ke2 6.Nb2 *
+
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "8/8/8/8/5N2/8/2p4K/2k5 w - - 0 1"]
+
+1.Ne2+ Kd2 ( 1...Kd1 2.Nc3+ Kd2 3.Na2 ) 2.Nd4 c1=Q 3.Nb3+ *
+
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "8/8/K7/4N3/8/7p/7k/8 w - - 0 1"]
+
+1.Ng4+ ( 1.Nc4 Kg2 ( 1...Kg1 2.Ne5 Kf1 3.Ng4 ) 2.Ne3+ ) 1...Kg3 2.Ne3 Kf3 
+3.Nf1 Kf2 4.Nh2 *
+
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "K7/8/8/5N2/8/3k3p/8/8 w - - 0 1"]
+
+1.Ng3 h2 ( 1...Ke3 2.Nf1+ ) 2.Kb7 Kd4 ( 2...Kc2 3.Kc6 Kd1 4.Kd5 Ke1 5.Ke4 
+Kf2 6.Kf4 ) 3.Kc6 Ke5 4.Kc5 ( 4.Nh1 Ke4 5.Kc5 ) 4...Kf4 5.Nh1 Kf3 6.Kd4 
+Kg2 7.Ke3 Kxh1 8.Kf2 *
+
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "8/2K5/8/8/4N3/2k5/7p/8 b - - 0 1"]
+
+1...Kc2 ( 1...Kd3 2.Ng3 Kc2 3.Kd6 Kd1 4.Ke5 Ke1 5.Kf4 ) ( 1...Kd4 2.Nf2 
+Kc3 3.Kd6 Kd2 4.Ke5 Ke2 5.Nh1 Kf3 6.Kd4 Kg2 7.Ke3 Kxh1 8.Kf2 ) 2.Ng3 Kd1 
+3.Kd6 Ke1 4.Ke5 Kf2 5.Kf4 *
+
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "8/8/8/8/8/p7/2K1N3/k7 w - - 0 1"]
+
+1.Nc1 a2 2.Nb3# *
+
+[Event "100 - Endgames (De la Villa)"]
+[Site "Cavalier contre pion"]
+[Date "????.??.??"]
+[Round ""]
+[White ""]
+[Black ""]
+[Result "*"]
+[FEN "3k4/1n6/8/P7/8/8/7K/8 w - - 0 1"]
+
+1.a6 Kc8 2.a7 *
+

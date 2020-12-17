@@ -96,6 +96,7 @@ import {
   FilesystemEncoding,
 } from "@capacitor/core";
 import moment from "moment";
+import PgnParser from "@mliebelt/pgn-parser";
 
 const { Filesystem } = Plugins;
 
@@ -114,13 +115,11 @@ export default {
   },
   setup() {
     const locale = ref(null);
+    const selectedGame = ref(null);
 
     const { t } = useI18n();
 
-    const {
-      PLAYER_TYPE_HUMAN,
-      PLAYER_TYPE_EXTERNAL,
-    } = useChessBoardLogic();
+    const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
 
     if (window.Intl && typeof window.Intl === "object") {
       locale.value = navigator.language.substring(0, 2);
@@ -325,11 +324,18 @@ export default {
       }
     }
 
-    function doStartNewGame() {
-      //const defaultPosition = "8/8/8/3k4/8/8/8/1B1K2B1 w - - 0 1";
-      const startPosition = "7k/1R6/P7/8/8/8/8/7K w - - 0 1"
-      const whiteType = PLAYER_TYPE_EXTERNAL;
-      const blackType = PLAYER_TYPE_HUMAN;
+    async function doStartNewGame() {
+      await loadSamplePgnGame();
+
+      console.log(selectedGame);
+
+      const defaultPosition =
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+      const gameCustomPosition = selectedGame.value.tags["FEN"];
+      const startPosition =
+        gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
+      const whiteType = PLAYER_TYPE_HUMAN;
+      const blackType = PLAYER_TYPE_EXTERNAL;
       historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame(startPosition);
       boardComponent.value.letUserStartANewGame(
@@ -499,13 +505,29 @@ export default {
       return { width, height, margin };
     }
 
+    async function loadSamplePgnGame() {
+      const fileName = "KnightVsPawn";
+      const filePath = `/assets/sample-pgn-files/${fileName}.pgn`;
+      try {
+        const file = await fetch(filePath);
+        const text = await file.text();
+
+        const pgnGames = PgnParser.parse(text, { startRule: "games" });
+        const selectedGameIndex = 4;
+        selectedGame.value = pgnGames[selectedGameIndex];
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     async function saveGameInPgn() {
       const gamePgn = boardComponent.value.tryToGetGamePgn();
       if (!gamePgn) return;
 
       try {
         const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");
-        const filePath = "chess_exercises_organizer/pgn_" + fileDateStr + ".pgn";
+        const filePath =
+          "chess_exercises_organizer/pgn_" + fileDateStr + ".pgn";
         await Filesystem.writeFile({
           path: filePath,
           data: gamePgn,
@@ -515,7 +537,11 @@ export default {
         });
         showMessageDialog({
           title: getTranslation("game_page.pgn_saved_title"),
-          message: t('game_page.pgn_saved_message', {filePath: filePath}, { locale: locale.value }),
+          message: t(
+            "game_page.pgn_saved_message",
+            { filePath: filePath },
+            { locale: locale.value }
+          ),
         });
       } catch (loadingError) {
         console.error(loadingError);
