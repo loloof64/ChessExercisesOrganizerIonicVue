@@ -12,6 +12,7 @@
     "draw_fifty_moves": "Nulo por la regla de los cincuenta movimientos."
   },
   "game_page": {
+    "title": "Página del juego",
     "confirm_restart_title": "¿Confirmar reinicio?",
     "confirm_restart_message": "¿De verdad quiere empezar un nuevo juego y dejar este?",
     "confirm_stop_title": "¿Detener?",
@@ -20,5 +21,12 @@
     "pgn_saved_title": "Archivo pgn guardado correctamente.",
     "pgn_saved_message": "Archivo pgn guardado al interiorde la carpeta de documentos: {filePath}.",
     "error_saving_pgn_title": "No se pudo guardar el archivo pgn."
-  }   
+  },
+  "sample_games_tab": {
+    "title": "Posiciones de ejemplo",
+    "queen_king_vs_king": "Dama+Rey / Rey",
+    "2rooks_king_vs_king": "2Torres+Rey / Rey",
+    "rook_king_vs_king": "2Alfiles+Rey / Rey",
+    "pawn_endgames": "Finales de peones"
+  }
 }

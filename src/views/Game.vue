@@ -2,13 +2,15 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Game</ion-title>
+        <ion-title>{{ getTranslation("game_page.title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true" :scrollY="false">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Game</ion-title>
+          <ion-title size="large">{{
+            getTranslation("game_page.title")
+          }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -84,6 +86,7 @@ import {
   saveOutline,
 } from "ionicons/icons";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
+import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
@@ -96,7 +99,6 @@ import {
   FilesystemEncoding,
 } from "@capacitor/core";
 import moment from "moment";
-import PgnParser from "@mliebelt/pgn-parser";
 
 const { Filesystem } = Plugins;
 
@@ -115,9 +117,10 @@ export default {
   },
   setup() {
     const locale = ref(null);
-    const selectedGame = ref(null);
 
     const { t } = useI18n();
+
+    const route = useRoute();
 
     const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
 
@@ -325,13 +328,10 @@ export default {
     }
 
     async function doStartNewGame() {
-      await loadSamplePgnGame();
-
-      console.log(selectedGame);
-
       const defaultPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-      const gameCustomPosition = selectedGame.value.tags["FEN"];
+      const gameData = JSON.parse(route.params.gameData);
+      const gameCustomPosition = gameData.tags["FEN"] || defaultPosition;
       const startPosition =
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
       const whiteType = PLAYER_TYPE_HUMAN;
@@ -408,33 +408,33 @@ export default {
       historyNavigationBarVisible.value = true;
       showToast(
         whiteSide
-          ? t("game.white_win", {}, { locale: locale.value })
-          : t("game.black_win", {}, { locale: locale.value })
+          ? getTranslation("game.white_win")
+          : getTranslation("game.black_win")
       );
     }
 
     function handleStalemate() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
-      showToast(t("game.stalemate", {}, { locale: locale.value }));
+      showToast(getTranslation("game.stalemate"));
     }
 
     function handleThreeFoldRepetition() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
-      showToast(t("game.draw_three_fold", {}, { locale: locale.value }));
+      showToast(getTranslation("game.draw_three_fold"));
     }
 
     function handleInsufficientMaterial() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
-      showToast(t("game.draw_missing_material", {}, { locale: locale.value }));
+      showToast(getTranslation("game.draw_missing_material"));
     }
 
     function handleFiftyMoves() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
-      showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
+      showToast(getTranslation("game.draw_fifty_moves"));
     }
 
     function handleMoveDone(moveData) {
@@ -503,21 +503,6 @@ export default {
       const margin = isPortrait ? "2% 2%" : "8% 18%";
 
       return { width, height, margin };
-    }
-
-    async function loadSamplePgnGame() {
-      const fileName = "KnightVsPawn";
-      const filePath = `/assets/sample-pgn-files/${fileName}.pgn`;
-      try {
-        const file = await fetch(filePath);
-        const text = await file.text();
-
-        const pgnGames = PgnParser.parse(text, { startRule: "games" });
-        const selectedGameIndex = 4;
-        selectedGame.value = pgnGames[selectedGameIndex];
-      } catch (err) {
-        console.error(err);
-      }
     }
 
     async function saveGameInPgn() {
@@ -624,6 +609,7 @@ export default {
       waitingEngineMove,
       waitingSpinnerStyle,
       saveGameInPgn,
+      getTranslation,
     };
   },
 };

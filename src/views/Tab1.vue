@@ -2,656 +2,121 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Game</ion-title>
+        <ion-title>{{ getTranslation("sample_games_tab.title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" :scrollY="false">
+    <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Game</ion-title>
+          <ion-title size="large">{{
+            getTranslation("sample_games_tab.title")
+          }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <div class="game_zone" :style="gameZoneStyle" slot="fixed">
-        <chess-board
-          :sizePx="boardAndHistorySize"
-          :reversed="boardReversed"
-          ref="boardComponent"
-          @win="handleWin"
-          @stalemate="handleStalemate"
-          @three-fold-repetition="handleThreeFoldRepetition"
-          @insufficient-material="handleInsufficientMaterial"
-          @fifty-moves="handleFiftyMoves"
-          @move-done="handleMoveDone"
-          @external-turn="handleExternalTurn"
-        />
-        <simple-history
-          :sizePx="boardAndHistorySize"
-          :navigationBarVisible="historyNavigationBarVisible"
-          ref="historyComponent"
-          @selection-request="handleHistorySelectionRequest"
-        />
-        <div :style="metaStyle">
-          <ion-icon
-            :icon="swapVertical"
-            :style="metaButtonStyle"
-            @click="boardReversed = !boardReversed"
-          />
-          <ion-icon
-            :icon="gameControllerOutline"
-            :style="metaButtonStyle"
-            @click="startNewGame"
-          />
-          <ion-icon
-            :icon="stopCircleOutline"
-            :style="metaButtonStyle"
-            @click="stopGame"
-          />
-          <ion-icon
-            :icon="saveOutline"
-            :style="metaButtonStyle"
-            @click="saveGameInPgn"
-          />
-        </div>
+      <div
+        class="item"
+        v-for="aGame in games"
+        :key="aGame.nameKey"
+        @click="loadGame(aGame.fileName)"
+      >
+        {{ getTranslation(completeNameKey(aGame.nameKey)) }}
       </div>
-
-      <ion-spinner
-        class="engine_move_spinner"
-        color="tertiary"
-        v-if="waitingEngineMove"
-        :style="waitingSpinnerStyle"
-      ></ion-spinner>
     </ion-content>
   </ion-page>
 </template>
 
 <script>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
-  IonIcon,
-  IonSpinner,
-  toastController,
-  alertController,
 } from "@ionic/vue";
-import {
-  swapVertical,
-  gameControllerOutline,
-  stopCircleOutline,
-  saveOutline,
-} from "ionicons/icons";
-import { ref, reactive, onBeforeUnmount, computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { ScreenOrientation } from "@ionic-native/screen-orientation";
-import ChessBoard from "@/components/ChessBoard";
-import SimpleHistory from "@/components/SimpleHistory";
-import ChessEngineCommunication from "../services/ChessEngineCommunication";
-import useChessBoardLogic from "@/hooks/ChessBoardLogic";
-import {
-  Plugins,
-  FilesystemDirectory,
-  FilesystemEncoding,
-} from "@capacitor/core";
-import moment from "moment";
 import PgnParser from "@mliebelt/pgn-parser";
 
-const { Filesystem } = Plugins;
-
 export default {
-  name: "Game",
+  name: "SampleGames",
   components: {
-    ChessBoard,
-    SimpleHistory,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
     IonPage,
-    IonIcon,
-    IonSpinner,
   },
   setup() {
     const locale = ref(null);
-    const selectedGame = ref(null);
-
     const { t } = useI18n();
 
-    const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
-
-    if (window.Intl && typeof window.Intl === "object") {
-      locale.value = navigator.language.substring(0, 2);
-    }
-
-    const boardComponent = ref(null);
-    const boardReversed = ref(false);
-    const historyComponent = ref(null);
-    const historyNavigationBarVisible = ref(false);
-    const engineCommunication = ref({});
-    const engineReady = ref(false);
-    const pendingPositionToSendToEngine = ref(null);
-
-    const waitingSpinnerStyle = reactive({
-      transform: "scale(3)",
-      position: "absolute",
-      top: 30,
-      left: 30,
-      "z-index": 1,
-    });
-
-    let engineReadyTimer;
-
-    try {
-      const engineCommunicationLayer = new ChessEngineCommunication(
-        processEngineMessage
-      );
-      engineCommunication.value = engineCommunicationLayer;
-    } catch (engineLoadingError) {
-      engineCommunication.value = null;
-      console.error(engineLoadingError);
-      showMessageDialog({
-        title: getTranslation("game_page.failed_loading_stockfish_title"),
-        message: engineLoadingError,
-      });
-    }
-
-    function sendCommandToEngine(cmd) {
-      if (engineCommunication.value) {
-        engineCommunication.value.sendCommand(cmd);
-      }
-    }
-
-    function checkEngineReady() {
-      const ENGINE_SEARCH_DEPTH = 13;
-      if (engineReady.value === true) {
-        clearInterval(engineReadyTimer);
-        sendCommandToEngine(
-          `position fen ${pendingPositionToSendToEngine.value}`
-        );
-        pendingPositionToSendToEngine.value = null;
-        sendCommandToEngine(`go depth ${ENGINE_SEARCH_DEPTH}`);
-      }
-    }
-
-    function handleExternalTurn(currentPositionFen) {
-      const CHECK_ENGINE_READY_INTERVAL_MS = 100;
-      engineReady.value = false;
-      pendingPositionToSendToEngine.value = currentPositionFen;
-      sendCommandToEngine("isready");
-
-      engineReadyTimer = setInterval(
-        checkEngineReady,
-        CHECK_ENGINE_READY_INTERVAL_MS
-      );
-    }
-
-    function processEngineMessage(message) {
-      if (message === "readyok") {
-        engineReady.value = true;
-      } else if (message.startsWith("bestmove")) {
-        const moveParams = parseEngineMoveMessage(message);
-        if (moveParams) {
-          const {
-            startFile,
-            startRank,
-            endFile,
-            endRank,
-            promotion,
-          } = moveParams;
-
-          const moveValidated = boardComponent.value.tryToMakeExternalMove({
-            startFile,
-            startRank,
-            endFile,
-            endRank,
-            promotion,
-          });
-
-          if (moveValidated) {
-            boardComponent.value.setLastMoveArrow({
-              startFile,
-              startRank,
-              endFile,
-              endRank,
-            });
-          }
-        } else {
-          console.error("Bad move parameters got from engine !");
-        }
-      }
-    }
-
-    function parseFile(str) {
-      return str.charCodeAt(0) - "a".charCodeAt(0);
-    }
-
-    function parseRank(str) {
-      return str.charCodeAt(0) - "1".charCodeAt(0);
-    }
-
-    function parseEngineMoveMessage(moveStr) {
-      const match = moveStr.match(
-        /^bestmove ([a-h][1-8])([a-h][1-8])([qrbn])?/
-      );
-      if (match) {
-        const from = match[1];
-        const to = match[2];
-        const promotion = match[3];
-
-        const startFile = parseFile(from.charAt(0));
-        const startRank = parseRank(from.charAt(1));
-
-        const endFile = parseFile(to.charAt(0));
-        const endRank = parseRank(to.charAt(1));
-
-        return { startFile, startRank, endFile, endRank, promotion };
-      } else return null;
-    }
+    const router = useRouter();
 
     function getTranslation(key) {
       return t(key, {}, { locale: locale.value });
     }
 
-    async function showMessageDialog({ title, message }) {
-      const alert = await alertController.create({
-        cssClass: "confirmDialog",
-        header: title,
-        message: message,
-        buttons: [
-          {
-            text: getTranslation("general.ok_button"),
-            role: "primary",
-            cssClass: "primaryButton",
-            handler: () => {},
-          },
-        ],
-      });
-      alert.present();
+    if (window.Intl && typeof window.Intl === "object") {
+      locale.value = navigator.language.substring(0, 2);
     }
 
-    async function showConfirmDialog({ title, message, onCancel, onConfirm }) {
-      const alert = await alertController.create({
-        cssClass: "confirmDialog",
-        header: title,
-        message: message,
-        buttons: [
-          {
-            text: getTranslation("general.cancel_button"),
-            role: "cancel",
-            cssClass: "secondaryButton",
-            handler: () => {
-              if (onCancel) onCancel();
-            },
-          },
-          {
-            text: getTranslation("general.ok_button"),
-            role: "primary",
-            cssClass: "primaryButton",
-            handler: () => {
-              if (onConfirm) onConfirm();
-            },
-          },
-        ],
-      });
-      alert.present();
+    function completeNameKey(gameNameKey) {
+      return `sample_games_tab.${gameNameKey}`;
     }
 
-    function startNewGame() {
-      if (boardComponent.value.gameIsIdle()) {
-        doStartNewGame();
-      } else {
-        showConfirmDialog({
-          title: getTranslation("game_page.confirm_restart_title"),
-          message: getTranslation("game_page.confirm_restart_message"),
-          onConfirm: () => doStartNewGame(),
-        });
-      }
-    }
-
-    function stopGame() {
-      if (boardComponent.value.gameIsInProgress()) {
-        showConfirmDialog({
-          title: getTranslation("game_page.confirm_stop_title"),
-          message: getTranslation("game_page.confirm_stop_message"),
-          onConfirm: () => {
-            boardComponent.value.stopCurrentGame();
-            historyComponent.value.selectLastHistoryMoveIfThereIsOne();
-            historyNavigationBarVisible.value = true;
-          },
-        });
-      }
-    }
-
-    async function doStartNewGame() {
-      await loadSamplePgnGame();
-
-      console.log(selectedGame);
-
-      const defaultPosition =
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-      const gameCustomPosition = selectedGame.value.tags["FEN"];
-      const startPosition =
-        gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
-      const whiteType = PLAYER_TYPE_HUMAN;
-      const blackType = PLAYER_TYPE_EXTERNAL;
-      historyNavigationBarVisible.value = false;
-      historyComponent.value.startNewGame(startPosition);
-      boardComponent.value.letUserStartANewGame(
-        startPosition,
-        whiteType,
-        blackType
-      );
-    }
-
-    function computeBoardAndHistorySize() {
-      const orientationType = ScreenOrientation.type;
-      const isPortrait = orientationType.includes("portrait");
-      const minSize = Math.min(window.innerWidth, window.innerHeight);
-      const sizeRatio = isPortrait ? 0.55 : 0.62;
-      return Math.floor(sizeRatio * minSize);
-    }
-
-    function computeLayout() {
-      const orientationType = ScreenOrientation.type;
-      const isPortrait = orientationType.includes("portrait");
-
-      const oneDimension = "100%";
-      const threeDimensions = "42%  42% 10%";
-
-      if (isPortrait) {
-        return [oneDimension, threeDimensions];
-      } else {
-        return [threeDimensions, oneDimension];
-      }
-    }
-
-    const boardAndHistorySize = ref(computeBoardAndHistorySize());
-    const gameZoneStyle = reactive({
-      margin: "0 auto",
-      display: "flex",
-      width: "100%",
-      height: "100%",
-      "flex-direction": "column",
-      "justify-content": "space-between",
-      "align-items": "center",
-    });
-
-    const metaStyle = reactive({
-      width: "100%",
-      height: "100%",
-      "justify-self": "center",
-      "align-self": "center",
-      margin: "0.1em",
-      "background-color": "salmon",
-    });
-
-    const metaButtonStyle = reactive({
-      color: "blue",
-      width: "10%",
-      height: "66%",
-      margin: "1.5% 0.5%",
-      border: "1px solid black",
-    });
-
-    async function showToast(message, duration = 1100) {
-      const toast = await toastController.create({
-        message,
-        duration: duration,
-      });
-      return toast.present();
-    }
-
-    function handleWin(whiteSide) {
-      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
-      historyNavigationBarVisible.value = true;
-      showToast(
-        whiteSide
-          ? t("game.white_win", {}, { locale: locale.value })
-          : t("game.black_win", {}, { locale: locale.value })
-      );
-    }
-
-    function handleStalemate() {
-      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
-      historyNavigationBarVisible.value = true;
-      showToast(t("game.stalemate", {}, { locale: locale.value }));
-    }
-
-    function handleThreeFoldRepetition() {
-      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
-      historyNavigationBarVisible.value = true;
-      showToast(t("game.draw_three_fold", {}, { locale: locale.value }));
-    }
-
-    function handleInsufficientMaterial() {
-      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
-      historyNavigationBarVisible.value = true;
-      showToast(t("game.draw_missing_material", {}, { locale: locale.value }));
-    }
-
-    function handleFiftyMoves() {
-      historyComponent.value.selectLastHistoryMoveIfThereIsOne();
-      historyNavigationBarVisible.value = true;
-      showToast(t("game.draw_fifty_moves", {}, { locale: locale.value }));
-    }
-
-    function handleMoveDone(moveData) {
-      historyComponent.value.addMove({ ...moveData });
-    }
-
-    function handleHistorySelectionRequest(data) {
-      const success = boardComponent.value.tryToLoadPosition(data.fen);
-      if (success) {
-        historyComponent.value.commitSelection(data.index);
-        const lastMoveArrow = historyComponent.value.getSelectedMoveArrow();
-        if (lastMoveArrow !== undefined) {
-          boardComponent.value.setLastMoveArrow({
-            startFile: lastMoveArrow.fromFile,
-            startRank: lastMoveArrow.fromRank,
-            endFile: lastMoveArrow.toFile,
-            endRank: lastMoveArrow.toRank,
-          });
-        } else {
-          const eraseCoordinate = -100;
-          boardComponent.value.setLastMoveArrow({
-            startFile: eraseCoordinate,
-            startRank: eraseCoordinate,
-            endFile: eraseCoordinate,
-            endRank: eraseCoordinate,
-          });
-        }
-      }
-    }
-
-    function computeGameZoneDirection() {
-      const orientationType = ScreenOrientation.type;
-      const isPortrait = orientationType.includes("portrait");
-
-      return isPortrait ? "column" : "row";
-    }
-
-    function computeMetaZoneDirection() {
-      const orientationType = ScreenOrientation.type;
-      const isPortrait = orientationType.includes("portrait");
-
-      return isPortrait ? "row" : "column";
-    }
-
-    function computeMetaZoneDimensions() {
-      const orientationType = ScreenOrientation.type;
-      const isPortrait = orientationType.includes("portrait");
-
-      return isPortrait
-        ? {
-            width: "100%",
-            height: "8%",
-          }
-        : {
-            width: "8%",
-            height: "100%",
-          };
-    }
-
-    function computeMetaButtonDimension() {
-      const orientationType = ScreenOrientation.type;
-      const isPortrait = orientationType.includes("portrait");
-
-      const width = isPortrait ? "10%" : "60%";
-      const height = isPortrait ? "66%" : "10%";
-      const margin = isPortrait ? "2% 2%" : "8% 18%";
-
-      return { width, height, margin };
-    }
-
-    async function loadSamplePgnGame() {
-      const fileName = "KnightVsPawn";
+    async function loadGame(fileName) {
       const filePath = `/assets/sample-pgn-files/${fileName}.pgn`;
       try {
         const file = await fetch(filePath);
         const text = await file.text();
 
         const pgnGames = PgnParser.parse(text, { startRule: "games" });
-        const selectedGameIndex = 4;
-        selectedGame.value = pgnGames[selectedGameIndex];
+        const selectedGameIndex = 0;
+        const gameData = JSON.stringify(pgnGames[selectedGameIndex]);
+        await router.push({ name: "game", params: { gameData } });
       } catch (err) {
         console.error(err);
       }
     }
 
-    async function saveGameInPgn() {
-      const gamePgn = boardComponent.value.tryToGetGamePgn();
-      if (!gamePgn) return;
-
-      try {
-        const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");
-        const filePath =
-          "chess_exercises_organizer/pgn_" + fileDateStr + ".pgn";
-        await Filesystem.writeFile({
-          path: filePath,
-          data: gamePgn,
-          directory: FilesystemDirectory.Documents,
-          encoding: FilesystemEncoding.ASCII,
-          recursive: true,
-        });
-        showMessageDialog({
-          title: getTranslation("game_page.pgn_saved_title"),
-          message: t(
-            "game_page.pgn_saved_message",
-            { filePath: filePath },
-            { locale: locale.value }
-          ),
-        });
-      } catch (loadingError) {
-        console.error(loadingError);
-        showMessageDialog({
-          title: getTranslation("game_page.error_saving_pgn_title"),
-          message: loadingError,
-        });
-      }
-    }
-
-    function updateSizeAndLayout() {
-      boardAndHistorySize.value = computeBoardAndHistorySize();
-      const [columnsLayout, rowsLayout] = computeLayout();
-
-      const {
-        width: metaZoneWidth,
-        height: metaZoneHeight,
-      } = computeMetaZoneDimensions();
-
-      const {
-        width: buttonWidth,
-        height: buttonHeight,
-        margin: buttonMargin,
-      } = computeMetaButtonDimension();
-
-      gameZoneStyle["flex-direction"] = computeGameZoneDirection();
-      gameZoneStyle["grid-template-columns"] = columnsLayout;
-      gameZoneStyle["grid-template-rows"] = rowsLayout;
-
-      metaStyle["flex-direction"] = computeMetaZoneDirection();
-      metaStyle["width"] = metaZoneWidth;
-      metaStyle["height"] = metaZoneHeight;
-
-      metaButtonStyle["width"] = buttonWidth;
-      metaButtonStyle["height"] = buttonHeight;
-      metaButtonStyle["margin"] = buttonMargin;
-
-      const cellsSize = boardAndHistorySize.value * 0.1111;
-      waitingSpinnerStyle["transform"] = `scale(${0.25 * cellsSize})`;
-      waitingSpinnerStyle["left"] = `${7 * cellsSize}px`;
-      waitingSpinnerStyle["top"] = `${7 * cellsSize}px`;
-    }
-
-    const waitingEngineMove = computed(() => {
-      if (!boardComponent.value) return false;
-      return boardComponent.value.externalTurn();
-    });
-
-    window.addEventListener("orientationchange", updateSizeAndLayout);
-
-    onBeforeUnmount(function () {
-      window.removeEventListener("orientationchange", updateSizeAndLayout);
-    });
-
-    updateSizeAndLayout();
+    const games = [
+      {
+        fileName: "QKvK",
+        nameKey: "queen_king_vs_king",
+      },
+      {
+        fileName: "RRKvK",
+        nameKey: "2rooks_king_vs_king",
+      },
+      {
+        fileName: "RKvK",
+        nameKey: "rook_king_vs_king",
+      },
+      {
+        fileName: "BBKvK",
+        nameKey: "2bishops_king_vs_king",
+      },
+      {
+        fileName: "PawnEndgames",
+        nameKey: "pawn_endgames",
+      },
+    ];
 
     return {
-      boardAndHistorySize,
-      gameZoneStyle,
-      metaStyle,
-      metaButtonStyle,
-      swapVertical,
-      gameControllerOutline,
-      stopCircleOutline,
-      saveOutline,
-      boardReversed,
-      boardComponent,
-      historyComponent,
-      startNewGame,
-      stopGame,
-      handleWin,
-      handleStalemate,
-      handleThreeFoldRepetition,
-      handleInsufficientMaterial,
-      handleFiftyMoves,
-      handleMoveDone,
-      handleHistorySelectionRequest,
-      handleExternalTurn,
-      historyNavigationBarVisible,
-      waitingEngineMove,
-      waitingSpinnerStyle,
-      saveGameInPgn,
+      getTranslation,
+      games,
+      completeNameKey,
+      loadGame,
     };
   },
 };
 </script>
 
 <style>
-.game_zone {
-  width: 100%;
-  height: 100%;
-}
-
-.confirmDialog .alert-wrapper {
-  background-color: rgba(45, 211, 211, 0.6);
-}
-
-.confirmDialog .alert-wrapper .alert-message {
-  color: blue;
-}
-
-.confirmDialog .primaryButton.alert-button {
-  background-color: green;
-  color: white;
-  border-radius: 20%;
-}
-
-.confirmDialog .secondaryButton.alert-button {
-  background-color: red;
-  color: white;
-  border-radius: 20%;
+.item {
+  font-size: 1.5em;
+  border-bottom: 1px solid black;
 }
 </style>

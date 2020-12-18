@@ -12,6 +12,7 @@
     "draw_fifty_moves": "Draw by the fifty moves rule."
   },
   "game_page": {
+    "title": "Game page",
     "confirm_restart_title": "Confirm restart ?",
     "confirm_restart_message": "Do you really want to start a new game and leave this one ?",
     "confirm_stop_title": "Stop ?",
@@ -20,5 +21,13 @@
     "pgn_saved_title": "Pgn file saved successfully.",
     "pgn_saved_message": "Pgn file saved in the documents folder : {filePath}.",
     "error_saving_pgn_title": "Failed to save pgn file."
-  }
+  },
+  "sample_games_tab": {
+    "title": "Sample positions",
+    "queen_king_vs_king": "Queen+King / King",
+    "2rooks_king_vs_king": "2Rooks+King / King",
+    "rook_king_vs_king": "Rook+King / King",
+    "2bishops_king_vs_king": "2Bishops+King / King",
+    "pawn_endgames": "Pawn endgames"
+  }   
 }

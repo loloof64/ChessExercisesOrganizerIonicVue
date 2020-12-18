@@ -3,8 +3,8 @@ import Tabs from "../views/Tabs.vue";
 
 const routes = [
   {
-    path: "/tabs/tab1",
-    redirect: "/game",
+    path: "/",
+    redirect: "/tabs/tab1",
   },
   {
     path: "/tabs/",
@@ -30,8 +30,9 @@ const routes = [
   },
   {
     path: "/game",
+    name: "game",
     component: () => import("@/views/Game.vue"),
-  }
+  },
 ];
 
 const router = createRouter({

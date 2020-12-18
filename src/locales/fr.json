@@ -12,6 +12,7 @@
     "draw_fifty_moves": "Nulle par la règle des 50 coups."
   },
   "game_page": {
+    "title": "Page jeu",
     "confirm_restart_title": "Confirmer la nouvelle partie ?",
     "confirm_restart_message": "Souhaitez-vous vraiment démarrer une nouvelle partie et abandonner celle-ci ?",
     "confirm_stop_title": "Arrêter ?",
@@ -20,5 +21,13 @@
     "pgn_saved_title": "Fichier pgn sauvegardé avec succès.",
     "pgn_saved_message": "Fichier pgn sauvegardé à l'intérieur du dossier documents : {filePath}.",
     "error_saving_pgn_title": "Echec de sauvegarde du fichier pgn."
+  },
+  "sample_games_tab": {
+    "title": "Positions exemples",
+    "queen_king_vs_king": "Dame+Roi / Roi",
+    "2rooks_king_vs_king": "2Tours+Roi / Roi",
+    "rook_king_vs_king": "Tour+Roi / Roi",
+    "2bishops_king_vs_king": "2Fous+Roi / Roi",
+    "pawn_endgames": "Finales de pions"
   }   
 }
