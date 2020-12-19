@@ -3,6 +3,9 @@
     "ok_button": "Ok",
     "cancel_button": "Annuler"
   },
+  "main_page": {
+    "samples_tab": "Exemples"
+  },
   "game": {
     "white_win": "Les Blancs ont gagné.",
     "black_win": "Les Noirs ont gagné.",

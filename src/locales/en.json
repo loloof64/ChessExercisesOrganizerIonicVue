@@ -3,6 +3,9 @@
     "ok_button": "Ok",
     "cancel_button": "Cancel"
   },
+  "main_page": {
+    "samples_tab": "Samples"
+  },
   "game": {
     "white_win": "White has won.",
     "black_win": "Black has won.",
