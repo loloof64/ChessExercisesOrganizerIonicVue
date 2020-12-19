@@ -329,7 +329,7 @@ export default {
         showConfirmDialog({
           title: getTranslation("game_page.confirm_restart_title"),
           message: getTranslation("game_page.confirm_restart_message"),
-          onConfirm:  doStartNewGame,
+          onConfirm: doStartNewGame,
         });
       }
     }
@@ -527,8 +527,11 @@ export default {
     }
 
     async function saveGameInPgn() {
-      const gamePgn = boardComponent.value.tryToGetGamePgn();
+      let gamePgn = boardComponent.value.tryToGetGamePgn();
       if (!gamePgn) return;
+
+      // More standard way of writing a Black first move.
+      gamePgn = gamePgn.replace(". ...", "...");
 
       try {
         const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");

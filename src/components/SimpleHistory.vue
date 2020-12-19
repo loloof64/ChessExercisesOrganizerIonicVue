@@ -102,11 +102,12 @@ export default {
     function startNewGame(
       startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     ) {
+      const blackTurnAtStart = startFen.split(" ")[1] === "b";
       moveNumber.value = parseInt(startFen.split(" ")[5]);
       selectedIndex.value = -1;
       gameStartFen.value = startFen;
       nextElementToAddIndex.value = 0;
-      const text = `${moveNumber.value}.`;
+      const text = `${moveNumber.value}.${blackTurnAtStart ? ".." : "."}`;
       elements.splice(0, elements.length);
       pushElementAndUpdateIndex({ text });
     }
