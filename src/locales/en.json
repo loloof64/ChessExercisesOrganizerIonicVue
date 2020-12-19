@@ -23,7 +23,9 @@
     "failed_loading_stockfish_title": "Error loading chess engine.",
     "pgn_saved_title": "Pgn file saved successfully.",
     "pgn_saved_message": "Pgn file saved in the documents folder : {filePath}.",
-    "error_saving_pgn_title": "Failed to save pgn file."
+    "error_saving_pgn_title": "Failed to save pgn file.",
+    "confirm_exit_page_title": "Quit current game ?",
+    "confirm_exit_page_message": "Do you really want to quit current game and return to the main page ?"
   },
   "sample_games_tab": {
     "title": "Sample positions",

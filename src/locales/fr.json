@@ -23,7 +23,9 @@
     "failed_loading_stockfish_title": "Erreur de chargement du moteur d'échecs.",
     "pgn_saved_title": "Fichier pgn sauvegardé avec succès.",
     "pgn_saved_message": "Fichier pgn sauvegardé à l'intérieur du dossier documents : {filePath}.",
-    "error_saving_pgn_title": "Echec de sauvegarde du fichier pgn."
+    "error_saving_pgn_title": "Echec de sauvegarde du fichier pgn.",
+    "confirm_exit_page_title": "Quitter la partie en cours ?",
+    "confirm_exit_page_message": "Souhaitez-vous vraiment quitter la partie en cours et retourner sur la page principale ?"
   },
   "sample_games_tab": {
     "title": "Positions exemples",

@@ -166,6 +166,18 @@ export default {
     }
 
     function navigateBack() {
+      if (boardComponent.value.gameIsIdle()) {
+        doNavigateBack();
+      } else {
+        showConfirmDialog({
+          title: getTranslation("game_page.confirm_exit_page_title"),
+          message: getTranslation("game_page.confirm_exit_page_message"),
+          onConfirm: doNavigateBack,
+        });
+      }
+    }
+
+    function doNavigateBack() {
       router.go(-1);
     }
 

@@ -23,7 +23,9 @@
     "failed_loading_stockfish_title": "Error al cargar el motor de ajedrez.",
     "pgn_saved_title": "Archivo pgn guardado correctamente.",
     "pgn_saved_message": "Archivo pgn guardado al interiorde la carpeta de documentos: {filePath}.",
-    "error_saving_pgn_title": "No se pudo guardar el archivo pgn."
+    "error_saving_pgn_title": "No se pudo guardar el archivo pgn.",
+    "confirm_exit_page_title": "¿Salir del juego actual?",
+    "confirm_exit_page_message": "¿Realmente quieres salir del juego actual y volver a la página principal?"
   },
   "sample_games_tab": {
     "title": "Posiciones de ejemplo",
