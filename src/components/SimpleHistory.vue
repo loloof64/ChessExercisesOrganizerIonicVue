@@ -102,7 +102,7 @@ export default {
     function startNewGame(
       startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     ) {
-      moveNumber.value = 1;
+      moveNumber.value = parseInt(startFen.split(" ")[5]);
       selectedIndex.value = -1;
       gameStartFen.value = startFen;
       nextElementToAddIndex.value = 0;

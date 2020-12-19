@@ -329,7 +329,7 @@ export default {
         showConfirmDialog({
           title: getTranslation("game_page.confirm_restart_title"),
           message: getTranslation("game_page.confirm_restart_message"),
-          onConfirm: () => doStartNewGame(),
+          onConfirm:  doStartNewGame,
         });
       }
     }
