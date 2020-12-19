@@ -2,7 +2,10 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ getTranslation("game_page.title") }}</ion-title>
+        <ion-title>
+          <ion-icon :icon="arrowBackOutline" @click="navigateBack" />
+          {{ getTranslation("game_page.title") }}</ion-title
+        >
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true" :scrollY="false">
@@ -84,9 +87,10 @@ import {
   gameControllerOutline,
   stopCircleOutline,
   saveOutline,
+  arrowBackOutline,
 } from "ionicons/icons";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
@@ -121,6 +125,7 @@ export default {
     const { t } = useI18n();
 
     const route = useRoute();
+    const router = useRouter();
 
     const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
 
@@ -158,6 +163,10 @@ export default {
         title: getTranslation("game_page.failed_loading_stockfish_title"),
         message: engineLoadingError,
       });
+    }
+
+    function navigateBack() {
+      router.go(-1);
     }
 
     function sendCommandToEngine(cmd) {
@@ -592,6 +601,7 @@ export default {
       gameControllerOutline,
       stopCircleOutline,
       saveOutline,
+      arrowBackOutline,
       boardReversed,
       boardComponent,
       historyComponent,
@@ -610,6 +620,7 @@ export default {
       waitingSpinnerStyle,
       saveGameInPgn,
       getTranslation,
+      navigateBack,
     };
   },
 };
