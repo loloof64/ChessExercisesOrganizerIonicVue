@@ -1,8 +1,12 @@
 import Chess from "chess.js";
 
 let result = {};
+let elementIndex = 0;
 
 export default function convertPgnDataToHistory(pgnData) {
+  //////////////////////////////////////////
+  console.log(pgnData);
+  ////////////////////////////////////////////
   result = {};
   const fenTagValue = pgnData.tags["FEN"];
   const startPosition =
@@ -14,6 +18,26 @@ export default function convertPgnDataToHistory(pgnData) {
   return result;
 }
 
+function convertSanToFan({ moveSan, whiteTurn }) {
+  moveSan = moveSan
+    .replace(/K/g, whiteTurn ? "\u2654" : "\u265A")
+    .normalize("NFKC");
+  moveSan = moveSan
+    .replace(/Q/g, whiteTurn ? "\u2655" : "\u265B")
+    .normalize("NFKC");
+  moveSan = moveSan
+    .replace(/R/g, whiteTurn ? "\u2656" : "\u265C")
+    .normalize("NFKC");
+  moveSan = moveSan
+    .replace(/B/g, whiteTurn ? "\u2657" : "\u265D")
+    .normalize("NFKC");
+  moveSan = moveSan
+    .replace(/N/g, whiteTurn ? "\u2658" : "\u265E")
+    .normalize("NFKC");
+
+  return moveSan;
+}
+
 function getCoordinatesOf(coordsStr) {
   const file = coordsStr.charCodeAt(0) - "a".charCodeAt(0);
   const rank = coordsStr.charCodeAt(1) - "1".charCodeAt(0);
@@ -22,7 +46,6 @@ function getCoordinatesOf(coordsStr) {
 
 function parseMoves(movesArray, gameState) {
   let result = [];
-  let elementIndex = 0;
   for (const [index, move] of movesArray.entries()) {
     if (index === 0) {
       const moveNumberText = `${move.moveNumber}.${
@@ -41,8 +64,9 @@ function parseMoves(movesArray, gameState) {
     }
 
     const moveSan = move.notation?.notation;
-    const moveFan = moveSan; // todo convert to fan
-    const text = moveFan || move;
+    const text = moveSan
+      ? convertSanToFan({ moveSan, whiteTurn: gameState.turn() === "w" })
+      : move;
 
     let fen;
     let lastMoveArrow;
