@@ -38,6 +38,7 @@ import {
   IonContent,
 } from "@ionic/vue";
 import PgnParser from "@mliebelt/pgn-parser";
+import convertPgnDataToHistory from '@/services/PgnGameDataToHistoryData';
 
 export default {
   name: "SampleGames",
@@ -74,8 +75,11 @@ export default {
 
         const pgnGames = PgnParser.parse(text, { startRule: "games" });
         const selectedGameIndex = 0;
-        const gameData = JSON.stringify(pgnGames[selectedGameIndex]);
-        await router.push({ name: "game", params: { gameData } });
+        const gameData = pgnGames[selectedGameIndex];
+        const solutionData = convertPgnDataToHistory(gameData);
+        const gameDataJSON = JSON.stringify(gameData);
+        const solutionDataJSON = JSON.stringify(solutionData);
+        await router.push({ name: "game", params: { gameData: gameDataJSON, solutionData: solutionDataJSON } });
       } catch (err) {
         console.error(err);
       }
@@ -102,6 +106,10 @@ export default {
         fileName: "PawnEndgames",
         nameKey: "pawn_endgames",
       },
+      {
+        fileName: "BerndRosenExercises",
+        nameKey: "BerndRosenExercises",
+      }
     ];
 
     return {

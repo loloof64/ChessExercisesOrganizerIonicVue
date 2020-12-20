@@ -89,27 +89,73 @@ export default {
     IonIcon,
   },
   setup(props, context) {
-    const elements = reactive([]);
+    const elements = ref([]);
     const moveNumber = ref(-1);
     const selectedIndex = ref(-1);
     const nextElementToAddIndex = ref(0);
     const gameStartFen = ref("error");
+
+    const gameFinished = ref(false);
+
+    const gameData = ref(null);
+    const solutionData = ref(null);
+    const solutionActive = ref(false);
 
     const singleNavigationButtonStyle = reactive({
       "background-color": "yellowgreen",
     });
 
     function startNewGame(
-      startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      solution = {}
     ) {
+      solutionActive.value = false;
+      gameFinished.value = false;
+      solutionData.value = solution;
+      gameData.value = null;
       const blackTurnAtStart = startFen.split(" ")[1] === "b";
       moveNumber.value = parseInt(startFen.split(" ")[5]);
       selectedIndex.value = -1;
       gameStartFen.value = startFen;
       nextElementToAddIndex.value = 0;
-      const text = `${moveNumber.value}.${blackTurnAtStart ? ".." : "."}`;
-      elements.splice(0, elements.length);
+      const text = `${moveNumber.value}.${blackTurnAtStart ? ".." : ""}`;
+      elements.value.splice(0, elements.value.length);
       pushElementAndUpdateIndex({ text });
+    }
+
+    function terminateGame() {
+      gameFinished.value = true;
+      gameData.value = {
+        startPosition: gameStartFen.value,
+        elements: elements.value,
+      };
+    }
+
+    function isSolutionActive() {
+      return solutionActive.value;
+    }
+
+    function toggleBetweenSolutionAndGame() {
+      if (!gameFinished.value) return;
+
+      const solutionMovesCount = solutionData.value.elements.filter(
+        (item) => item.fen !== undefined
+      ).length;
+      const noSolution = solutionMovesCount === 0;
+      if (noSolution) return;
+
+      const mustShowSolution = !(solutionActive.value);
+      if (mustShowSolution) {
+        gameStartFen.value = solutionData.value.startPosition;
+        elements.value = [...solutionData.value.elements];
+      } else {
+        gameStartFen.value = gameData.value.startPosition;
+        elements.value = [...gameData.value.elements];
+      }
+
+      selectedIndex.value = -1;
+      solutionActive.value = !(solutionActive.value);
+      navigateToStartPositionIfPossible();
     }
 
     function historySize() {
@@ -123,7 +169,11 @@ export default {
     }
 
     function pushElementAndUpdateIndex(elementToAdd) {
-      elements.push({ ...elementToAdd, index: nextElementToAddIndex.value });
+      if (gameFinished.value) return;
+      elements.value.push({
+        ...elementToAdd,
+        index: nextElementToAddIndex.value,
+      });
       nextElementToAddIndex.value += 1;
     }
 
@@ -133,6 +183,7 @@ export default {
         fen: moveData.fen,
         lastMoveArrow: moveData.lastMoveArrow,
       });
+      if (gameFinished.value) return;
       if (moveData.blackTurnBeforeMove) {
         moveNumber.value += 1;
         const text = `${moveNumber.value}.`;
@@ -151,9 +202,9 @@ export default {
     }
 
     function handleSelection(elementIndex) {
-      const element = elements[elementIndex];
+      const element = elements.value[elementIndex];
       const isAMoveElement = element.fen !== undefined;
-      
+
       if (isAMoveElement) {
         context.emit("selection-request", {
           index: elementIndex,
@@ -163,10 +214,12 @@ export default {
     }
 
     function navigateToLastMoveIfPossible() {
-      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      const historyMoves = elements.value.filter(
+        (item) => item.fen !== undefined
+      );
       if (historyMoves.length > 0) {
         const lastHistoryElement = historyMoves[historyMoves.length - 1];
-        const lastHistoryIndex = elements.indexOf(lastHistoryElement);
+        const lastHistoryIndex = elements.value.indexOf(lastHistoryElement);
         context.emit("selection-request", {
           ...lastHistoryElement,
           index: lastHistoryIndex,
@@ -179,13 +232,16 @@ export default {
     }
 
     function navigateToNextMoveIfPossible() {
-      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      const historyMoves = elements.value.filter(
+        (item) => item.fen !== undefined
+      );
+
       if (selectedIndex.value < 0) {
         if (historyMoves.length === 0) return;
         const nextHistoryMoveElement = historyMoves[0];
         context.emit("selection-request", { ...nextHistoryMoveElement });
       } else {
-        const currentOverallElement = elements[selectedIndex.value];
+        const currentOverallElement = elements.value[selectedIndex.value];
         const currentHistoryMovesElementIndex = historyMoves.findIndex(
           (item) => {
             return (
@@ -211,7 +267,9 @@ export default {
       }
     }
     function navigateToPreviousHistoryMoveIfPossible() {
-      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      const historyMoves = elements.value.filter(
+        (item) => item.fen !== undefined
+      );
       const currentlyOnTheFirstNodeOrAtStart = selectedIndex.value <= 1;
       if (currentlyOnTheFirstNodeOrAtStart) {
         context.emit("selection-request", {
@@ -219,7 +277,7 @@ export default {
           index: -1,
         });
       } else {
-        const currentOverallElement = elements[selectedIndex.value];
+        const currentOverallElement = elements.value[selectedIndex.value];
         const currentHistoryMovesElementIndex = historyMoves.findIndex(
           (item) => {
             return (
@@ -246,6 +304,7 @@ export default {
     }
 
     function commitSelection(elementIndex) {
+      if (!gameFinished.value) return;
       selectedIndex.value = elementIndex;
 
       function scrollToSelectedElement() {
@@ -279,21 +338,23 @@ export default {
     }
 
     function selectLastHistoryMoveIfThereIsOne() {
-      const historyMoves = elements.filter((item) => item.fen !== undefined);
+      const historyMoves = elements.value.filter(
+        (item) => item.fen !== undefined
+      );
       if (historyMoves.length > 0) {
         const lastHistoryElement = historyMoves[historyMoves.length - 1];
-        const lastHistoryIndex = elements.indexOf(lastHistoryElement);
+        const lastHistoryIndex = elements.value.indexOf(lastHistoryElement);
         selectedIndex.value = lastHistoryIndex;
       }
     }
 
     function isLastElement(nodeIndex) {
-      return nodeIndex === elements.length - 1;
+      return nodeIndex === elements.value.length - 1;
     }
 
     function getSelectedMoveArrow() {
       if (selectedIndex.value < 0) return undefined;
-      const selectedElement = elements[selectedIndex.value];
+      const selectedElement = elements.value[selectedIndex.value];
       return selectedElement.lastMoveArrow;
     }
 
@@ -357,6 +418,9 @@ export default {
       navigateToLastMoveIfPossible,
       isLastElement,
       buttonsDisplay,
+      terminateGame,
+      toggleBetweenSolutionAndGame,
+      isSolutionActive,
     };
   },
 };

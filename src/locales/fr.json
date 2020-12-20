@@ -25,7 +25,9 @@
     "pgn_saved_message": "Fichier pgn sauvegardé à l'intérieur du dossier documents : {filePath}.",
     "error_saving_pgn_title": "Echec de sauvegarde du fichier pgn.",
     "confirm_exit_page_title": "Quitter la partie en cours ?",
-    "confirm_exit_page_message": "Souhaitez-vous vraiment quitter la partie en cours et retourner sur la page principale ?"
+    "confirm_exit_page_message": "Souhaitez-vous vraiment quitter la partie en cours et retourner sur la page principale ?",
+    "show_solution": "Voir la solution",
+    "show_game": "Voir la partie"
   },
   "sample_games_tab": {
     "title": "Positions exemples",

@@ -7,6 +7,7 @@
           {{ getTranslation("game_page.title") }}</ion-title
         >
       </ion-toolbar>
+      <span class="show_solution" @click="toggleBetweenSolutionAndGame">{{ solutionButtonCaption }}</span>
     </ion-header>
     <ion-content :fullscreen="true" :scrollY="false">
       <ion-header collapse="condense">
@@ -181,6 +182,10 @@ export default {
       router.go(-1);
     }
 
+    function toggleBetweenSolutionAndGame() {
+      historyComponent.value.toggleBetweenSolutionAndGame();
+    }
+
     function sendCommandToEngine(cmd) {
       if (engineCommunication.value) {
         engineCommunication.value.sendCommand(cmd);
@@ -343,6 +348,7 @@ export default {
             boardComponent.value.stopCurrentGame();
             historyComponent.value.selectLastHistoryMoveIfThereIsOne();
             historyNavigationBarVisible.value = true;
+            historyComponent.value.terminateGame();
           },
         });
       }
@@ -352,13 +358,14 @@ export default {
       const defaultPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
       const gameData = JSON.parse(route.params.gameData);
+      const solutionData = JSON.parse(route.params.solutionData);
       const gameCustomPosition = gameData.tags["FEN"] || defaultPosition;
       const startPosition =
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
       const whiteType = PLAYER_TYPE_HUMAN;
       const blackType = PLAYER_TYPE_EXTERNAL;
       historyNavigationBarVisible.value = false;
-      historyComponent.value.startNewGame(startPosition);
+      historyComponent.value.startNewGame(startPosition, solutionData);
       boardComponent.value.letUserStartANewGame(
         startPosition,
         whiteType,
@@ -427,6 +434,7 @@ export default {
     function handleWin(whiteSide) {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
+      historyComponent.value.terminateGame();
       showToast(
         whiteSide
           ? getTranslation("game.white_win")
@@ -437,24 +445,28 @@ export default {
     function handleStalemate() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
+      historyComponent.value.terminateGame();
       showToast(getTranslation("game.stalemate"));
     }
 
     function handleThreeFoldRepetition() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
+      historyComponent.value.terminateGame();
       showToast(getTranslation("game.draw_three_fold"));
     }
 
     function handleInsufficientMaterial() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
+      historyComponent.value.terminateGame();
       showToast(getTranslation("game.draw_missing_material"));
     }
 
     function handleFiftyMoves() {
       historyComponent.value.selectLastHistoryMoveIfThereIsOne();
       historyNavigationBarVisible.value = true;
+      historyComponent.value.terminateGame();
       showToast(getTranslation("game.draw_fifty_moves"));
     }
 
@@ -599,6 +611,13 @@ export default {
       return boardComponent.value.externalTurn();
     });
 
+    const solutionButtonCaption = computed(() => {
+      if (!boardComponent.value?.gameIsStalled()) return "";
+      return historyComponent.value?.isSolutionActive()
+        ? getTranslation("game_page.show_game")
+        : getTranslation("game_page.show_solution")
+    });
+
     window.addEventListener("orientationchange", updateSizeAndLayout);
 
     onBeforeUnmount(function () {
@@ -636,6 +655,8 @@ export default {
       saveGameInPgn,
       getTranslation,
       navigateBack,
+      solutionButtonCaption,
+      toggleBetweenSolutionAndGame,
     };
   },
 };
@@ -665,5 +686,12 @@ export default {
   background-color: red;
   color: white;
   border-radius: 20%;
+}
+
+.show_solution {
+  font-size: 1.2em;
+  margin: 0 auto;
+  background-color: salmon;
+  color: aliceblue;
 }
 </style>
