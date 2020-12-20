@@ -144,7 +144,7 @@ export default {
       const noSolution = solutionMovesCount === 0;
       if (noSolution) return;
 
-      const mustShowSolution = !(solutionActive.value);
+      const mustShowSolution = !solutionActive.value;
       if (mustShowSolution) {
         gameStartFen.value = solutionData.value.startPosition;
         elements.value = [...solutionData.value.elements];
@@ -154,7 +154,7 @@ export default {
       }
 
       selectedIndex.value = -1;
-      solutionActive.value = !(solutionActive.value);
+      solutionActive.value = !solutionActive.value;
       navigateToStartPositionIfPossible();
     }
 
@@ -233,12 +233,14 @@ export default {
 
     function navigateToNextMoveIfPossible() {
       const historyMoves = elements.value.filter(
-        (item) => item.fen !== undefined
+        (item) => ["(", ")"].includes(item.text) || item.fen !== undefined
       );
 
       if (selectedIndex.value < 0) {
         if (historyMoves.length === 0) return;
         const nextHistoryMoveElement = historyMoves[0];
+        const hasOnlyVariations = nextHistoryMoveElement.text === "(";
+        if (hasOnlyVariations) return;
         context.emit("selection-request", { ...nextHistoryMoveElement });
       } else {
         const currentOverallElement = elements.value[selectedIndex.value];
@@ -261,14 +263,34 @@ export default {
           currentHistoryMovesElementIndex >= historyMoves.length - 1;
         if (noMoreElementInHistoryMoves) return;
 
-        const nextHistoryMoveElement =
-          historyMoves[currentHistoryMovesElementIndex + 1];
+        let variationLevel = 0;
+        let nextHistoryElementIndex = currentHistoryMovesElementIndex + 1;
+        let nextHistoryMoveElement;
+        for (;;) {
+          const nextElement = historyMoves[nextHistoryElementIndex];
+
+          const isAMove = nextElement.fen !== undefined;
+          const isStartOfVariation = nextElement.text === "(";
+          const isEndOfVariation = nextElement.text === ")";
+          const isAtRootVariation = variationLevel === 0;
+
+          if (isStartOfVariation) variationLevel += 1;
+         else  if (isEndOfVariation) variationLevel -= 1;
+          if (variationLevel < 0) throw "Too much ')' symbols.";
+
+          if (isAMove && isAtRootVariation) {
+            nextHistoryMoveElement = nextElement;
+            break;
+          }
+
+          nextHistoryElementIndex += 1;
+        }
         context.emit("selection-request", { ...nextHistoryMoveElement });
       }
     }
     function navigateToPreviousHistoryMoveIfPossible() {
       const historyMoves = elements.value.filter(
-        (item) => item.fen !== undefined
+        (item) => ["(", ")"].includes(item.text) || item.fen !== undefined
       );
       const currentlyOnTheFirstNodeOrAtStart = selectedIndex.value <= 1;
       if (currentlyOnTheFirstNodeOrAtStart) {
@@ -297,8 +319,29 @@ export default {
           currentHistoryMovesElementIndex <= 0;
         if (noMoreElementInHistoryMoves) return;
 
-        const previousHistoryMoveElement =
-          historyMoves[currentHistoryMovesElementIndex - 1];
+        let variationLevel = 0;
+        let previousHistoryElementIndex = currentHistoryMovesElementIndex - 1;
+        let previousHistoryMoveElement;
+        for (;;) {
+          const previousElement = historyMoves[previousHistoryElementIndex];
+
+          const isAMove = previousElement.fen !== undefined;
+          const isStartOfVariation = previousElement.text === "(";
+          const isEndOfVariation = previousElement.text === ")";
+          const isAtRootVariation = variationLevel === 0;
+
+          if (isEndOfVariation) variationLevel -= 1;
+          else if (isStartOfVariation) variationLevel += 1;
+          if (variationLevel > 0) throw "Too much '(' symbols.";
+
+          if (isAMove && isAtRootVariation) {
+            previousHistoryMoveElement = previousElement;
+            break;
+          }
+
+          previousHistoryElementIndex -= 1;
+        }
+
         context.emit("selection-request", { ...previousHistoryMoveElement });
       }
     }
