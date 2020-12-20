@@ -215,14 +215,35 @@ export default {
 
     function navigateToLastMoveIfPossible() {
       const historyMoves = elements.value.filter(
-        (item) => item.fen !== undefined
+        (item) => ["(", ")"].includes(item.text) || item.fen !== undefined
       );
       if (historyMoves.length > 0) {
-        const lastHistoryElement = historyMoves[historyMoves.length - 1];
-        const lastHistoryIndex = elements.value.indexOf(lastHistoryElement);
+        let previousElementIndex = historyMoves.length - 1;
+        let lastHistoryElement;
+        let variationLevel = 0;
+
+        for (;;) {
+          const previousElement = historyMoves[previousElementIndex];
+
+          const isAMove = previousElement.fen !== undefined;
+          const isStartOfVariation = previousElement.text === "(";
+          const isEndOfVariation = previousElement.text === ")";
+          const isAtRootVariation = variationLevel === 0;
+
+          if (isEndOfVariation) variationLevel -= 1;
+          else if (isStartOfVariation) variationLevel += 1;
+          if (variationLevel > 0) throw "Too much '(' symbols.";
+
+          if (isAMove && isAtRootVariation) {
+            lastHistoryElement = previousElement;
+            break;
+          }
+
+          previousElementIndex -= 1;
+        }
+
         context.emit("selection-request", {
           ...lastHistoryElement,
-          index: lastHistoryIndex,
         });
       }
     }
@@ -275,8 +296,8 @@ export default {
           const isAtRootVariation = variationLevel === 0;
 
           if (isStartOfVariation) variationLevel += 1;
-         else  if (isEndOfVariation) variationLevel -= 1;
-          if (variationLevel < 0) throw "Too much ')' symbols.";
+          else if (isEndOfVariation) variationLevel -= 1;
+          if (variationLevel < 0) throw "End of variation.";
 
           if (isAMove && isAtRootVariation) {
             nextHistoryMoveElement = nextElement;
@@ -332,7 +353,7 @@ export default {
 
           if (isEndOfVariation) variationLevel -= 1;
           else if (isStartOfVariation) variationLevel += 1;
-          if (variationLevel > 0) throw "Too much '(' symbols.";
+          if (variationLevel > 0) throw "Start of variation.";
 
           if (isAMove && isAtRootVariation) {
             previousHistoryMoveElement = previousElement;
