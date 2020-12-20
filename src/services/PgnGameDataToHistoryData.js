@@ -63,10 +63,13 @@ function parseMoves(movesArray, gameState) {
 
     const fenBeforeMove = gameState.fen();
     const moveSan = move.notation?.notation;
-    const text = moveSan
+    let text = moveSan
       ? convertSanToFan({ moveSan, whiteTurn: gameState.turn() === "w" })
       : move;
 
+    if (move.nag) {
+      text = appendNagToText(text, move.nag);
+    }
     let fen;
     let lastMoveArrow;
 
@@ -116,5 +119,70 @@ function parseMoves(movesArray, gameState) {
       }
     }
   }
+}
 
+function appendNagToText(text, nagArray) {
+  for (const nag of nagArray) {
+    text += convertNagToUnicode(nag);
+  }
+
+  return text;
+}
+
+function convertNagToUnicode(nag) {
+  switch (nag) {
+    case "$1":
+      return "\u0021";
+    case "$2":
+      return "\u003F";
+    case "$3":
+      return "\u203C";
+    case "$4":
+      return "\u2047";
+    case "$5":
+      return "\u2049";
+    case "$6":
+      return "\u2048";
+    case "$7":
+      return "\u25A1";
+    case "$10":
+      return "\u003D";
+    case "$13":
+      return "\u221E";
+    case "$14":
+      return "\u2A72";
+    case "$15":
+      return "\u2A71";
+    case "$16":
+      return "\u00B1";
+    case "$17":
+      return "\u2213";
+    case "$18":
+      return "\u002B\u002D";
+    case "$19":
+      return "\u002D\u002B";
+    case "$22":
+    case "$23":
+      return "\u2A00";
+    case "$32":
+    case "$33":
+      return "\u27F3";
+    case "$36":
+    case "$37":
+      return "\u2192";
+    case "$40":
+    case "$41":
+      return "\u2191";
+    case "$45":
+    case "$46":
+      return "\u2A73";
+    case "$131":
+    case "$132":
+      return "\u21C6";
+    case "$138":
+    case "$139":
+      return "\u2A01";
+    default:
+      return nag;
+  }
 }

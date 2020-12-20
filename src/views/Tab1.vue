@@ -74,7 +74,7 @@ export default {
         const text = await file.text();
 
         const pgnGames = PgnParser.parse(text, { startRule: "games" });
-        const selectedGameIndex = 0;
+        const selectedGameIndex = 1;
         const gameData = pgnGames[selectedGameIndex];
         const solutionData = convertPgnDataToHistory(gameData);
         const gameDataJSON = JSON.stringify(gameData);
