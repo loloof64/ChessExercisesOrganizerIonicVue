@@ -1,19 +1,18 @@
 import Chess from "chess.js";
 
-let result = {};
 let elementIndex = 0;
+let elementList = [];
 
 export default function convertPgnDataToHistory(pgnData) {
-  //////////////////////////////////////////
-  console.log(pgnData);
-  ////////////////////////////////////////////
-  result = {};
+  const result = {};
   const fenTagValue = pgnData.tags["FEN"];
   const startPosition =
     fenTagValue || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
+  parseMoves(pgnData.moves, new Chess(startPosition));
+
   result["startPosition"] = startPosition;
-  result["elements"] = parseMoves(pgnData.moves, new Chess(startPosition));
+  result["elements"] = elementList;
 
   return result;
 }
@@ -45,24 +44,24 @@ function getCoordinatesOf(coordsStr) {
 }
 
 function parseMoves(movesArray, gameState) {
-  let result = [];
   for (const [index, move] of movesArray.entries()) {
     if (index === 0) {
       const moveNumberText = `${move.moveNumber}.${
         move.turn === "b" ? ".." : ""
       }`;
-      result.push({
+      elementList.push({
         text: moveNumberText,
       });
       elementIndex++;
     } else if (move.turn === "w") {
       const moveNumberText = `${move.moveNumber}.`;
-      result.push({
+      elementList.push({
         text: moveNumberText,
       });
       elementIndex++;
     }
 
+    const fenBeforeMove = gameState.fen();
     const moveSan = move.notation?.notation;
     const text = moveSan
       ? convertSanToFan({ moveSan, whiteTurn: gameState.turn() === "w" })
@@ -93,8 +92,29 @@ function parseMoves(movesArray, gameState) {
       fen,
       lastMoveArrow,
     };
-    result.push(element);
+    elementList.push(element);
     elementIndex++;
+
+    if ((move.variations?.length || 0) > 0) {
+      for (const currentVariation of move.variations) {
+        const startParenthesis = {
+          index: elementIndex,
+          text: "(",
+        };
+        elementList.push(startParenthesis);
+        elementIndex++;
+
+        const gameStateBeforeMoveClone = new Chess(fenBeforeMove);
+        parseMoves(currentVariation, gameStateBeforeMoveClone);
+
+        const endParenthesis = {
+          index: elementIndex,
+          text: ")",
+        };
+        elementList.push(endParenthesis);
+        elementIndex++;
+      }
+    }
   }
-  return result;
+
 }
