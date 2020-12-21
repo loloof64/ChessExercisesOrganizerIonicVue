@@ -359,7 +359,7 @@ export default {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
       const gameData = JSON.parse(route.params.gameData);
       const solutionData = JSON.parse(route.params.solutionData);
-      const gameCustomPosition = gameData.tags["FEN"] || defaultPosition;
+      const gameCustomPosition = gameData.headers.find(it =>it.name === "FEN")?.value || defaultPosition;
       const startPosition =
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
       const whiteType = PLAYER_TYPE_HUMAN;

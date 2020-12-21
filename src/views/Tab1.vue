@@ -37,7 +37,7 @@ import {
   IonTitle,
   IonContent,
 } from "@ionic/vue";
-import PgnParser from "@mliebelt/pgn-parser";
+import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
 
 export default {
@@ -73,10 +73,11 @@ export default {
         const file = await fetch(filePath);
         const text = await file.text();
 
-        const pgnGames = PgnParser.parse(text, { startRule: "games" });
-        const selectedGameIndex = 1;
+        const pgnGames = PgnParser.parse(text);
+        const selectedGameIndex = 2; // todo put 0 back
         const gameData = pgnGames[selectedGameIndex];
         const solutionData = convertPgnDataToHistory(gameData);
+
         const gameDataJSON = JSON.stringify(gameData);
         const solutionDataJSON = JSON.stringify(solutionData);
         await router.push({

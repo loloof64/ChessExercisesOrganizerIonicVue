@@ -4,12 +4,17 @@ let elementIndex = 0;
 let elementList = [];
 
 export default function convertPgnDataToHistory(pgnData) {
+  //////////////////////////////////////
+  console.log(pgnData);
+  ////////////////////////////////////////
   const result = {};
-  const fenTagValue = pgnData.tags["FEN"];
+  const fenTagValue = pgnData.headers.find((it) => it.name === "FEN");
   const startPosition =
-    fenTagValue || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    fenTagValue?.value ||
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+  const firstMoveForWhite = startPosition.split(" ")[1] === "w";
 
-  parseMoves(pgnData.moves, new Chess(startPosition));
+  parseMoves(pgnData.moves, new Chess(startPosition), firstMoveForWhite);
 
   result["startPosition"] = startPosition;
   result["elements"] = elementList;
@@ -43,18 +48,20 @@ function getCoordinatesOf(coordsStr) {
   return { file, rank };
 }
 
-function parseMoves(movesArray, gameState) {
+function parseMoves(movesArray, gameState, firstMoveForWhite = true) {
+  let whiteTurn = firstMoveForWhite;
   for (const [index, move] of movesArray.entries()) {
+    /////////////////////////////////////////
+    console.log(move.move, whiteTurn);
+    /////////////////////////////////////////
     if (index === 0) {
-      const moveNumberText = `${move.moveNumber}.${
-        move.turn === "b" ? ".." : ""
-      }`;
+      const moveNumberText = `${move.move_number}.${whiteTurn ? "" : ".."}`;
       elementList.push({
         text: moveNumberText,
       });
       elementIndex++;
-    } else if (move.turn === "w") {
-      const moveNumberText = `${move.moveNumber}.`;
+    } else if (whiteTurn) {
+      const moveNumberText = `${move.move_number}.`;
       elementList.push({
         text: moveNumberText,
       });
@@ -62,13 +69,13 @@ function parseMoves(movesArray, gameState) {
     }
 
     const fenBeforeMove = gameState.fen();
-    const moveSan = move.notation?.notation;
+    const moveSan = move.move;
     let text = moveSan
       ? convertSanToFan({ moveSan, whiteTurn: gameState.turn() === "w" })
       : move;
 
-    if (move.nag) {
-      text = appendNagToText(text, move.nag);
+    if (move.nags) {
+      text = appendNagToText(text, move.nags);
     }
     let fen;
     let lastMoveArrow;
@@ -96,10 +103,12 @@ function parseMoves(movesArray, gameState) {
       lastMoveArrow,
     };
     elementList.push(element);
+    
+    whiteTurn = !whiteTurn;
     elementIndex++;
 
-    if ((move.variations?.length || 0) > 0) {
-      for (const currentVariation of move.variations) {
+    if ((move.ravs?.length || 0) > 0) {
+      for (const currentVariation of move.ravs) {
         const startParenthesis = {
           index: elementIndex,
           text: "(",
@@ -108,7 +117,12 @@ function parseMoves(movesArray, gameState) {
         elementIndex++;
 
         const gameStateBeforeMoveClone = new Chess(fenBeforeMove);
-        parseMoves(currentVariation, gameStateBeforeMoveClone);
+        const firstMoveForWhite = fenBeforeMove.split(" ")[1] === "w";
+        parseMoves(
+          currentVariation.moves,
+          gameStateBeforeMoveClone,
+          firstMoveForWhite
+        );
 
         const endParenthesis = {
           index: elementIndex,
