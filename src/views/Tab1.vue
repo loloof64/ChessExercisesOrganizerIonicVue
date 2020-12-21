@@ -110,10 +110,6 @@ export default {
         fileName: "PawnEndgames",
         nameKey: "pawn_endgames",
       },
-      {
-        fileName: "BerndRosenExercises",
-        nameKey: "BerndRosenExercises",
-      },
     ];
 
     return {
