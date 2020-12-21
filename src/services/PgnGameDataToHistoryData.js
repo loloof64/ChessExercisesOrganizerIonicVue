@@ -4,9 +4,6 @@ let elementIndex = 0;
 let elementList = [];
 
 export default function convertPgnDataToHistory(pgnData) {
-  //////////////////////////////////////
-  console.log(pgnData);
-  ////////////////////////////////////////
   const result = {};
   const fenTagValue = pgnData.headers.find((it) => it.name === "FEN");
   const startPosition =
@@ -50,22 +47,22 @@ function getCoordinatesOf(coordsStr) {
 
 function parseMoves(movesArray, gameState, firstMoveForWhite = true) {
   let whiteTurn = firstMoveForWhite;
+  let mustAddMoveNumberReminder = false;
+
   for (const [index, move] of movesArray.entries()) {
-    /////////////////////////////////////////
-    console.log(move.move, whiteTurn);
-    /////////////////////////////////////////
     if (index === 0) {
       const moveNumberText = `${move.move_number}.${whiteTurn ? "" : ".."}`;
       elementList.push({
         text: moveNumberText,
       });
       elementIndex++;
-    } else if (whiteTurn) {
-      const moveNumberText = `${move.move_number}.`;
+    } else if (whiteTurn || mustAddMoveNumberReminder) {
+      const moveNumberText = `${move.move_number}.${whiteTurn ? "" : ".."}`;
       elementList.push({
         text: moveNumberText,
       });
       elementIndex++;
+      mustAddMoveNumberReminder = false;
     }
 
     const fenBeforeMove = gameState.fen();
@@ -103,11 +100,12 @@ function parseMoves(movesArray, gameState, firstMoveForWhite = true) {
       lastMoveArrow,
     };
     elementList.push(element);
-    
+
     whiteTurn = !whiteTurn;
     elementIndex++;
 
     if ((move.ravs?.length || 0) > 0) {
+      mustAddMoveNumberReminder = true;
       for (const currentVariation of move.ravs) {
         const startParenthesis = {
           index: elementIndex,

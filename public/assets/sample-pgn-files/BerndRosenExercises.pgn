@@ -5,6 +5,19 @@
 [White "?"]
 [Black "?"]
 [Result "*"]
+[FEN "4k3/8/4K3/4P3/8/8/8/8 w - - 0 32"]
+[Setup "1"]
+
+32. Kf6 ( 32. Kd6 Kd8 33. e6 Ke8 34. e7 Kf7 35. Kd7 $18 )32... Kf8 33. e6 Ke8
+34. e7 Kd7 35. Kf7 $18  *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "?"]
+[Result "*"]
 [FEN "8/2p4K/8/7k/8/8/6PP/8 w - - 0 1"]
 [Setup "1"]
 

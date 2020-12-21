@@ -74,7 +74,7 @@ export default {
         const text = await file.text();
 
         const pgnGames = PgnParser.parse(text);
-        const selectedGameIndex = 2; // todo put 0 back
+        const selectedGameIndex = 0; 
         const gameData = pgnGames[selectedGameIndex];
         const solutionData = convertPgnDataToHistory(gameData);
 
