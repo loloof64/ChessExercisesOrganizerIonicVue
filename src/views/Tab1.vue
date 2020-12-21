@@ -18,10 +18,17 @@
         class="item"
         v-for="aGame in games"
         :key="aGame.nameKey"
-        @click="loadGame(aGame.fileName)"
+        @click="loadGame(aGame.fileName, aGame.nameKey)"
       >
         {{ getTranslation(completeNameKey(aGame.nameKey)) }}
       </div>
+
+      <pgn-game-selector
+        ref="gameSelector"
+        :pgnGames="pgnGamesToPreview"
+        :title="pgnGameSelectorTitle"
+        @game-selected="launchGame"
+      />
     </ion-content>
   </ion-page>
 </template>
@@ -39,6 +46,7 @@ import {
 } from "@ionic/vue";
 import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
+import PgnGameSelector from "@/components/PgnGameSelector";
 
 export default {
   name: "SampleGames",
@@ -48,6 +56,7 @@ export default {
     IonTitle,
     IonContent,
     IonPage,
+    PgnGameSelector,
   },
   setup() {
     const locale = ref(null);
@@ -63,19 +72,37 @@ export default {
       locale.value = navigator.language.substring(0, 2);
     }
 
+    const gameSelector = ref(null);
+    const pgnGamesToPreview = ref(null);
+    const pgnGameSelectorTitle = ref(null);
+
     function completeNameKey(gameNameKey) {
       return `sample_games_tab.${gameNameKey}`;
     }
 
-    async function loadGame(fileName) {
+    async function loadGame(fileName, nameTranslationKey) {
       const filePath = `/assets/sample-pgn-files/${fileName}.pgn`;
       try {
         const file = await fetch(filePath);
         const text = await file.text();
 
         const pgnGames = PgnParser.parse(text);
-        const selectedGameIndex = 0; 
-        const gameData = pgnGames[selectedGameIndex];
+        pgnGamesToPreview.value = pgnGames;
+        pgnGameSelectorTitle.value = getTranslation(
+          `sample_games_tab.${nameTranslationKey}`
+        );
+
+        gameSelector.value?.open();
+      } catch (err) {
+        console.error(err);
+        gameSelector.value?.dismiss();
+      }
+    }
+
+    async function launchGame(selectedGameIndex) {
+      gameSelector.value?.dismiss();
+      try {
+        const gameData = pgnGamesToPreview.value[selectedGameIndex];
         const solutionData = convertPgnDataToHistory(gameData);
 
         const gameDataJSON = JSON.stringify(gameData);
@@ -117,6 +144,10 @@ export default {
       games,
       completeNameKey,
       loadGame,
+      pgnGamesToPreview,
+      pgnGameSelectorTitle,
+      gameSelector,
+      launchGame,
     };
   },
 };
