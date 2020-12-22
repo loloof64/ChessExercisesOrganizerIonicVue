@@ -7,9 +7,12 @@
           {{ getTranslation("game_page.title") }}</ion-title
         >
       </ion-toolbar>
-      <span class="show_solution" @click="toggleBetweenSolutionAndGame">{{
-        solutionButtonCaption
-      }}</span>
+      <span
+        class="show_solution"
+        @click="toggleBetweenSolutionAndGame"
+        v-if="shouldShowSolution"
+        >{{ solutionButtonCaption }}</span
+      >
     </ion-header>
     <ion-content :fullscreen="true" :scrollY="false">
       <ion-header collapse="condense">
@@ -147,6 +150,7 @@ export default {
     const engineReady = ref(false);
     const pendingPositionToSendToEngine = ref(null);
     const gameGoal = ref("");
+    const shouldShowSolution = ref(false);
 
     const waitingSpinnerStyle = reactive({
       transform: "scale(3)",
@@ -355,12 +359,14 @@ export default {
             historyComponent.value.selectLastHistoryMoveIfThereIsOne();
             historyNavigationBarVisible.value = true;
             historyComponent.value.terminateGame();
+            shouldShowSolution.value = historyComponent.value.hasASolution();
           },
         });
       }
     }
 
     async function doStartNewGame() {
+      shouldShowSolution.value = false;
       const defaultPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
       const gameData = JSON.parse(route.params.gameData);
@@ -461,6 +467,7 @@ export default {
           ? getTranslation("game.white_win")
           : getTranslation("game.black_win")
       );
+      shouldShowSolution.value = historyComponent.value.hasASolution();
     }
 
     function handleStalemate() {
@@ -468,6 +475,7 @@ export default {
       historyNavigationBarVisible.value = true;
       historyComponent.value.terminateGame();
       showToast(getTranslation("game.stalemate"));
+      shouldShowSolution.value = historyComponent.value.hasASolution();
     }
 
     function handleThreeFoldRepetition() {
@@ -475,6 +483,7 @@ export default {
       historyNavigationBarVisible.value = true;
       historyComponent.value.terminateGame();
       showToast(getTranslation("game.draw_three_fold"));
+      shouldShowSolution.value = historyComponent.value.hasASolution();
     }
 
     function handleInsufficientMaterial() {
@@ -482,6 +491,7 @@ export default {
       historyNavigationBarVisible.value = true;
       historyComponent.value.terminateGame();
       showToast(getTranslation("game.draw_missing_material"));
+      shouldShowSolution.value = historyComponent.value.hasASolution();
     }
 
     function handleFiftyMoves() {
@@ -489,6 +499,7 @@ export default {
       historyNavigationBarVisible.value = true;
       historyComponent.value.terminateGame();
       showToast(getTranslation("game.draw_fifty_moves"));
+      shouldShowSolution.value = historyComponent.value.hasASolution();
     }
 
     function handleMoveDone(moveData) {
@@ -682,6 +693,7 @@ export default {
       solutionButtonCaption,
       toggleBetweenSolutionAndGame,
       gameGoal,
+      shouldShowSolution,
     };
   },
 };

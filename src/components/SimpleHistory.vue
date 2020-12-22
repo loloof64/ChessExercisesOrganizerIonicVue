@@ -135,6 +135,13 @@ export default {
       return solutionActive.value;
     }
 
+    function hasASolution() {
+      const solutionMovesCount = solutionData.value.elements.filter(
+        (item) => item.fen !== undefined
+      ).length;
+      return solutionMovesCount > 0;
+    }
+
     function toggleBetweenSolutionAndGame() {
       if (!gameFinished.value) return;
 
@@ -485,6 +492,7 @@ export default {
       terminateGame,
       toggleBetweenSolutionAndGame,
       isSolutionActive,
+      hasASolution,
     };
   },
 };
