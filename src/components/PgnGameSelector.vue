@@ -8,11 +8,17 @@
           <ion-icon
             :icon="playSkipBackCircleOutline"
             class="navigationButton"
+            :class="{
+              visible: afterFirstGame,
+            }"
             @click="chooseFirstGame"
           />
           <ion-icon
             :icon="playBackCircleOutline"
             class="navigationButton"
+            :class="{
+              visible: afterFirstGame,
+            }"
             @click="choosePreviousGame"
           />
           <input
@@ -27,11 +33,17 @@
           <ion-icon
             :icon="playForwardCircleOutline"
             class="navigationButton"
+            :class="{
+              visible: beforeLastGame,
+            }"
             @click="chooseNextGame"
           />
           <ion-icon
             :icon="playSkipForwardCircleOutline"
             class="navigationButton"
+            :class="{
+              visible: beforeLastGame,
+            }"
             @click="chooseLastGame"
           />
         </div>
@@ -277,6 +289,14 @@ export default {
       return gameIndex.value + 1;
     });
 
+    const afterFirstGame = computed(() => {
+      return gameIndex.value > 0;
+    });
+
+    const beforeLastGame = computed(() => {
+      return gameIndex.value < totalGamesCount.value - 1;
+    });
+
     window.addEventListener("orientationchange", computeBoardSize);
     window.addEventListener("orientationchange", computeAlignment);
 
@@ -314,6 +334,8 @@ export default {
       chooseLastGame,
       updateGameWithText,
       navigationNumberInput,
+      afterFirstGame,
+      beforeLastGame,
     };
   },
 };
@@ -420,8 +442,13 @@ export default {
 }
 
 .navigationButton {
-  color: green;
+  visibility: hidden;
   font-size: 1.04em;
+}
+
+.navigationButton.visible {
+  visibility: visible;
+  color: green;
 }
 
 .navigationText {
