@@ -1,30 +1,46 @@
 <template>
   <div class="dropShadow" v-if="active">
-    <div class="title">{{ title }}</div>
-    <div class="goal">{{ goalText }}</div>
-    <chess-board :sizePx="boardSize" ref="boardComponent" />
-    <div class="playersType">
-      <div class="playersTypeLine">
-        <span class="label">{{ getTranslation("game_selector.whites") }}</span>
-        <select ref="whiteSideTypeSelect" @change="handleWhiteSideTypeChange">
-          <option value="human">
-            {{ getTranslation("game_selector.human") }}
-          </option>
-          <option value="external">
-            {{ getTranslation("game_selector.cpu") }}
-          </option>
-        </select>
+    <div class="mainZone" :style="mainZoneStyle">
+      <div class="header">
+        <div class="title">{{ title }}</div>
+        <div class="goal">{{ goalText }}</div>
       </div>
-      <div class="playersTypeLine">
-        <span class="label">{{ getTranslation("game_selector.blacks") }}</span>
-        <select ref="blackSideTypeSelect" @change="handleBlackSideTypeChange">
-          <option value="human">
-            {{ getTranslation("game_selector.human") }}
-          </option>
-          <option value="external">
-            {{ getTranslation("game_selector.cpu") }}
-          </option>
-        </select>
+      <chess-board :sizePx="boardSize" ref="boardComponent" />
+      <div class="footer">
+        <div class="playersType">
+          <div class="playersTypeLine">
+            <span class="label">{{
+              getTranslation("game_selector.whites")
+            }}</span>
+            <select
+              ref="whiteSideTypeSelect"
+              @change="handleWhiteSideTypeChange"
+            >
+              <option value="human">
+                {{ getTranslation("game_selector.human") }}
+              </option>
+              <option value="external">
+                {{ getTranslation("game_selector.cpu") }}
+              </option>
+            </select>
+          </div>
+          <div class="playersTypeLine">
+            <span class="label">{{
+              getTranslation("game_selector.blacks")
+            }}</span>
+            <select
+              ref="blackSideTypeSelect"
+              @change="handleBlackSideTypeChange"
+            >
+              <option value="human">
+                {{ getTranslation("game_selector.human") }}
+              </option>
+              <option value="external">
+                {{ getTranslation("game_selector.cpu") }}
+              </option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
     <div class="buttonsZone">
@@ -40,7 +56,7 @@
 
 <script>
 import ChessBoard from "@/components/ChessBoard";
-import { ref, onBeforeUnmount } from "vue";
+import { ref, reactive, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
@@ -83,6 +99,10 @@ export default {
     const whiteSideTypeSelect = ref(null);
     const blackSideTypeSelect = ref(null);
     const goalText = ref("");
+
+    const mainZoneStyle = reactive({
+      "flex-direction": "column",
+    });
 
     const whiteSideType = ref(PLAYER_TYPE_HUMAN);
     const blackSideType = ref(PLAYER_TYPE_HUMAN);
@@ -166,10 +186,18 @@ export default {
         newValue === "human" ? PLAYER_TYPE_HUMAN : PLAYER_TYPE_EXTERNAL;
     }
 
+    function computeAlignment() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+      mainZoneStyle["flex-direction"] = isPortrait ? "column" : "row";
+    }
+
     window.addEventListener("orientationchange", computeBoardSize);
+    window.addEventListener("orientationchange", computeAlignment);
 
     onBeforeUnmount(function () {
       window.removeEventListener("orientationchange", computeBoardSize);
+      window.removeEventListener("orientationchange", computeAlignment);
     });
 
     computeBoardSize();
@@ -188,6 +216,7 @@ export default {
       handleWhiteSideTypeChange,
       handleBlackSideTypeChange,
       goalText,
+      mainZoneStyle,
     };
   },
 };
@@ -201,8 +230,29 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 1000;
-  background-color: rgba(92, 21, 207, 0.562);
+  background-color: rgba(209, 202, 221, 0.562);
 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mainZone {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -217,7 +267,7 @@ export default {
 }
 
 .goal {
-  color: yellow;
+  color: green;
   font-family: serif;
   font-size: 1em;
   margin-bottom: 0.5%;
