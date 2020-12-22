@@ -7,6 +7,9 @@ let elementIndex = 0;
 let elementList = [];
 
 export default function convertPgnDataToHistory(pgnData) {
+  elementIndex = 0;
+  elementList = [];
+
   const result = {};
   const fenTagValue = pgnData.headers.find((it) => it.name === "FEN");
   const startPosition =
