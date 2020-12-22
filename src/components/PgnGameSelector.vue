@@ -1,6 +1,7 @@
 <template>
   <div class="dropShadow" v-if="active">
     <div class="title">{{ title }}</div>
+    <div class="goal">{{ goalText }}</div>
     <chess-board :sizePx="boardSize" ref="boardComponent" />
     <div class="playersType">
       <div class="playersTypeLine">
@@ -79,6 +80,7 @@ export default {
     const boardComponent = ref(null);
     const whiteSideTypeSelect = ref(null);
     const blackSideTypeSelect = ref(null);
+    const goalText = ref("");
 
     const whiteSideType = ref(PLAYER_TYPE_HUMAN);
     const blackSideType = ref(PLAYER_TYPE_HUMAN);
@@ -104,7 +106,7 @@ export default {
       if (!selectedGame) return;
 
       const startPosition =
-        selectedGame?.headers?.find((item) => item.name === "FEN").value ||
+        selectedGame?.headers?.find((item) => item.name === "FEN")?.value ||
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
       boardComponent.value?.letUserStartANewGame(
         startPosition,
@@ -118,13 +120,42 @@ export default {
         blackSideTypeSelect.value.value = "external";
         whiteSideType.value = PLAYER_TYPE_HUMAN;
         blackSideType.value = PLAYER_TYPE_EXTERNAL;
-      }
-      else {
+      } else {
         whiteSideTypeSelect.value.value = "external";
         blackSideTypeSelect.value.value = "human";
         whiteSideType.value = PLAYER_TYPE_EXTERNAL;
         blackSideType.value = PLAYER_TYPE_HUMAN;
       }
+
+      updateSelectedGameGoal(selectedGame);
+    }
+
+    function updateSelectedGameGoal(selectedGame) {
+      let newGoalText = "";
+      const defaultGoalText = selectedGame?.headers?.find(
+        (item) => item.name === "Goal"
+      )?.value;
+
+      const englishGoalText = getSelectedGameGoalTranslation(selectedGame, "en");
+      const currentLocaleGoalText = getSelectedGameGoalTranslation(selectedGame, locale.value);
+
+      if (currentLocaleGoalText) {
+        newGoalText = currentLocaleGoalText;
+      }
+      else if (englishGoalText) {
+        newGoalText = englishGoalText;
+      }
+      else if (defaultGoalText) {
+        newGoalText = defaultGoalText;
+      }
+      
+      goalText.value = newGoalText;
+    }
+
+    function getSelectedGameGoalTranslation(selectedGame, localeStr) {
+      return selectedGame?.headers?.find(
+        (item) => item.name === `Goal_${localeStr}`
+      )?.value;
     }
 
     function open() {
@@ -134,7 +165,7 @@ export default {
         // The board component won't be available until some times, because its must be visible
         // which occurs just after the active state is taken into account.
         updateSelectedGame();
-      }, 150);
+      }, 100);
     }
 
     function dismiss() {
@@ -182,6 +213,7 @@ export default {
       blackSideTypeSelect,
       handleWhiteSideTypeChange,
       handleBlackSideTypeChange,
+      goalText,
     };
   },
 };
@@ -198,7 +230,7 @@ export default {
   background-color: rgba(92, 21, 207, 0.562);
 
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   justify-content: center;
   align-items: center;
 }
@@ -206,8 +238,15 @@ export default {
 .title {
   color: blue;
   font-family: sans-serif;
-  font-size: 1.2em;
-  margin-bottom: 2%;
+  font-size: 1.0em;
+  margin-bottom: 0.5%;
+}
+
+.goal {
+  color: yellow;
+  font-family: serif;
+  font-size: 1.0em;
+  margin-bottom: 0.5%;
 }
 
 .playersType {
@@ -215,7 +254,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 2% 0;
+  margin: 0.5% 0;
 }
 
 .playersTypeLine {
@@ -245,7 +284,7 @@ export default {
   font-size: 1.04em;
   border-radius: 18%;
   padding: 8%;
-  margin: 4%;
+  margin: 0.5% 4%;
 }
 
 .ok {

@@ -7,6 +7,9 @@
 [Result "*"]
 [FEN "4k3/Q7/8/8/8/8/8/4K3 w - - 0 1"]
 [Setup "1"]
+[Goal "White must win"]
+[Goal_fr "Les Blancs doivent gagner"]
+[Goal_es "Blancos deben ganar"]
 
  *
 
