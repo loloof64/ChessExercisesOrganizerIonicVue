@@ -6,6 +6,11 @@
         <div class="goal">{{ goalText }}</div>
         <div class="navigation">
           <ion-icon
+            :icon="playSkipBackCircleOutline"
+            class="navigationButton"
+            @click="chooseFirstGame"
+          />
+          <ion-icon
             :icon="playBackCircleOutline"
             class="navigationButton"
             @click="choosePreviousGame"
@@ -17,6 +22,11 @@
             :icon="playForwardCircleOutline"
             class="navigationButton"
             @click="chooseNextGame"
+          />
+          <ion-icon
+            :icon="playSkipForwardCircleOutline"
+            class="navigationButton"
+            @click="chooseLastGame"
           />
         </div>
       </div>
@@ -216,6 +226,11 @@ export default {
       mainZoneStyle["flex-direction"] = isPortrait ? "column" : "row";
     }
 
+    function chooseFirstGame() {
+      gameIndex.value = 0;
+      updateSelectedGame();
+    }
+
     function choosePreviousGame() {
       if (gameIndex.value > 0) gameIndex.value -= 1;
       updateSelectedGame();
@@ -223,6 +238,11 @@ export default {
 
     function chooseNextGame() {
       if (gameIndex.value < totalGamesCount.value - 1) gameIndex.value += 1;
+      updateSelectedGame();
+    }
+
+    function chooseLastGame() {
+      gameIndex.value = totalGamesCount.value - 1;
       updateSelectedGame();
     }
 
@@ -266,8 +286,10 @@ export default {
       playSkipForwardCircleOutline,
       currentGameNumber,
       totalGamesCount,
+      chooseFirstGame,
       choosePreviousGame,
       chooseNextGame,
+      chooseLastGame,
     };
   },
 };
