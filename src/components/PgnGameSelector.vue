@@ -111,13 +111,25 @@ export default {
         PLAYER_TYPE_EXTERNAL,
         PLAYER_TYPE_EXTERNAL
       );
+
+      const startsWithWhiteTurn = startPosition.split(" ")[1] === "w";
+      if (startsWithWhiteTurn) {
+        whiteSideTypeSelect.value.value = "human";
+        blackSideTypeSelect.value.value = "external";
+        whiteSideType.value = PLAYER_TYPE_HUMAN;
+        blackSideType.value = PLAYER_TYPE_EXTERNAL;
+      }
+      else {
+        whiteSideTypeSelect.value.value = "external";
+        blackSideTypeSelect.value.value = "human";
+        whiteSideType.value = PLAYER_TYPE_EXTERNAL;
+        blackSideType.value = PLAYER_TYPE_HUMAN;
+      }
     }
 
     function open() {
       active.value = true;
       gameIndex = 0;
-      whiteSideType.value = PLAYER_TYPE_HUMAN;
-      blackSideType.value = PLAYER_TYPE_HUMAN;
       setTimeout(() => {
         // The board component won't be available until some times, because its must be visible
         // which occurs just after the active state is taken into account.
