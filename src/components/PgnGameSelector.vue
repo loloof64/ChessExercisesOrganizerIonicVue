@@ -15,9 +15,15 @@
             class="navigationButton"
             @click="choosePreviousGame"
           />
-          <span class="navigationText"
-            >{{ currentGameNumber }} / {{ totalGamesCount }}</span
-          >
+          <input
+            ref="navigationNumberInput"
+            type="number"
+            class="navigationText navigationInput"
+            :value="currentGameNumber"
+            @focusout="updateGameWithText"
+            @change="updateGameWithText"
+          />
+          <span class="navigationText"> / {{ totalGamesCount }}</span>
           <ion-icon
             :icon="playForwardCircleOutline"
             class="navigationButton"
@@ -133,6 +139,7 @@ export default {
     const whiteSideTypeSelect = ref(null);
     const blackSideTypeSelect = ref(null);
     const goalText = ref("");
+    const navigationNumberInput = ref(null);
 
     const mainZoneStyle = reactive({
       "flex-direction": "column",
@@ -246,6 +253,19 @@ export default {
       updateSelectedGame();
     }
 
+    function updateGameWithText() {
+      const newNavigationNumber = parseInt(navigationNumberInput.value.value);
+      if (isNaN(newNavigationNumber)) {navigationNumberInput.value.value = currentGameNumber.value}
+      else {
+        const numberInRange = newNavigationNumber >= 1 && newNavigationNumber <= totalGamesCount.value;
+        if (numberInRange) {
+          gameIndex.value = newNavigationNumber - 1;
+          updateSelectedGame();
+        }
+        else navigationNumberInput.value.value = currentGameNumber.value;
+      }
+    }
+
     const totalGamesCount = computed(() => {
       if (!props.pgnGames) return 0;
       return props.pgnGames.length;
@@ -290,6 +310,8 @@ export default {
       choosePreviousGame,
       chooseNextGame,
       chooseLastGame,
+      updateGameWithText,
+      navigationNumberInput,
     };
   },
 };
@@ -399,6 +421,10 @@ export default {
 .navigationText {
   color: green;
   font-size: 1.04em;
+}
+
+.navigationInput {
+  text-align: right;
 }
 
 .ok {
