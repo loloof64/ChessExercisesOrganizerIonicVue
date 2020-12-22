@@ -44,6 +44,7 @@ import { ref, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
+import usePgnUtils from "@/hooks/PgnUtils";
 
 export default {
   props: {
@@ -73,6 +74,7 @@ export default {
     }
 
     const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
+    const { getSelectedGameGoal } = usePgnUtils();
 
     const boardSize = ref(null);
     const active = ref(false);
@@ -127,35 +129,7 @@ export default {
         blackSideType.value = PLAYER_TYPE_HUMAN;
       }
 
-      updateSelectedGameGoal(selectedGame);
-    }
-
-    function updateSelectedGameGoal(selectedGame) {
-      let newGoalText = "";
-      const defaultGoalText = selectedGame?.headers?.find(
-        (item) => item.name === "Goal"
-      )?.value;
-
-      const englishGoalText = getSelectedGameGoalTranslation(selectedGame, "en");
-      const currentLocaleGoalText = getSelectedGameGoalTranslation(selectedGame, locale.value);
-
-      if (currentLocaleGoalText) {
-        newGoalText = currentLocaleGoalText;
-      }
-      else if (englishGoalText) {
-        newGoalText = englishGoalText;
-      }
-      else if (defaultGoalText) {
-        newGoalText = defaultGoalText;
-      }
-      
-      goalText.value = newGoalText;
-    }
-
-    function getSelectedGameGoalTranslation(selectedGame, localeStr) {
-      return selectedGame?.headers?.find(
-        (item) => item.name === `Goal_${localeStr}`
-      )?.value;
+      goalText.value = getSelectedGameGoal(selectedGame, locale.value);
     }
 
     function open() {
@@ -230,7 +204,7 @@ export default {
   background-color: rgba(92, 21, 207, 0.562);
 
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
@@ -238,14 +212,14 @@ export default {
 .title {
   color: blue;
   font-family: sans-serif;
-  font-size: 1.0em;
+  font-size: 1em;
   margin-bottom: 0.5%;
 }
 
 .goal {
   color: yellow;
   font-family: serif;
-  font-size: 1.0em;
+  font-size: 1em;
   margin-bottom: 0.5%;
 }
 

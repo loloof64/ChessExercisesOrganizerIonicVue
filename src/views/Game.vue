@@ -20,8 +20,10 @@
         </ion-toolbar>
       </ion-header>
 
+      <div class="game_goal">{{ gameGoal }}</div>
       <div class="game_zone" :style="gameZoneStyle" slot="fixed">
         <chess-board
+          :style="boardStyle"
           :sizePx="boardAndHistorySize"
           :reversed="boardReversed"
           ref="boardComponent"
@@ -99,6 +101,7 @@ import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
+import usePgnUtils from "@/hooks/PgnUtils";
 
 import {
   Plugins,
@@ -108,6 +111,8 @@ import {
 import moment from "moment";
 
 const { Filesystem } = Plugins;
+
+const { getSelectedGameGoal } = usePgnUtils();
 
 export default {
   name: "Game",
@@ -141,6 +146,7 @@ export default {
     const engineCommunication = ref({});
     const engineReady = ref(false);
     const pendingPositionToSendToEngine = ref(null);
+    const gameGoal = ref("");
 
     const waitingSpinnerStyle = reactive({
       transform: "scale(3)",
@@ -366,6 +372,7 @@ export default {
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
       const whiteType = parseInt(route.params.whiteSide);
       const blackType = parseInt(route.params.blackSide);
+      gameGoal.value = getSelectedGameGoal(gameData, locale.value);
 
       historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame(startPosition, solutionData);
@@ -374,6 +381,12 @@ export default {
         whiteType,
         blackType
       );
+    }
+
+    function computeBoardTop() {
+      const orientationType = ScreenOrientation.type;
+      const isPortrait = orientationType.includes("portrait");
+      return isPortrait ? "5%" : "0%";
     }
 
     function computeBoardAndHistorySize() {
@@ -399,6 +412,11 @@ export default {
     }
 
     const boardAndHistorySize = ref(computeBoardAndHistorySize());
+
+    const boardStyle = reactive({
+      top: "5%",
+    });
+
     const gameZoneStyle = reactive({
       margin: "0 auto",
       display: "flex",
@@ -591,6 +609,8 @@ export default {
         margin: buttonMargin,
       } = computeMetaButtonDimension();
 
+      boardStyle["top"] = computeBoardTop();
+
       gameZoneStyle["flex-direction"] = computeGameZoneDirection();
       gameZoneStyle["grid-template-columns"] = columnsLayout;
       gameZoneStyle["grid-template-rows"] = rowsLayout;
@@ -631,6 +651,7 @@ export default {
 
     return {
       boardAndHistorySize,
+      boardStyle,
       gameZoneStyle,
       metaStyle,
       metaButtonStyle,
@@ -660,15 +681,28 @@ export default {
       navigateBack,
       solutionButtonCaption,
       toggleBetweenSolutionAndGame,
+      gameGoal,
     };
   },
 };
 </script>
 
 <style>
+.game_goal {
+  position: absolute;
+  width: 100%;
+  height: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: green;
+  font-family: serif;
+  font-size: 1em;
+}
+
 .game_zone {
   width: 100%;
-  height: 100%;
+  height: 95%;
 }
 
 .confirmDialog .alert-wrapper {

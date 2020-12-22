@@ -57,6 +57,7 @@ import { ref, reactive, onMounted, watch, onBeforeUnmount } from "vue";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
+import usePgnUtils from "@/hooks/PgnUtils";
 import ChessBoardMainLayer from "@/components/ChessBoardMainLayer";
 import ChessBoardArrowLayer from "@/components/ChessBoardArrowLayer";
 import ChessBoardDndLayer from "@/components/ChessBoardDndLayer";
@@ -96,6 +97,7 @@ export default {
     const draggedPieceLocationRatio = reactive({ x: null, y: null });
 
     const { sizePixels, cellsSizePixels } = useChessBoardGraphic();
+    const { convertSanToFan } = usePgnUtils();
 
     const {
       piecesValues,
@@ -218,26 +220,6 @@ export default {
     function cancelPromotionSelection() {
       resetDndState();
       promotionDialogOpen.value = false;
-    }
-
-    function convertSanToFan({ moveSan, whiteTurn }) {
-      moveSan = moveSan
-        .replace(/K/g, whiteTurn ? "\u2654" : "\u265A")
-        .normalize("NFKC");
-      moveSan = moveSan
-        .replace(/Q/g, whiteTurn ? "\u2655" : "\u265B")
-        .normalize("NFKC");
-      moveSan = moveSan
-        .replace(/R/g, whiteTurn ? "\u2656" : "\u265C")
-        .normalize("NFKC");
-      moveSan = moveSan
-        .replace(/B/g, whiteTurn ? "\u2657" : "\u265D")
-        .normalize("NFKC");
-      moveSan = moveSan
-        .replace(/N/g, whiteTurn ? "\u2658" : "\u265E")
-        .normalize("NFKC");
-
-      return moveSan;
     }
 
     function onPromotionMoveDone(san) {
