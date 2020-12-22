@@ -23,7 +23,7 @@ function getSelectedGameGoal(selectedGame, currentLocale) {
   } else if (defaultGoalText) {
     newGoalText = defaultGoalText;
   }
-
+  
   return newGoalText;
 }
 

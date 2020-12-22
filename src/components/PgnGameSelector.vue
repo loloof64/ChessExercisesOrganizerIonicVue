@@ -255,14 +255,16 @@ export default {
 
     function updateGameWithText() {
       const newNavigationNumber = parseInt(navigationNumberInput.value.value);
-      if (isNaN(newNavigationNumber)) {navigationNumberInput.value.value = currentGameNumber.value}
-      else {
-        const numberInRange = newNavigationNumber >= 1 && newNavigationNumber <= totalGamesCount.value;
+      if (isNaN(newNavigationNumber)) {
+        navigationNumberInput.value.value = currentGameNumber.value;
+      } else {
+        const numberInRange =
+          newNavigationNumber >= 1 &&
+          newNavigationNumber <= totalGamesCount.value;
         if (numberInRange) {
           gameIndex.value = newNavigationNumber - 1;
           updateSelectedGame();
-        }
-        else navigationNumberInput.value.value = currentGameNumber.value;
+        } else navigationNumberInput.value.value = currentGameNumber.value;
       }
     }
 
@@ -366,6 +368,10 @@ export default {
   font-family: serif;
   font-size: 1em;
   margin-bottom: 0.5%;
+}
+
+.goal::before {
+  content: "\A0";
 }
 
 .navigation {
