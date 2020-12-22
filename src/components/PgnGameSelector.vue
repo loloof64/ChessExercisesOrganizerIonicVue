@@ -4,6 +4,21 @@
       <div class="header">
         <div class="title">{{ title }}</div>
         <div class="goal">{{ goalText }}</div>
+        <div class="navigation">
+          <ion-icon
+            :icon="playBackCircleOutline"
+            class="navigationButton"
+            @click="choosePreviousGame"
+          />
+          <span class="navigationText"
+            >{{ currentGameNumber }} / {{ totalGamesCount }}</span
+          >
+          <ion-icon
+            :icon="playForwardCircleOutline"
+            class="navigationButton"
+            @click="chooseNextGame"
+          />
+        </div>
       </div>
       <chess-board :sizePx="boardSize" ref="boardComponent" />
       <div class="footer">
@@ -56,11 +71,19 @@
 
 <script>
 import ChessBoard from "@/components/ChessBoard";
-import { ref, reactive, onBeforeUnmount } from "vue";
+import { ref, reactive, onBeforeUnmount, computed } from "vue";
+import { IonIcon } from "@ionic/vue";
 import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import usePgnUtils from "@/hooks/PgnUtils";
+
+import {
+  playBackCircleOutline,
+  playSkipBackCircleOutline,
+  playForwardCircleOutline,
+  playSkipForwardCircleOutline,
+} from "ionicons/icons";
 
 export default {
   props: {
@@ -77,6 +100,7 @@ export default {
   },
   components: {
     ChessBoard,
+    IonIcon,
   },
   setup(props, context) {
     const locale = ref(null);
@@ -94,7 +118,7 @@ export default {
 
     const boardSize = ref(null);
     const active = ref(false);
-    let gameIndex = -1;
+    const gameIndex = ref(-1);
     const boardComponent = ref(null);
     const whiteSideTypeSelect = ref(null);
     const blackSideTypeSelect = ref(null);
@@ -116,7 +140,7 @@ export default {
     }
 
     function updateSelectedGame() {
-      if (gameIndex < 0) {
+      if (gameIndex.value < 0) {
         boardComponent.value?.letUserStartANewGame(
           "8/8/8/8/8/8/8/8 w - - 0 1",
           PLAYER_TYPE_EXTERNAL,
@@ -124,7 +148,7 @@ export default {
         );
         return;
       }
-      const selectedGame = props.pgnGames?.[gameIndex];
+      const selectedGame = props.pgnGames?.[gameIndex.value];
       if (!selectedGame) return;
 
       const startPosition =
@@ -154,7 +178,7 @@ export default {
 
     function open() {
       active.value = true;
-      gameIndex = 0;
+      gameIndex.value = 0;
       setTimeout(() => {
         // The board component won't be available until some times, because its must be visible
         // which occurs just after the active state is taken into account.
@@ -168,7 +192,7 @@ export default {
 
     function emitSelectedIndex() {
       context.emit("game-selected", {
-        index: gameIndex,
+        index: gameIndex.value,
         whiteSide: whiteSideType.value,
         blackSide: blackSideType.value,
       });
@@ -191,6 +215,25 @@ export default {
       const isPortrait = orientationType.includes("portrait");
       mainZoneStyle["flex-direction"] = isPortrait ? "column" : "row";
     }
+
+    function choosePreviousGame() {
+      if (gameIndex.value > 0) gameIndex.value -= 1;
+      updateSelectedGame();
+    }
+
+    function chooseNextGame() {
+      if (gameIndex.value < totalGamesCount.value - 1) gameIndex.value += 1;
+      updateSelectedGame();
+    }
+
+    const totalGamesCount = computed(() => {
+      if (!props.pgnGames) return 0;
+      return props.pgnGames.length;
+    });
+
+    const currentGameNumber = computed(() => {
+      return gameIndex.value + 1;
+    });
 
     window.addEventListener("orientationchange", computeBoardSize);
     window.addEventListener("orientationchange", computeAlignment);
@@ -217,6 +260,14 @@ export default {
       handleBlackSideTypeChange,
       goalText,
       mainZoneStyle,
+      playBackCircleOutline,
+      playSkipBackCircleOutline,
+      playForwardCircleOutline,
+      playSkipForwardCircleOutline,
+      currentGameNumber,
+      totalGamesCount,
+      choosePreviousGame,
+      chooseNextGame,
     };
   },
 };
@@ -273,6 +324,13 @@ export default {
   margin-bottom: 0.5%;
 }
 
+.navigation {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .playersType {
   display: flex;
   flex-direction: column;
@@ -309,6 +367,16 @@ export default {
   border-radius: 18%;
   padding: 8%;
   margin: 0.5% 4%;
+}
+
+.navigationButton {
+  color: green;
+  font-size: 1.04em;
+}
+
+.navigationText {
+  color: green;
+  font-size: 1.04em;
 }
 
 .ok {
