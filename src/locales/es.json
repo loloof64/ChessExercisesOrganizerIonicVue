@@ -35,5 +35,11 @@
     "2rooks_king_vs_king": "2Torres+Rey / Rey",
     "rook_king_vs_king": "2Alfiles+Rey / Rey",
     "pawn_endgames": "Finales de peones"
+  },
+  "game_selector": {
+    "whites": "Blancos",
+    "blacks": "Negros",
+    "human": "Humano",
+    "cpu": "Computadora"
   }
 }

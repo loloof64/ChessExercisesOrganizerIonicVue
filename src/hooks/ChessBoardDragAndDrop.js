@@ -33,7 +33,6 @@ export default function useChessBoardDragAndDrop() {
     piecesPaths,
     whiteTurn,
   }) {
-
     const x = detail.srcEvent.offsetX;
     const y = detail.srcEvent.offsetY;
 

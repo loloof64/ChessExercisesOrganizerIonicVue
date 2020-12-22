@@ -36,5 +36,11 @@
     "rook_king_vs_king": "Tour+Roi / Roi",
     "2bishops_king_vs_king": "2Fous+Roi / Roi",
     "pawn_endgames": "Finales de pions"
-  }   
+  },
+  "game_selector": {
+    "whites": "Blancs",
+    "blacks": "Noirs",
+    "human": "Humain",
+    "cpu": "Ordinateur"
+  }
 }

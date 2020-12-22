@@ -99,7 +99,11 @@ export default {
       }
     }
 
-    async function launchGame(selectedGameIndex) {
+    async function launchGame({
+      index: selectedGameIndex,
+      whiteSide,
+      blackSide,
+    }) {
       gameSelector.value?.dismiss();
       try {
         const gameData = pgnGamesToPreview.value[selectedGameIndex];
@@ -109,7 +113,12 @@ export default {
         const solutionDataJSON = JSON.stringify(solutionData);
         await router.push({
           name: "game",
-          params: { gameData: gameDataJSON, solutionData: solutionDataJSON },
+          params: {
+            gameData: gameDataJSON,
+            solutionData: solutionDataJSON,
+            whiteSide,
+            blackSide,
+          },
         });
       } catch (err) {
         console.error(err);

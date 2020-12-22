@@ -2,8 +2,34 @@
   <div class="dropShadow" v-if="active">
     <div class="title">{{ title }}</div>
     <chess-board :sizePx="boardSize" ref="boardComponent" />
+    <div class="playersType">
+      <div class="playersTypeLine">
+        <span class="label">{{ getTranslation("game_selector.whites") }}</span>
+        <select ref="whiteSideTypeSelect" @change="handleWhiteSideTypeChange">
+          <option value="human">
+            {{ getTranslation("game_selector.human") }}
+          </option>
+          <option value="external">
+            {{ getTranslation("game_selector.cpu") }}
+          </option>
+        </select>
+      </div>
+      <div class="playersTypeLine">
+        <span class="label">{{ getTranslation("game_selector.blacks") }}</span>
+        <select ref="blackSideTypeSelect" @change="handleBlackSideTypeChange">
+          <option value="human">
+            {{ getTranslation("game_selector.human") }}
+          </option>
+          <option value="external">
+            {{ getTranslation("game_selector.cpu") }}
+          </option>
+        </select>
+      </div>
+    </div>
     <div class="buttonsZone">
-      <div class="button ok" @click="emitSelectedIndex">{{ getTranslation("general.ok_button") }}</div>
+      <div class="button ok" @click="emitSelectedIndex">
+        {{ getTranslation("general.ok_button") }}
+      </div>
       <div class="button cancel" @click="dismiss">
         {{ getTranslation("general.cancel_button") }}
       </div>
@@ -45,12 +71,17 @@ export default {
       return t(key, {}, { locale: locale.value });
     }
 
-    const { PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
+    const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
 
     const boardSize = ref(null);
     const active = ref(false);
     let gameIndex = -1;
     const boardComponent = ref(null);
+    const whiteSideTypeSelect = ref(null);
+    const blackSideTypeSelect = ref(null);
+
+    const whiteSideType = ref(PLAYER_TYPE_HUMAN);
+    const blackSideType = ref(PLAYER_TYPE_HUMAN);
 
     function computeBoardSize() {
       const orientationType = ScreenOrientation.type;
@@ -85,6 +116,8 @@ export default {
     function open() {
       active.value = true;
       gameIndex = 0;
+      whiteSideType.value = PLAYER_TYPE_HUMAN;
+      blackSideType.value = PLAYER_TYPE_HUMAN;
       setTimeout(() => {
         // The board component won't be available until some times, because its must be visible
         // which occurs just after the active state is taken into account.
@@ -97,7 +130,23 @@ export default {
     }
 
     function emitSelectedIndex() {
-        context.emit('game-selected', gameIndex);
+      context.emit("game-selected", {
+        index: gameIndex,
+        whiteSide: whiteSideType.value,
+        blackSide: blackSideType.value,
+      });
+    }
+
+    function handleWhiteSideTypeChange() {
+      const newValue = whiteSideTypeSelect.value?.value || "human";
+      whiteSideType.value =
+        newValue === "human" ? PLAYER_TYPE_HUMAN : PLAYER_TYPE_EXTERNAL;
+    }
+
+    function handleBlackSideTypeChange() {
+      const newValue = blackSideTypeSelect.value?.value || "human";
+      blackSideType.value =
+        newValue === "human" ? PLAYER_TYPE_HUMAN : PLAYER_TYPE_EXTERNAL;
     }
 
     window.addEventListener("orientationchange", computeBoardSize);
@@ -117,6 +166,10 @@ export default {
       getTranslation,
       boardComponent,
       emitSelectedIndex,
+      whiteSideTypeSelect,
+      blackSideTypeSelect,
+      handleWhiteSideTypeChange,
+      handleBlackSideTypeChange,
     };
   },
 };
@@ -143,6 +196,26 @@ export default {
   font-family: sans-serif;
   font-size: 1.2em;
   margin-bottom: 2%;
+}
+
+.playersType {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2% 0;
+}
+
+.playersTypeLine {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0.5% 0;
+}
+
+.playersType > .playersTypeLine > .label {
+  padding: 0 2%;
 }
 
 .buttonsZone {

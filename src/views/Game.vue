@@ -7,7 +7,9 @@
           {{ getTranslation("game_page.title") }}</ion-title
         >
       </ion-toolbar>
-      <span class="show_solution" @click="toggleBetweenSolutionAndGame">{{ solutionButtonCaption }}</span>
+      <span class="show_solution" @click="toggleBetweenSolutionAndGame">{{
+        solutionButtonCaption
+      }}</span>
     </ion-header>
     <ion-content :fullscreen="true" :scrollY="false">
       <ion-header collapse="condense">
@@ -97,7 +99,7 @@ import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
-import useChessBoardLogic from "@/hooks/ChessBoardLogic";
+
 import {
   Plugins,
   FilesystemDirectory,
@@ -127,8 +129,6 @@ export default {
 
     const route = useRoute();
     const router = useRouter();
-
-    const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
 
     if (window.Intl && typeof window.Intl === "object") {
       locale.value = navigator.language.substring(0, 2);
@@ -359,11 +359,14 @@ export default {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
       const gameData = JSON.parse(route.params.gameData);
       const solutionData = JSON.parse(route.params.solutionData);
-      const gameCustomPosition = gameData.headers.find(it =>it.name === "FEN")?.value || defaultPosition;
+      const gameCustomPosition =
+        gameData.headers.find((it) => it.name === "FEN")?.value ||
+        defaultPosition;
       const startPosition =
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
-      const whiteType = PLAYER_TYPE_HUMAN;
-      const blackType = PLAYER_TYPE_EXTERNAL;
+      const whiteType = parseInt(route.params.whiteSide);
+      const blackType = parseInt(route.params.blackSide);
+
       historyNavigationBarVisible.value = false;
       historyComponent.value.startNewGame(startPosition, solutionData);
       boardComponent.value.letUserStartANewGame(
@@ -615,7 +618,7 @@ export default {
       if (!boardComponent.value?.gameIsStalled()) return "";
       return historyComponent.value?.isSolutionActive()
         ? getTranslation("game_page.show_game")
-        : getTranslation("game_page.show_solution")
+        : getTranslation("game_page.show_solution");
     });
 
     window.addEventListener("orientationchange", updateSizeAndLayout);

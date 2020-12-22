@@ -271,7 +271,7 @@ export default {
       endRank,
       promotion,
     }) {
-      const moveResult= makeExternalMove({
+      const moveResult = makeExternalMove({
         startFile,
         startRank,
         endFile,
@@ -279,9 +279,8 @@ export default {
         promotion,
       });
       if (!moveResult) return;
-      const { san, positionFen, lastMoveArrow }  = moveResult;
+      const { san, positionFen, lastMoveArrow } = moveResult;
       if (!san) return;
-
 
       const fan = convertSanToFan({
         moveSan: san,
@@ -305,10 +304,10 @@ export default {
     }
 
     function setLastMoveArrow({ startFile, startRank, endFile, endRank }) {
-        arrowFromFile.value = startFile;
-        arrowFromRank.value = startRank;
-        arrowToFile.value = endFile;
-        arrowToRank.value = endRank;
+      arrowFromFile.value = startFile;
+      arrowFromRank.value = startRank;
+      arrowToFile.value = endFile;
+      arrowToRank.value = endRank;
     }
 
     function onPanStart(detail) {

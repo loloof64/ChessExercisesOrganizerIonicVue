@@ -84,6 +84,7 @@ export default function useChessBoardLogic() {
     isWhiteTurn.value = game.value.turn() === "w";
     whitePlayerType.value = whiteType;
     blackPlayerType.value = blackType;
+
     gameStatus.value = GAME_STATUS_RUNNING;
   }
 
@@ -326,7 +327,7 @@ export default function useChessBoardLogic() {
       gameStatus.value != GAME_STATUS_RUNNING;
     if (allowedToLoadPosition) {
       gameCurrentFen.value = fen;
-      isWhiteTurn.value = fen.split(' ')[1] === 'w';
+      isWhiteTurn.value = fen.split(" ")[1] === "w";
       return true;
     }
     return false;
@@ -334,18 +335,15 @@ export default function useChessBoardLogic() {
 
   function isHumanTurn() {
     return (
-      (isWhiteTurn.value &&
-        whitePlayerType.value === PLAYER_TYPE_HUMAN) ||
+      (isWhiteTurn.value && whitePlayerType.value === PLAYER_TYPE_HUMAN) ||
       (!isWhiteTurn.value && blackPlayerType.value === PLAYER_TYPE_HUMAN)
     );
   }
 
   function isExternalTurn() {
     return (
-      (isWhiteTurn.value &&
-        whitePlayerType.value === PLAYER_TYPE_EXTERNAL) ||
-      (!isWhiteTurn.value &&
-        blackPlayerType.value === PLAYER_TYPE_EXTERNAL)
+      (isWhiteTurn.value && whitePlayerType.value === PLAYER_TYPE_EXTERNAL) ||
+      (!isWhiteTurn.value && blackPlayerType.value === PLAYER_TYPE_EXTERNAL)
     );
   }
 

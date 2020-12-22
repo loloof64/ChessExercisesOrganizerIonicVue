@@ -36,5 +36,11 @@
     "rook_king_vs_king": "Rook+King / King",
     "2bishops_king_vs_king": "2Bishops+King / King",
     "pawn_endgames": "Pawn endgames"
-  }   
+  },
+  "game_selector": {
+    "whites": "Whites",
+    "blacks": "Blacks",
+    "human": "Human",
+    "cpu": "Computeur"
+  }
 }
