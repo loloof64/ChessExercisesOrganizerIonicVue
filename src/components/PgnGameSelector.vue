@@ -377,7 +377,7 @@ export default {
 .title {
   color: blue;
   font-family: sans-serif;
-  font-size: 0.8em;
+  font-size: 1.1em;
   margin-bottom: 0.5%;
 }
 
