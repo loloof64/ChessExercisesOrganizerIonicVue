@@ -89,6 +89,7 @@ import {
   IonSpinner,
   toastController,
   alertController,
+  useBackButton,
 } from "@ionic/vue";
 import {
   swapVertical,
@@ -639,6 +640,10 @@ export default {
       waitingSpinnerStyle["left"] = `${7 * cellsSize}px`;
       waitingSpinnerStyle["top"] = `${7 * cellsSize}px`;
     }
+
+    useBackButton(10, () => {
+      navigateBack();
+    });
 
     const waitingEngineMove = computed(() => {
       if (!boardComponent.value) return false;

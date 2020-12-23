@@ -364,7 +364,7 @@ export default {
 .mainZone {
   display: grid;
   width: 100%;
-  height: 80%;
+  height: 80% ;
 }
 
 .header {
