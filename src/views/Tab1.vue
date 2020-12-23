@@ -11,7 +11,7 @@
         <ion-title>{{ getTranslation("sample_games_tab.title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" scrollY="false">
+    <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{

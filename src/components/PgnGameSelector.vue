@@ -455,7 +455,7 @@ export default {
 
 .navigationButton {
   visibility: hidden;
-  font-size: 1.04em;
+  font-size: 1.6em;
 }
 
 .navigationButton.visible {
