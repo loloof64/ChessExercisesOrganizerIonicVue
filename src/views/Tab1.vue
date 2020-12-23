@@ -1,11 +1,17 @@
 <template>
   <ion-page>
+    <pgn-game-selector
+        ref="gameSelector"
+        :pgnGames="pgnGamesToPreview"
+        :title="pgnGameSelectorTitle"
+        @game-selected="launchGame"
+      />
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ getTranslation("sample_games_tab.title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" scrollY="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{
@@ -22,13 +28,6 @@
       >
         {{ getTranslation(completeNameKey(aGame.nameKey)) }}
       </div>
-
-      <pgn-game-selector
-        ref="gameSelector"
-        :pgnGames="pgnGamesToPreview"
-        :title="pgnGameSelectorTitle"
-        @game-selected="launchGame"
-      />
     </ion-content>
   </ion-page>
 </template>

@@ -48,7 +48,9 @@
           />
         </div>
       </div>
-      <chess-board :sizePx="boardSize" ref="boardComponent" />
+      <div class="boardZone">
+        <chess-board :sizePx="boardSize" ref="boardComponent" />
+      </div>
       <div class="footer">
         <div class="playersType">
           <div class="playersTypeLine">
@@ -242,7 +244,9 @@ export default {
     function computeAlignment() {
       const orientationType = ScreenOrientation.type;
       const isPortrait = orientationType.includes("portrait");
-      mainZoneStyle["flex-direction"] = isPortrait ? "column" : "row";
+      mainZoneStyle["grid-template"] = isPortrait
+        ? "1fr 1fr 1fr / 1fr"
+        : "1fr / 1fr 1fr 1fr";
     }
 
     function chooseFirstGame() {
@@ -349,7 +353,7 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 1000;
-  background-color: rgba(209, 202, 221, 0.562);
+  background-color: rgba(209, 202, 221, 0.938);
 
   display: flex;
   flex-direction: column;
@@ -358,15 +362,22 @@ export default {
 }
 
 .mainZone {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  display: grid;
   width: 100%;
+  height: 80%;
 }
 
 .header {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2% 0;
+}
+
+.boardZone {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
 }
@@ -376,19 +387,20 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin: 2% 0;
 }
 
 .title {
   color: blue;
   font-family: sans-serif;
-  font-size: 1em;
+  font-size: 0.8em;
   margin-bottom: 0.5%;
 }
 
 .goal {
   color: green;
   font-family: serif;
-  font-size: 1em;
+  font-size: 0.8em;
   margin-bottom: 0.5%;
 }
 
@@ -399,7 +411,7 @@ export default {
 .navigation {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
@@ -453,11 +465,14 @@ export default {
 
 .navigationText {
   color: green;
-  font-size: 1.04em;
+  font-size: 0.8em;
+  width: 12%;
 }
 
 .navigationInput {
   text-align: right;
+  width: 20%;
+  font-size: 0.8em;
 }
 
 .ok {
