@@ -165,5 +165,6 @@ export default {
 .item {
   font-size: 1.5em;
   border-bottom: 1px solid black;
+  padding-left: 2%;
 }
 </style>
