@@ -21,15 +21,7 @@
             }"
             @click="choosePreviousGame"
           />
-          <input
-            ref="navigationNumberInput"
-            type="number"
-            class="navigationText navigationInput"
-            :value="currentGameNumber"
-            @focusout="updateGameWithText"
-            @change="updateGameWithText"
-          />
-          <span class="navigationText"> / {{ totalGamesCount }}</span>
+          <span class="navigationText">{{ currentGameNumber}} / {{ totalGamesCount }}</span>
           <ion-icon
             :icon="playForwardCircleOutline"
             class="navigationButton"
@@ -47,6 +39,7 @@
             @click="chooseLastGame"
           />
         </div>
+        <input type="range" :min="1" :max="totalGamesCount" :value="currentGameNumber" @change="updateGameIndex"/>
       </div>
       <div class="boardZone">
         <chess-board :sizePx="boardSize" ref="boardComponent" />
@@ -269,19 +262,10 @@ export default {
       updateSelectedGame();
     }
 
-    function updateGameWithText() {
-      const newNavigationNumber = parseInt(navigationNumberInput.value.value);
-      if (isNaN(newNavigationNumber)) {
-        navigationNumberInput.value.value = currentGameNumber.value;
-      } else {
-        const numberInRange =
-          newNavigationNumber >= 1 &&
-          newNavigationNumber <= totalGamesCount.value;
-        if (numberInRange) {
-          gameIndex.value = newNavigationNumber - 1;
-          updateSelectedGame();
-        } else navigationNumberInput.value.value = currentGameNumber.value;
-      }
+    function updateGameIndex(evt) {
+      const selectedGame = parseInt(evt.target.value - 1);
+      gameIndex.value = selectedGame;
+      updateSelectedGame();
     }
 
     const totalGamesCount = computed(() => {
@@ -336,10 +320,10 @@ export default {
       choosePreviousGame,
       chooseNextGame,
       chooseLastGame,
-      updateGameWithText,
       navigationNumberInput,
       afterFirstGame,
       beforeLastGame,
+      updateGameIndex,
     };
   },
 };
@@ -466,13 +450,7 @@ export default {
 .navigationText {
   color: green;
   font-size: 0.8em;
-  width: 12%;
-}
-
-.navigationInput {
-  text-align: right;
-  width: 20%;
-  font-size: 0.8em;
+  padding: 6px;
 }
 
 .ok {
