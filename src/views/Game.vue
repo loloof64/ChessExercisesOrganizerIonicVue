@@ -1,5 +1,6 @@
 <template>
   <ion-page>
+    <simple-dialog ref="simpleDialog" />
     <ion-header>
       <ion-toolbar>
         <ion-title>
@@ -88,7 +89,6 @@ import {
   IonIcon,
   IonSpinner,
   toastController,
-  alertController,
   useBackButton,
 } from "@ionic/vue";
 import {
@@ -106,6 +106,7 @@ import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
 import usePgnUtils from "@/hooks/PgnUtils";
+import SimpleDialog from "@/components/SimpleDialog";
 
 import {
   Plugins,
@@ -130,6 +131,7 @@ export default {
     IonPage,
     IonIcon,
     IonSpinner,
+    SimpleDialog,
   },
   setup() {
     const locale = ref(null);
@@ -152,6 +154,7 @@ export default {
     const pendingPositionToSendToEngine = ref(null);
     const gameGoal = ref("");
     const shouldShowSolution = ref(false);
+    const simpleDialog = ref(null);
 
     const waitingSpinnerStyle = reactive({
       transform: "scale(3)",
@@ -171,7 +174,7 @@ export default {
     } catch (engineLoadingError) {
       engineCommunication.value = null;
       console.error(engineLoadingError);
-      showMessageDialog({
+      simpleDialog.value.showMessage({
         title: getTranslation("game_page.failed_loading_stockfish_title"),
         message: engineLoadingError,
       });
@@ -181,7 +184,7 @@ export default {
       if (boardComponent.value.gameIsIdle()) {
         doNavigateBack();
       } else {
-        showConfirmDialog({
+        simpleDialog.value.showConfirm({
           title: getTranslation("game_page.confirm_exit_page_title"),
           message: getTranslation("game_page.confirm_exit_page_message"),
           onConfirm: doNavigateBack,
@@ -294,55 +297,11 @@ export default {
       return t(key, {}, { locale: locale.value });
     }
 
-    async function showMessageDialog({ title, message }) {
-      const alert = await alertController.create({
-        cssClass: "confirmDialog",
-        header: title,
-        message: message,
-        buttons: [
-          {
-            text: getTranslation("general.ok_button"),
-            role: "primary",
-            cssClass: "primaryButton",
-            handler: () => {},
-          },
-        ],
-      });
-      alert.present();
-    }
-
-    async function showConfirmDialog({ title, message, onCancel, onConfirm }) {
-      const alert = await alertController.create({
-        cssClass: "confirmDialog",
-        header: title,
-        message: message,
-        buttons: [
-          {
-            text: getTranslation("general.cancel_button"),
-            role: "cancel",
-            cssClass: "secondaryButton",
-            handler: () => {
-              if (onCancel) onCancel();
-            },
-          },
-          {
-            text: getTranslation("general.ok_button"),
-            role: "primary",
-            cssClass: "primaryButton",
-            handler: () => {
-              if (onConfirm) onConfirm();
-            },
-          },
-        ],
-      });
-      alert.present();
-    }
-
     function startNewGame() {
       if (boardComponent.value.gameIsIdle()) {
         doStartNewGame();
       } else {
-        showConfirmDialog({
+        simpleDialog.value.showConfirm({
           title: getTranslation("game_page.confirm_restart_title"),
           message: getTranslation("game_page.confirm_restart_message"),
           onConfirm: doStartNewGame,
@@ -352,7 +311,7 @@ export default {
 
     function stopGame() {
       if (boardComponent.value.gameIsInProgress()) {
-        showConfirmDialog({
+        simpleDialog.value.showConfirm({
           title: getTranslation("game_page.confirm_stop_title"),
           message: getTranslation("game_page.confirm_stop_message"),
           onConfirm: () => {
@@ -589,7 +548,7 @@ export default {
           encoding: FilesystemEncoding.ASCII,
           recursive: true,
         });
-        showMessageDialog({
+        simpleDialog.value.showMessage({
           title: getTranslation("game_page.pgn_saved_title"),
           message: t(
             "game_page.pgn_saved_message",
@@ -599,7 +558,7 @@ export default {
         });
       } catch (loadingError) {
         console.error(loadingError);
-        showMessageDialog({
+        simpleDialog.value.showMessage({
           title: getTranslation("game_page.error_saving_pgn_title"),
           message: loadingError,
         });
@@ -699,6 +658,7 @@ export default {
       toggleBetweenSolutionAndGame,
       gameGoal,
       shouldShowSolution,
+      simpleDialog,
     };
   },
 };
@@ -720,26 +680,6 @@ export default {
 .game_zone {
   width: 100%;
   height: 95%;
-}
-
-.confirmDialog .alert-wrapper {
-  background-color: rgba(45, 211, 211, 0.6);
-}
-
-.confirmDialog .alert-wrapper .alert-message {
-  color: blue;
-}
-
-.confirmDialog .primaryButton.alert-button {
-  background-color: green;
-  color: white;
-  border-radius: 20%;
-}
-
-.confirmDialog .secondaryButton.alert-button {
-  background-color: red;
-  color: white;
-  border-radius: 20%;
 }
 
 .show_solution {

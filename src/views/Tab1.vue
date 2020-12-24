@@ -6,6 +6,7 @@
       :title="pgnGameSelectorTitle"
       @game-selected="launchGame"
     />
+    <simple-dialog ref="simpleDialog" />
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ getTranslation("sample_games_tab.title") }}</ion-title>
@@ -42,11 +43,11 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  alertController,
 } from "@ionic/vue";
 import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
 import PgnGameSelector from "@/components/PgnGameSelector";
+import SimpleDialog from "@/components/SimpleDialog";
 
 export default {
   name: "SampleGames",
@@ -57,6 +58,7 @@ export default {
     IonContent,
     IonPage,
     PgnGameSelector,
+    SimpleDialog
   },
   setup() {
     const locale = ref(null);
@@ -75,6 +77,7 @@ export default {
     const gameSelector = ref(null);
     const pgnGamesToPreview = ref(null);
     const pgnGameSelectorTitle = ref(null);
+    const simpleDialog = ref(null);
 
     function completeNameKey(gameNameKey) {
       return `sample_games_tab.${gameNameKey}`;
@@ -96,30 +99,13 @@ export default {
       } catch (err) {
         console.error(err);
         gameSelector.value?.dismiss();
-        showMessageDialog({
+        simpleDialog.value.showMessage({
           title: getTranslation(
             "sample_games_tab.exercise_loading_error_title"
           ),
           message: err,
         });
       }
-    }
-
-    async function showMessageDialog({ title, message }) {
-      const alert = await alertController.create({
-        cssClass: "confirmDialog",
-        header: title,
-        message: message,
-        buttons: [
-          {
-            text: getTranslation("general.ok_button"),
-            role: "primary",
-            cssClass: "primaryButton",
-            handler: () => {},
-          },
-        ],
-      });
-      alert.present();
     }
 
     async function launchGame({
@@ -145,7 +131,7 @@ export default {
         });
       } catch (err) {
         console.error(err);
-        showMessageDialog({
+        simpleDialog.value.showMessage({
           title: getTranslation(
             "sample_games_tab.exercise_loading_error_title"
           ),
@@ -186,6 +172,7 @@ export default {
       pgnGameSelectorTitle,
       gameSelector,
       launchGame,
+      simpleDialog,
     };
   },
 };
@@ -196,25 +183,5 @@ export default {
   font-size: 1.5em;
   border-bottom: 1px solid black;
   padding-left: 2%;
-}
-
-.confirmDialog .alert-wrapper {
-  background-color: rgba(45, 211, 211, 0.6);
-}
-
-.confirmDialog .alert-wrapper .alert-message {
-  color: blue;
-}
-
-.confirmDialog .primaryButton.alert-button {
-  background-color: green;
-  color: white;
-  border-radius: 20%;
-}
-
-.confirmDialog .secondaryButton.alert-button {
-  background-color: red;
-  color: white;
-  border-radius: 20%;
 }
 </style>
