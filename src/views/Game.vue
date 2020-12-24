@@ -190,7 +190,7 @@ export default {
     }
 
     function doNavigateBack() {
-      router.pop();
+      router.go(-1);
     }
 
     function toggleBetweenSolutionAndGame() {
@@ -530,7 +530,7 @@ export default {
       // More standard way of writing a Black first move.
       gamePgn = gamePgn.replace(". ...", "...");
 
-      router.push("/local_games_explorer");
+      await router.push("/save_game_explorer");
 
       /*
       try {
