@@ -34,7 +34,8 @@
     "queen_king_vs_king": "Dama+Rey / Rey",
     "2rooks_king_vs_king": "2Torres+Rey / Rey",
     "rook_king_vs_king": "2Alfiles+Rey / Rey",
-    "pawn_endgames": "Finales de peones"
+    "pawn_endgames": "Finales de peones",
+    "exercise_loading_error_title": "Error al cargar el ejercicio"
   },
   "game_selector": {
     "whites": "Blancos",

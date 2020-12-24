@@ -1,11 +1,11 @@
 <template>
   <ion-page>
     <pgn-game-selector
-        ref="gameSelector"
-        :pgnGames="pgnGamesToPreview"
-        :title="pgnGameSelectorTitle"
-        @game-selected="launchGame"
-      />
+      ref="gameSelector"
+      :pgnGames="pgnGamesToPreview"
+      :title="pgnGameSelectorTitle"
+      @game-selected="launchGame"
+    />
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ getTranslation("sample_games_tab.title") }}</ion-title>
@@ -42,6 +42,7 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
+  alertController,
 } from "@ionic/vue";
 import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
@@ -95,7 +96,30 @@ export default {
       } catch (err) {
         console.error(err);
         gameSelector.value?.dismiss();
+        showMessageDialog({
+          title: getTranslation(
+            "sample_games_tab.exercise_loading_error_title"
+          ),
+          message: err,
+        });
       }
+    }
+
+    async function showMessageDialog({ title, message }) {
+      const alert = await alertController.create({
+        cssClass: "confirmDialog",
+        header: title,
+        message: message,
+        buttons: [
+          {
+            text: getTranslation("general.ok_button"),
+            role: "primary",
+            cssClass: "primaryButton",
+            handler: () => {},
+          },
+        ],
+      });
+      alert.present();
     }
 
     async function launchGame({
@@ -121,6 +145,12 @@ export default {
         });
       } catch (err) {
         console.error(err);
+        showMessageDialog({
+          title: getTranslation(
+            "sample_games_tab.exercise_loading_error_title"
+          ),
+          message: err,
+        });
       }
     }
 
@@ -166,5 +196,25 @@ export default {
   font-size: 1.5em;
   border-bottom: 1px solid black;
   padding-left: 2%;
+}
+
+.confirmDialog .alert-wrapper {
+  background-color: rgba(45, 211, 211, 0.6);
+}
+
+.confirmDialog .alert-wrapper .alert-message {
+  color: blue;
+}
+
+.confirmDialog .primaryButton.alert-button {
+  background-color: green;
+  color: white;
+  border-radius: 20%;
+}
+
+.confirmDialog .secondaryButton.alert-button {
+  background-color: red;
+  color: white;
+  border-radius: 20%;
 }
 </style>

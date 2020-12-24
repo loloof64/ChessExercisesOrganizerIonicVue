@@ -35,7 +35,8 @@
     "2rooks_king_vs_king": "2Tours+Roi / Roi",
     "rook_king_vs_king": "Tour+Roi / Roi",
     "2bishops_king_vs_king": "2Fous+Roi / Roi",
-    "pawn_endgames": "Finales de pions"
+    "pawn_endgames": "Finales de pions",
+    "exercise_loading_error_title": "Erreur de chargement de l'exercice"
   },
   "game_selector": {
     "whites": "Blancs",

@@ -35,7 +35,8 @@
     "2rooks_king_vs_king": "2Rooks+King / King",
     "rook_king_vs_king": "Rook+King / King",
     "2bishops_king_vs_king": "2Bishops+King / King",
-    "pawn_endgames": "Pawn endgames"
+    "pawn_endgames": "Pawn endgames",
+    "exercise_loading_error_title": "Failed to load exercise"
   },
   "game_selector": {
     "whites": "Whites",
