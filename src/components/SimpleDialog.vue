@@ -3,23 +3,13 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import { useI18n } from "vue-i18n";
+import useTranslationUtils from "@/hooks/TranslationUtils";
 import { alertController } from "@ionic/vue";
 
 export default {
   setup() {
-    const locale = ref(null);
-
-    const { t } = useI18n();
-
-    if (window.Intl && typeof window.Intl === "object") {
-      locale.value = navigator.language.substring(0, 2);
-    }
-
-    function getTranslation(key) {
-      return t(key, {}, { locale: locale.value });
-    }
+    const { getTranslation, initTranslationsUtils } = useTranslationUtils();
+    initTranslationsUtils();
 
     async function showConfirm({ title, message, onCancel, onConfirm }) {
       const alert = await alertController.create({
@@ -65,11 +55,10 @@ export default {
       alert.present();
     }
 
-
     return {
-        showConfirm,
-        showMessage,
-    }
+      showConfirm,
+      showMessage,
+    };
   },
 };
 </script>

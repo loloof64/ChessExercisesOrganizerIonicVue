@@ -43,5 +43,10 @@
     "blacks": "Noirs",
     "human": "Humain",
     "cpu": "Ordinateur"
+  },
+  "save_game_explorer": {
+    "title": "Sauvegarder la partie",
+    "failed_accessing_documents_title": "Erreur d'accès au dossier documents : veuillez vérifier les permissions.",
+    "error_in_explorer": "Erreur diverse"
   }
 }

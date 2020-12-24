@@ -36,7 +36,7 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useI18n } from "vue-i18n";
+import useTranslationUtils from "@/hooks/TranslationUtils";
 import {
   IonPage,
   IonHeader,
@@ -61,18 +61,10 @@ export default {
     SimpleDialog
   },
   setup() {
-    const locale = ref(null);
-    const { t } = useI18n();
+    const { getTranslation, initTranslationsUtils } = useTranslationUtils();
+    initTranslationsUtils();
 
     const router = useRouter();
-
-    function getTranslation(key) {
-      return t(key, {}, { locale: locale.value });
-    }
-
-    if (window.Intl && typeof window.Intl === "object") {
-      locale.value = navigator.language.substring(0, 2);
-    }
 
     const gameSelector = ref(null);
     const pgnGamesToPreview = ref(null);

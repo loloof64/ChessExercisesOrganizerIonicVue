@@ -42,5 +42,10 @@
     "blacks": "Negros",
     "human": "Humano",
     "cpu": "Computadora"
+  },
+  "save_game_explorer": {
+    "title": "Guardar el juego",
+    "failed_accessing_documents_title": "Error al acceder a la carpeta de documentos: verifique los permisos.",
+    "error_in_explorer": "Error misceláneo"
   }
 }

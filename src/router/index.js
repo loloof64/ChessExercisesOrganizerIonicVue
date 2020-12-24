@@ -33,6 +33,11 @@ const routes = [
     name: "game",
     component: () => import("@/views/Game.vue"),
   },
+  {
+    path: "/local_games_explorer",
+    name: "localGamesExplorer",
+    component: () => import("@/views/LocalGamesExplorer.vue"),
+  },
 ];
 
 const router = createRouter({

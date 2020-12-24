@@ -100,14 +100,15 @@ import {
 } from "ionicons/icons";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
 import usePgnUtils from "@/hooks/PgnUtils";
+import useTranslationUtils from "@/hooks/TranslationUtils";
 import SimpleDialog from "@/components/SimpleDialog";
 
+/*
 import {
   Plugins,
   FilesystemDirectory,
@@ -116,6 +117,7 @@ import {
 import moment from "moment";
 
 const { Filesystem } = Plugins;
+*/
 
 const { getSelectedGameGoal } = usePgnUtils();
 
@@ -134,16 +136,11 @@ export default {
     SimpleDialog,
   },
   setup() {
-    const locale = ref(null);
-
-    const { t } = useI18n();
+    const { getTranslation, initTranslationsUtils, locale } = useTranslationUtils();
+    initTranslationsUtils();
 
     const route = useRoute();
     const router = useRouter();
-
-    if (window.Intl && typeof window.Intl === "object") {
-      locale.value = navigator.language.substring(0, 2);
-    }
 
     const boardComponent = ref(null);
     const boardReversed = ref(false);
@@ -193,7 +190,7 @@ export default {
     }
 
     function doNavigateBack() {
-      router.go(-1);
+      router.pop();
     }
 
     function toggleBetweenSolutionAndGame() {
@@ -291,10 +288,6 @@ export default {
 
         return { startFile, startRank, endFile, endRank, promotion };
       } else return null;
-    }
-
-    function getTranslation(key) {
-      return t(key, {}, { locale: locale.value });
     }
 
     function startNewGame() {
@@ -537,6 +530,9 @@ export default {
       // More standard way of writing a Black first move.
       gamePgn = gamePgn.replace(". ...", "...");
 
+      router.push("/local_games_explorer");
+
+      /*
       try {
         const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");
         const filePath =
@@ -563,6 +559,7 @@ export default {
           message: loadingError,
         });
       }
+      */
     }
 
     function updateSizeAndLayout() {

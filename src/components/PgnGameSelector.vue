@@ -21,7 +21,9 @@
             }"
             @click="choosePreviousGame"
           />
-          <span class="navigationText">{{ currentGameNumber}} / {{ totalGamesCount }}</span>
+          <span class="navigationText"
+            >{{ currentGameNumber }} / {{ totalGamesCount }}</span
+          >
           <ion-icon
             :icon="playForwardCircleOutline"
             class="navigationButton"
@@ -39,7 +41,13 @@
             @click="chooseLastGame"
           />
         </div>
-        <input type="range" :min="1" :max="totalGamesCount" :value="currentGameNumber" @change="updateGameIndex"/>
+        <input
+          type="range"
+          :min="1"
+          :max="totalGamesCount"
+          :value="currentGameNumber"
+          @change="updateGameIndex"
+        />
       </div>
       <div class="boardZone">
         <chess-board :sizePx="boardSize" ref="boardComponent" />
@@ -96,10 +104,10 @@
 import ChessBoard from "@/components/ChessBoard";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
 import { IonIcon } from "@ionic/vue";
-import { useI18n } from "vue-i18n";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import usePgnUtils from "@/hooks/PgnUtils";
+import useTranslationUtils from "@/hooks/TranslationUtils";
 
 import {
   playBackCircleOutline,
@@ -126,15 +134,8 @@ export default {
     IonIcon,
   },
   setup(props, context) {
-    const locale = ref(null);
-    const { t } = useI18n();
-    if (window.Intl && typeof window.Intl === "object") {
-      locale.value = navigator.language.substring(0, 2);
-    }
-
-    function getTranslation(key) {
-      return t(key, {}, { locale: locale.value });
-    }
+    const { getTranslation, initTranslationsUtils, locale } = useTranslationUtils();
+    initTranslationsUtils();
 
     const { PLAYER_TYPE_HUMAN, PLAYER_TYPE_EXTERNAL } = useChessBoardLogic();
     const { getSelectedGameGoal } = usePgnUtils();
@@ -348,7 +349,7 @@ export default {
 .mainZone {
   display: grid;
   width: 100%;
-  height: 80% ;
+  height: 80%;
 }
 
 .header {

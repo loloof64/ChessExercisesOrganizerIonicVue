@@ -43,5 +43,10 @@
     "blacks": "Blacks",
     "human": "Human",
     "cpu": "Computeur"
+  },
+  "save_game_explorer": {
+    "title": "Save game",
+    "failed_accessing_documents_title": "Failed to access Documents folder : please check permissions.",
+    "error_in_explorer": "Miscellaneous error"
   }
 }
