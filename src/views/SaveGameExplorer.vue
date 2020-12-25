@@ -9,6 +9,13 @@
       <simple-dialog ref="simpleDialog" />
       <file-explorer path="pgn/my_games" @error="handleError" />
     </ion-content>
+    <ion-footer>
+      <div class="buttons_zone">
+        <div class="button cancel" @click="cancel">
+          {{ getTranslation("general.cancel_button") }}
+        </div>
+      </div>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -20,14 +27,17 @@ import {
   IonTitle,
   IonContent,
   IonPage,
+  IonFooter,
 } from "@ionic/vue";
 import FileExplorer from "@/components/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const simpleDialog = ref(null);
+    const router = useRouter();
 
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
@@ -40,14 +50,20 @@ export default {
       });
     }
 
+    function cancel() {
+      router.go(-1);
+    }
+
     return {
       simpleDialog,
       handleError,
       getTranslation,
+      cancel,
     };
   },
   components: {
     IonHeader,
+    IonFooter,
     IonToolbar,
     IonTitle,
     IonContent,
@@ -59,4 +75,16 @@ export default {
 </script>
 
 <style scoped>
+.buttons_zone {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.button.cancel {
+  color: white;
+  background-color: red;
+  border-radius: 12%;
+}
 </style>
