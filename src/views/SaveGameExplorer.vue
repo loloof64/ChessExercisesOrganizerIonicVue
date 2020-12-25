@@ -2,20 +2,25 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{
-          getTranslation("save_game_explorer.title")
-        }}</ion-title>
+        <ion-title>{{ getTranslation("save_game_explorer.title") }}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <simple-dialog ref="simpleDialog" />
-      <file-explorer :path="path" :directory="directory" @error="handleError" />
+      <file-explorer :path="path" @error="handleError" />
     </ion-content>
   </ion-page>
 </template>
 
 <script>
 import { ref, onMounted } from "vue";
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonPage,
+} from "@ionic/vue";
 import FileExplorer from "@/components/FileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import { FilesystemDirectory, Plugins } from "@capacitor/core";
@@ -29,7 +34,6 @@ export default {
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
 
-    const directory = ref(null);
     const path = "pgn/my_games";
 
     onMounted(async () => {
@@ -53,7 +57,6 @@ export default {
     }
 
     return {
-      directory,
       path,
       simpleDialog,
       handleError,
@@ -61,6 +64,11 @@ export default {
     };
   },
   components: {
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonPage,
     FileExplorer,
     SimpleDialog,
   },

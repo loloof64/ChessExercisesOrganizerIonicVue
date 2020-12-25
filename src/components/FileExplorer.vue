@@ -6,10 +6,6 @@
 
 export default {
   props: {
-    directory: {
-      type: String,
-      required: true,
-    },
     path:  {
       type: String,
       required: true,
