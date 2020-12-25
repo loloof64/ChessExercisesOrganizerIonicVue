@@ -7,13 +7,13 @@
     </ion-header>
     <ion-content>
       <simple-dialog ref="simpleDialog" />
-      <file-explorer :path="path" @error="handleError" />
+      <file-explorer path="pgn/my_games" @error="handleError" />
     </ion-content>
   </ion-page>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import {
   IonHeader,
   IonToolbar,
@@ -21,10 +21,8 @@ import {
   IonContent,
   IonPage,
 } from "@ionic/vue";
-import FileExplorer from "@/components/FileExplorer";
+import FileExplorer from "@/components/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
-import { FilesystemDirectory, Plugins } from "@capacitor/core";
-const { Filesystem } = Plugins;
 import useTranslationUtils from "@/hooks/TranslationUtils";
 
 export default {
@@ -33,20 +31,6 @@ export default {
 
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
-
-    const path = "pgn/my_games";
-
-    onMounted(async () => {
-      try {
-        await Filesystem.mkdir({
-          path: "pgn/my_games",
-          directory: FilesystemDirectory.Documents,
-          recursive: true,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    });
 
     function handleError(error) {
       console.error(error);
@@ -57,7 +41,6 @@ export default {
     }
 
     return {
-      path,
       simpleDialog,
       handleError,
       getTranslation,
