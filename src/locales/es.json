@@ -43,6 +43,9 @@
     "human": "Humano",
     "cpu": "Computadora"
   },
+  "local_explorer": {
+    "path_prefix": "$[DiscoInterno/Documentos]"
+  },
   "save_game_explorer": {
     "title": "Guardar el juego",
     "failed_accessing_documents_title": "Error al acceder a la carpeta de documentos: verifique los permisos.",

@@ -44,6 +44,9 @@
     "human": "Human",
     "cpu": "Computeur"
   },
+  "local_explorer": {
+    "path_prefix": "$[InternalDisc/Documents]"
+  },
   "save_game_explorer": {
     "title": "Save game",
     "failed_accessing_documents_title": "Failed to access Documents folder : please check permissions.",

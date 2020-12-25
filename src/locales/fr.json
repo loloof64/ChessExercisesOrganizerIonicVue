@@ -44,6 +44,9 @@
     "human": "Humain",
     "cpu": "Ordinateur"
   },
+  "local_explorer": {
+    "path_prefix": "$[DisqueInterne/Documents]"
+  },
   "save_game_explorer": {
     "title": "Sauvegarder la partie",
     "failed_accessing_documents_title": "Erreur d'accès au dossier documents : veuillez vérifier les permissions.",
