@@ -43,7 +43,11 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
+  useBackButton,
+  useIonRouter,
 } from "@ionic/vue";
+import { Plugins } from '@capacitor/core';
+const { App } = Plugins;
 import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
 import PgnGameSelector from "@/components/PgnGameSelector";
@@ -65,6 +69,13 @@ export default {
     initTranslationsUtils();
 
     const router = useRouter();
+
+    const ionRouter = useIonRouter();
+    useBackButton(-1, () => {
+      if (!ionRouter.canGoBack()) {
+        App.exitApp();
+      }
+    });
 
     const gameSelector = ref(null);
     const pgnGamesToPreview = ref(null);

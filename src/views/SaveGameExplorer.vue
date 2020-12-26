@@ -51,7 +51,7 @@ export default {
     }
 
     function cancel() {
-      router.go(-1);
+      router.back();
     }
 
     return {

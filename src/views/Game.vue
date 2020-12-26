@@ -89,7 +89,6 @@ import {
   IonIcon,
   IonSpinner,
   toastController,
-  useBackButton,
 } from "@ionic/vue";
 import {
   swapVertical,
@@ -190,7 +189,7 @@ export default {
     }
 
     function doNavigateBack() {
-      router.go(-1);
+      router.back();
     }
 
     function toggleBetweenSolutionAndGame() {
@@ -596,10 +595,6 @@ export default {
       waitingSpinnerStyle["left"] = `${7 * cellsSize}px`;
       waitingSpinnerStyle["top"] = `${7 * cellsSize}px`;
     }
-
-    useBackButton(10, () => {
-      navigateBack();
-    });
 
     const waitingEngineMove = computed(() => {
       if (!boardComponent.value) return false;
