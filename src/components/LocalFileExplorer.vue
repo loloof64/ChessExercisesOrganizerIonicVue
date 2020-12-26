@@ -84,6 +84,13 @@ export default {
           });
 
         items.value = content;
+
+        const weAreInNotRoot = currentFolder.value !== props.path;
+        if (weAreInNotRoot) {
+          items.value.unshift({
+            type: "goBack",
+          });
+        }
       } catch (err) {
         console.error(err);
         emit("error", getTranslation("local_explorer.loading_content_error"));
@@ -120,8 +127,14 @@ export default {
 
     function handleItemClick(item) {
       try {
-        if (item.type === "folder") {
-          currentFolder.value += "/"+item.name;
+        if (item.type === "goBack") {
+          const lastSlashIndex = currentFolder.value.lastIndexOf('/');
+          const strippedPath = currentFolder.value.slice(0, lastSlashIndex);
+          currentFolder.value = strippedPath;
+          refreshContent();
+        }
+        else if (item.type === "folder") {
+          currentFolder.value += "/" + item.name;
           refreshContent();
         }
       } catch (err) {
