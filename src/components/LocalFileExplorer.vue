@@ -102,7 +102,7 @@ export default {
     }
 
     const currentPathString = computed(() => {
-      return `${getTranslation("local_explorer.path_prefix")}`;
+      return `${getTranslation("local_explorer.path_prefix")}/${currentFolder.value}`;
     });
 
     function keyFor(item) {
@@ -173,6 +173,7 @@ export default {
   font-family: serif;
   background-color: khaki;
   overflow: scroll;
+  position: fixed;
 }
 
 .item {
