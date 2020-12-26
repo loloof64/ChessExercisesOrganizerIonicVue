@@ -54,6 +54,9 @@
     "error_in_explorer": "Erreur diverse",
     "failed_saving_game_title": "Echec de sauvegarde de la partie",
     "failed_saving_game_message": "Veuillez vérifier les droits d'accès de l'application aux documents",
-    "success_saving_game": "Partie sauvegardée."
+    "success_saving_game": "Partie sauvegardée.",
+    "new_folder_prompt_title": "Nouveau dossier",
+    "new_folder_prompt_field": "Nom",
+    "failed_creating_folder": "Echec de création du dossier"
   }
 }

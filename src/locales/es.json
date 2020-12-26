@@ -53,6 +53,9 @@
     "error_in_explorer": "Error misceláneo",
     "failed_saving_game_title": "No se pudo guardar el juego",
     "failed_saving_game_message": "Verifique los derechos de acceso de la aplicación a los documentos",
-    "success_saving_game": "Juego guardado."
+    "success_saving_game": "Juego guardado.",
+    "new_folder_prompt_title": "Nueva carpeta",
+    "new_folder_prompt_field": "Apellido",
+    "failed_creating_folder": "No se pudo crear la carpeta"
   }
 }

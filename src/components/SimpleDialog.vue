@@ -55,9 +55,44 @@ export default {
       alert.present();
     }
 
+    async function showPrompt({ title, fieldName, onConfirm, onCancel }) {
+      const alert = await alertController.create({
+        cssClass: "confirmDialog",
+        header: title,
+        inputs: [
+          {
+            name: "field",
+            id: "field",
+            value: "",
+            placeholder: fieldName,
+          },
+        ],
+        buttons: [
+          {
+            text: getTranslation("general.cancel_button"),
+            role: "cancel",
+            cssClass: "secondaryButton",
+            handler: () => {
+              if (onCancel) onCancel();
+            },
+          },
+          {
+            text: getTranslation("general.ok_button"),
+            role: "primary",
+            cssClass: "primaryButton",
+            handler: (data) => {
+              if (onConfirm) onConfirm(data.field);
+            },
+          },
+        ],
+      });
+      alert.present();
+    }
+
     return {
       showConfirm,
       showMessage,
+      showPrompt,
     };
   },
 };
@@ -68,7 +103,7 @@ export default {
   display: none;
 }
 .alert-wrapper {
-  background-color: rgba(45, 211, 211, 0.6) !important;
+  background-color: rgba(138, 238, 238, 0.6) !important;
 }
 
 .alert-wrapper .alert-message {

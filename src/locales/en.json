@@ -54,6 +54,9 @@
     "error_in_explorer": "Miscellaneous error",
     "failed_saving_game_title": "Failed to save game",
     "failed_saving_game_message": "Please check applications rights for the documents folder",
-    "success_saving_game": "Game saved."
+    "success_saving_game": "Game saved.",
+    "new_folder_prompt_title": "New folder",
+    "new_folder_prompt_field": "Name",
+    "failed_creating_folder": "Failed creating folder"
   }
 }
