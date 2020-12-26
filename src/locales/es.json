@@ -45,7 +45,8 @@
     "cpu": "Computadora"
   },
   "local_explorer": {
-    "path_prefix": "$[DiscoInterno/Documentos]"
+    "path_prefix": "$[DiscoInterno/Documentos]",
+    "loading_content_error": "No se pudo cargar el contenido de la carpeta"
   },
   "save_game_explorer": {
     "title": "Guardar el juego",

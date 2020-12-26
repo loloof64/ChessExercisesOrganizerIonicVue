@@ -528,28 +528,6 @@ export default {
         name: "saveGameExplorer",
         params: { gamePgn: gamePgnJSON },
       });
-
-      /*
-      try {
-        const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");
-        const filePath =
-          "chess_exercises_organizer/pgn_" + fileDateStr + ".pgn";
-        simpleDialog.value.showMessage({
-          title: getTranslation("game_page.pgn_saved_title"),
-          message: t(
-            "game_page.pgn_saved_message",
-            { filePath: filePath },
-            { locale: locale.value }
-          ),
-        });
-      } catch (loadingError) {
-        console.error(loadingError);
-        simpleDialog.value.showMessage({
-          title: getTranslation("game_page.error_saving_pgn_title"),
-          message: loadingError,
-        });
-      }
-      */
     }
 
     function updateSizeAndLayout() {

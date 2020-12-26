@@ -46,7 +46,8 @@
     "cpu": "Computeur"
   },
   "local_explorer": {
-    "path_prefix": "$[InternalDisc/Documents]"
+    "path_prefix": "$[InternalDisc/Documents]",
+    "loading_content_error": "Failed to load folder content"
   },
   "save_game_explorer": {
     "title": "Save game",

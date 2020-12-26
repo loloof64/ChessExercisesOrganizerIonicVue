@@ -46,7 +46,8 @@
     "cpu": "Ordinateur"
   },
   "local_explorer": {
-    "path_prefix": "$[DisqueInterne/Documents]"
+    "path_prefix": "$[DisqueInterne/Documents]",
+    "loading_content_error": "Echec de chargement du contenu du dossier"
   },
   "save_game_explorer": {
     "title": "Sauvegarder la partie",
