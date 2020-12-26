@@ -98,6 +98,8 @@ export default {
           directory: FilesystemDirectory.Documents,
           recursive: true,
         });
+
+        explorer.value?.refreshContent();
       } catch (err) {
         console.error(err);
         simpleDialog.value.showMessage({

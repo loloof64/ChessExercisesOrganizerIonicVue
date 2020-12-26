@@ -117,6 +117,7 @@ export default {
       currentPathString,
       currentFolder,
       getCurrentFolder,
+      refreshContent,
       items,
       keyFor,
       imageFor,
