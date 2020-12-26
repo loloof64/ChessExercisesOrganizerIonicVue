@@ -1,7 +1,12 @@
 <template>
   <div class="root">
     <div class="path">{{ currentPathString }}</div>
-    <div class="item" v-for="singleItem in items" :key="keyFor(singleItem)">
+    <div
+      class="item"
+      v-for="singleItem in items"
+      :key="keyFor(singleItem)"
+      @click="handleItemClick(singleItem)"
+    >
       <ion-img class="icon" :src="imageFor(singleItem)"></ion-img>
       <div class="filename">{{ nameFor(singleItem) }}</div>
     </div>
@@ -71,8 +76,8 @@ export default {
           })
           .filter((item) => item !== undefined)
           .sort((fst, snd) => {
-            if (fst.type === 'goBack') return -1;
-            if (snd.type === 'goBack') return 1;
+            if (fst.type === "goBack") return -1;
+            if (snd.type === "goBack") return 1;
             if (fst.type === "folder" && snd.type === "file") return -1;
             if (fst.type === "file" && snd.type === "folder") return 1;
             return fst.name.toLowerCase().localeCompare(snd.name.toLowerCase());
@@ -113,11 +118,23 @@ export default {
       return item.name;
     }
 
+    function handleItemClick(item) {
+      try {
+        if (item.type === "folder") {
+          currentFolder.value += "/"+item.name;
+          refreshContent();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     return {
       currentPathString,
       currentFolder,
       getCurrentFolder,
       refreshContent,
+      handleItemClick,
       items,
       keyFor,
       imageFor,
