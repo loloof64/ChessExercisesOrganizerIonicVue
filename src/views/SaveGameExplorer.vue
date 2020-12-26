@@ -3,6 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ getTranslation("save_game_explorer.title") }}</ion-title>
+        <div class="path">{{ currentPathString }}</div>
         <div class="toolbar">
           <div class="bar_item" @click="addFolderRequest">
             <ion-icon :icon="folderOutline" />
@@ -12,7 +13,7 @@
     </ion-header>
     <ion-content>
       <simple-dialog ref="simpleDialog" />
-      <file-explorer path="pgn/my_games" @error="handleError" ref="explorer" />
+      <file-explorer path="pgn/my_games" @error="handleError" ref="explorer" @new-path="handleNewPath" />
     </ion-content>
     <ion-footer>
       <div class="filename">
@@ -65,6 +66,7 @@ export default {
     initTranslationsUtils();
 
     const filename = ref("");
+    const currentPathString = ref('');
     const explorer = ref(null);
 
     function handleError(error) {
@@ -150,9 +152,14 @@ export default {
       }
     }
 
+    function handleNewPath(path) {
+      currentPathString.value = path;
+    }
+
     return {
       simpleDialog,
       handleError,
+      handleNewPath,
       getTranslation,
       cancel,
       save,
@@ -160,6 +167,7 @@ export default {
       explorer,
       folderOutline,
       addFolderRequest,
+      currentPathString,
     };
   },
   components: {
@@ -217,5 +225,17 @@ export default {
 
 .button.ok {
   background-color: green;
+}
+
+.path {
+  width: 100%;
+  height: 6vh;
+  font-size: 1.1em;
+  font-family: serif;
+  background-color: khaki;
+  overflow: scroll;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 </style>
