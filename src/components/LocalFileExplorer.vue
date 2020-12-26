@@ -169,11 +169,15 @@ export default {
 
 .path {
   width: 100%;
+  height: 6vh;
   font-size: 1.1em;
   font-family: serif;
-  background-color: khaki;
+  background-color: rgba(240, 230, 140, 0.493);
   overflow: scroll;
   position: fixed;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 .item {
