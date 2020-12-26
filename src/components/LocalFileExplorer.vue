@@ -49,7 +49,7 @@ export default {
           path: currentFolder.value,
           directory: FilesystemDirectory.Documents,
         });
-        console.log(files);
+
         const content = files.files
           .map((item) => {
             const isAFile = item.includes(".") > 0;
@@ -69,7 +69,14 @@ export default {
               };
             }
           })
-          .filter((item) => item !== undefined);
+          .filter((item) => item !== undefined)
+          .sort((fst, snd) => {
+            if (fst.type === 'goBack') return -1;
+            if (snd.type === 'goBack') return 1;
+            if (fst.type === "folder" && snd.type === "file") return -1;
+            if (fst.type === "file" && snd.type === "folder") return 1;
+            return fst.name.toLowerCase().localeCompare(snd.name.toLowerCase());
+          });
 
         items.value = content;
       } catch (err) {
@@ -139,7 +146,7 @@ export default {
 
 .item {
   width: 100%;
-  height: 10%;
+  height: 18vw;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
