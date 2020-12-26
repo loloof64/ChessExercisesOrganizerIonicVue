@@ -1,7 +1,8 @@
 {
   "general": {
     "ok_button": "Ok",
-    "cancel_button": "Annuler"
+    "cancel_button": "Annuler",
+    "save_button": "Sauvegarder"
   },
   "main_page": {
     "samples_tab": "Exemples"
@@ -50,6 +51,9 @@
   "save_game_explorer": {
     "title": "Sauvegarder la partie",
     "failed_accessing_documents_title": "Erreur d'accès au dossier documents : veuillez vérifier les permissions.",
-    "error_in_explorer": "Erreur diverse"
+    "error_in_explorer": "Erreur diverse",
+    "failed_saving_game_title": "Echec de sauvegarde de la partie",
+    "failed_saving_game_message": "Veuillez vérifier les droits d'accès de l'application aux documents",
+    "success_saving_game": "Partie sauvegardée."
   }
 }

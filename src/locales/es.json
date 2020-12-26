@@ -1,7 +1,8 @@
 {
   "general": {
     "ok_button": "Okay",
-    "cancel_button": "Cancelar"
+    "cancel_button": "Cancelar",
+    "save_button": "Salvar"
   },
   "main_page": {
     "samples_tab": "Ejemplos"
@@ -49,6 +50,9 @@
   "save_game_explorer": {
     "title": "Guardar el juego",
     "failed_accessing_documents_title": "Error al acceder a la carpeta de documentos: verifique los permisos.",
-    "error_in_explorer": "Error misceláneo"
+    "error_in_explorer": "Error misceláneo",
+    "failed_saving_game_title": "No se pudo guardar el juego",
+    "failed_saving_game_message": "Verifique los derechos de acceso de la aplicación a los documentos",
+    "success_saving_game": "Juego guardado."
   }
 }

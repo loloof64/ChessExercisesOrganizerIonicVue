@@ -1,7 +1,8 @@
 {
   "general": {
     "ok_button": "Ok",
-    "cancel_button": "Cancel"
+    "cancel_button": "Cancel",
+    "save_button": "Save"
   },
   "main_page": {
     "samples_tab": "Samples"
@@ -50,6 +51,9 @@
   "save_game_explorer": {
     "title": "Save game",
     "failed_accessing_documents_title": "Failed to access Documents folder : please check permissions.",
-    "error_in_explorer": "Miscellaneous error"
+    "error_in_explorer": "Miscellaneous error",
+    "failed_saving_game_title": "Failed to save game",
+    "failed_saving_game_message": "Please check applications rights for the documents folder",
+    "success_saving_game": "Game saved."
   }
 }

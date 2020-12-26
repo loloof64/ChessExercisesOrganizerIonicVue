@@ -107,17 +107,6 @@ import usePgnUtils from "@/hooks/PgnUtils";
 import useTranslationUtils from "@/hooks/TranslationUtils";
 import SimpleDialog from "@/components/SimpleDialog";
 
-/*
-import {
-  Plugins,
-  FilesystemDirectory,
-  FilesystemEncoding,
-} from "@capacitor/core";
-import moment from "moment";
-
-const { Filesystem } = Plugins;
-*/
-
 const { getSelectedGameGoal } = usePgnUtils();
 
 export default {
@@ -135,7 +124,11 @@ export default {
     SimpleDialog,
   },
   setup() {
-    const { getTranslation, initTranslationsUtils, locale } = useTranslationUtils();
+    const {
+      getTranslation,
+      initTranslationsUtils,
+      locale,
+    } = useTranslationUtils();
     initTranslationsUtils();
 
     const route = useRoute();
@@ -529,20 +522,18 @@ export default {
       // More standard way of writing a Black first move.
       gamePgn = gamePgn.replace(". ...", "...");
 
-      await router.push("/save_game_explorer");
+      const gamePgnJSON = JSON.stringify(gamePgn);
+
+      await router.push({
+        name: "saveGameExplorer",
+        params: { gamePgn: gamePgnJSON },
+      });
 
       /*
       try {
         const fileDateStr = moment().format("YYYY_MM_DD_HH_mm_ss");
         const filePath =
           "chess_exercises_organizer/pgn_" + fileDateStr + ".pgn";
-        await Filesystem.writeFile({
-          path: filePath,
-          data: gamePgn,
-          directory: FilesystemDirectory.Documents,
-          encoding: FilesystemEncoding.ASCII,
-          recursive: true,
-        });
         simpleDialog.value.showMessage({
           title: getTranslation("game_page.pgn_saved_title"),
           message: t(
