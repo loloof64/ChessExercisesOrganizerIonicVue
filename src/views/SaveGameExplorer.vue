@@ -15,6 +15,16 @@
           >
             <ion-icon :icon="create" />
           </div>
+          <div class="bar_item" @click="copySelection" v-if="copyButtonVisible">
+            <ion-icon :icon="copy" />
+          </div>
+          <div
+            class="bar_item"
+            @click="pasteSelection"
+            v-if="pasteButtonVisible"
+          >
+            <ion-icon :icon="clipboard" />
+          </div>
         </div>
       </ion-toolbar>
     </ion-header>
@@ -56,7 +66,7 @@ import {
   toastController,
   IonIcon,
 } from "@ionic/vue";
-import { folder, create } from "ionicons/icons";
+import { folder, create, copy, clipboard } from "ionicons/icons";
 import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
@@ -83,9 +93,11 @@ export default {
 
     const filename = ref("");
     const currentPathString = ref("");
+    const copyPathString = ref(null);
     const explorer = ref(null);
     const selectedItemsCount = ref(0);
     const lastSelectedItem = ref(null);
+    const itemsToCopy = ref([]);
 
     function handleError(error) {
       console.error(error);
@@ -176,13 +188,8 @@ export default {
     }
 
     function updateSelectedItemsCount() {
-      const allItems = document.querySelectorAll(".item");
-      let count = 0;
-      allItems?.forEach((item) => {
-        if (item.classList.contains("selected")) count += 1;
-      });
-
-      selectedItemsCount.value = count;
+      const selectedItems = explorer.value?.getSelectedItems();
+      selectedItemsCount.value = selectedItems?.length || 0;
     }
 
     function renameRequest() {
@@ -242,8 +249,58 @@ export default {
       setTimeout(updateSelectedItemsCount, 50);
     }
 
+    function copySelection() {
+      copyPathString.value = explorer.value?.getCurrentFolder();
+      itemsToCopy.value = explorer.value?.getSelectedItems() || [];
+    }
+
+    async function pasteSelection() {
+      const selectedItems = itemsToCopy.value;
+      let failuresList = [];
+      const destinationPath = explorer.value?.getCurrentFolder();
+
+      selectedItems.forEach(async (item) => {
+        try {
+          const from = `${copyPathString.value}/${item.name}`;
+          const to = `${destinationPath}/${item.name}`;
+
+          await Filesystem.copy({
+            from,
+            to,
+            directory: FilesystemDirectory.Documents,
+          });
+
+          explorer.value?.refreshContent();
+        } catch (err) {
+          failuresList.push(item);
+        }
+      });
+
+      copyPathString.value = null;
+      itemsToCopy.value = [];
+
+      if (failuresList.length > 0) {
+        failuresList.forEach((item) => {
+         console.error(
+            `Failed to paste ${item.type === "folder" ? "folder" : "file"} ${
+              item.name
+            } !`
+          );
+        });
+      }
+    }
+
     const renameButtonVisible = computed(() => {
       return selectedItemsCount.value === 1;
+    });
+
+    const copyButtonVisible = computed(() => {
+      return selectedItemsCount.value > 0 && !pasteButtonVisible.value;
+    });
+
+    const pasteButtonVisible = computed(() => {
+      if (!itemsToCopy.value) return false;
+      return itemsToCopy.value.length > 0;
     });
 
     return {
@@ -256,13 +313,19 @@ export default {
       filename,
       explorer,
       folder,
+      copy,
       create,
+      clipboard,
       addFolderRequest,
       currentPathString,
       renameRequest,
       updateSelectedItemsCount,
       handleSelectedChanged,
       renameButtonVisible,
+      copyButtonVisible,
+      pasteButtonVisible,
+      copySelection,
+      pasteSelection,
     };
   },
   components: {

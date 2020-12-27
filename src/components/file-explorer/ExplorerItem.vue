@@ -38,7 +38,7 @@ export default {
     }
 
     function startTimer() {
-      const timeOutMs = 300;
+      const timeOutMs = 600;
       timer.value = setTimeout(toggleActivatedState, timeOutMs);
     }
 

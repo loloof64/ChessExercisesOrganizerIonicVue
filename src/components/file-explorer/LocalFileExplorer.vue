@@ -34,6 +34,7 @@ export default {
 
     const currentFolder = ref(props.path);
     const items = ref([]);
+    const selectedItems = ref([]);
 
     onMounted(async () => {
       try {
@@ -151,6 +152,19 @@ export default {
         item,
         newSelectedState,
       });
+
+      if (newSelectedState === true) {
+        selectedItems.value.push(item);
+      }
+      else {
+        selectedItems.value = selectedItems.value.filter(elt => {
+          return (elt.name !== item.name) || (elt.type !== item.type)
+        });
+      }
+    }
+
+    function getSelectedItems() {
+      return selectedItems.value;
     }
 
     onMounted(() => {
@@ -168,6 +182,7 @@ export default {
       imageFor,
       nameFor,
       handleSelectedChanged,
+      getSelectedItems,
     };
   },
   components: {
