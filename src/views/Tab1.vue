@@ -125,7 +125,7 @@ export default {
         const solutionDataJSON = JSON.stringify(solutionData);
         await router.push({
           name: "game",
-          params: {
+          query: {
             gameData: gameDataJSON,
             solutionData: solutionDataJSON,
             whiteSide,

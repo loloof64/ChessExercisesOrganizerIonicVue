@@ -314,15 +314,15 @@ export default {
       shouldShowSolution.value = false;
       const defaultPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-      const gameData = JSON.parse(route.params.gameData);
-      const solutionData = JSON.parse(route.params.solutionData);
+      const gameData = JSON.parse(route.query.gameData);
+      const solutionData = JSON.parse(route.query.solutionData);
       const gameCustomPosition =
         gameData.headers.find((it) => it.name === "FEN")?.value ||
         defaultPosition;
       const startPosition =
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
-      const whiteType = parseInt(route.params.whiteSide);
-      const blackType = parseInt(route.params.blackSide);
+      const whiteType = parseInt(route.query.whiteSide);
+      const blackType = parseInt(route.query.blackSide);
       gameGoal.value = getSelectedGameGoal(gameData, locale.value);
 
       historyNavigationBarVisible.value = false;
@@ -526,7 +526,7 @@ export default {
 
       await router.push({
         name: "saveGameExplorer",
-        params: { gamePgn: gamePgnJSON },
+        query: { gamePgn: gamePgnJSON },
       });
     }
 

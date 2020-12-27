@@ -139,7 +139,7 @@ export default {
         const name = filename.value;
         if (name.length === 0) return;
 
-        const gamePgn = JSON.parse(route.params.gamePgn);
+        const gamePgn = JSON.parse(route.query.gamePgn);
         const currentFolderPath = explorer.value?.getCurrentFolder();
 
         if (!currentFolderPath) throw "File explorer is not ready.";
