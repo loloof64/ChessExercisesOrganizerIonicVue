@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import ChessBoard from "@/components/ChessBoard";
+import ChessBoard from "@/components/chess-board/ChessBoard";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
 import { IonIcon } from "@ionic/vue";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";

@@ -100,7 +100,7 @@ import {
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
-import ChessBoard from "@/components/ChessBoard";
+import ChessBoard from "@/components/chess-board/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
 import ChessEngineCommunication from "../services/ChessEngineCommunication";
 import usePgnUtils from "@/hooks/PgnUtils";

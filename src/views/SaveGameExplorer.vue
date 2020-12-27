@@ -44,7 +44,7 @@ import {
   IonIcon,
 } from "@ionic/vue";
 import { folderOutline } from "ionicons/icons";
-import FileExplorer from "@/components/LocalFileExplorer";
+import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
 import { useRouter, useRoute } from "vue-router";

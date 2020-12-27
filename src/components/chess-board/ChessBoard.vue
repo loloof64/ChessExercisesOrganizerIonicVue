@@ -58,10 +58,10 @@ import useChessBoardLogic from "@/hooks/ChessBoardLogic";
 import useChessBoardGraphic from "@/hooks/ChessBoardGraphic";
 import useChessBoardDragAndDrop from "@/hooks/ChessBoardDragAndDrop";
 import usePgnUtils from "@/hooks/PgnUtils";
-import ChessBoardMainLayer from "@/components/ChessBoardMainLayer";
-import ChessBoardArrowLayer from "@/components/ChessBoardArrowLayer";
-import ChessBoardDndLayer from "@/components/ChessBoardDndLayer";
-import ChessBoardPromotionDialog from "@/components/ChessBoardPromotionDialog";
+import ChessBoardMainLayer from "@/components/chess-board/ChessBoardMainLayer";
+import ChessBoardArrowLayer from "@/components/chess-board/ChessBoardArrowLayer";
+import ChessBoardDndLayer from "@/components/chess-board/ChessBoardDndLayer";
+import ChessBoardPromotionDialog from "@/components/chess-board/ChessBoardPromotionDialog";
 
 export default {
   props: {

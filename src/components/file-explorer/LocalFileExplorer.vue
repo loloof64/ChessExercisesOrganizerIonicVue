@@ -16,7 +16,7 @@ import { onMounted, computed, ref } from "vue";
 import { FilesystemDirectory, Plugins } from "@capacitor/core";
 const { Filesystem } = Plugins;
 import useTranslationUtils from "@/hooks/TranslationUtils";
-import ExplorerItem from "@/components/ExplorerItem";
+import ExplorerItem from "@/components/file-explorer/ExplorerItem";
 
 export default {
   props: {
