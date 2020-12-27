@@ -55,7 +55,13 @@ export default {
       alert.present();
     }
 
-    async function showPrompt({ title, fieldName, onConfirm, onCancel }) {
+    async function showPrompt({
+      title,
+      fieldName,
+      initialValue,
+      onConfirm,
+      onCancel,
+    }) {
       const alert = await alertController.create({
         cssClass: "confirmDialog",
         header: title,
@@ -63,7 +69,7 @@ export default {
           {
             name: "field",
             id: "field",
-            value: "",
+            value: initialValue || "",
             placeholder: fieldName,
           },
         ],

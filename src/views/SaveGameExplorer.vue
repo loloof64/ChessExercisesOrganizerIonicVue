@@ -6,14 +6,27 @@
         <div class="path">{{ currentPathString }}</div>
         <div class="toolbar">
           <div class="bar_item" @click="addFolderRequest">
-            <ion-icon :icon="folderOutline" />
+            <ion-icon :icon="folder" />
+          </div>
+          <div
+            class="bar_item"
+            @click="renameRequest"
+            v-if="renameButtonVisible"
+          >
+            <ion-icon :icon="create" />
           </div>
         </div>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <simple-dialog ref="simpleDialog" />
-      <file-explorer path="pgn/my_games" @error="handleError" ref="explorer" @new-path="handleNewPath" />
+      <file-explorer
+        path="pgn/my_games"
+        @error="handleError"
+        ref="explorer"
+        @new-path="handleNewPath"
+        @selected-changed="handleSelectedChanged"
+      />
     </ion-content>
     <ion-footer>
       <div class="filename">
@@ -32,7 +45,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import {
   IonHeader,
   IonToolbar,
@@ -43,7 +56,7 @@ import {
   toastController,
   IonIcon,
 } from "@ionic/vue";
-import { folderOutline } from "ionicons/icons";
+import { folder, create } from "ionicons/icons";
 import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
@@ -66,8 +79,10 @@ export default {
     initTranslationsUtils();
 
     const filename = ref("");
-    const currentPathString = ref('');
+    const currentPathString = ref("");
     const explorer = ref(null);
+    const selectedItemsCount = ref(0);
+    const lastSelectedItem = ref(null);
 
     function handleError(error) {
       console.error(error);
@@ -156,6 +171,76 @@ export default {
       currentPathString.value = path;
     }
 
+    function updateSelectedItemsCount() {
+      const allItems = document.querySelectorAll(".item");
+      let count = 0;
+      allItems?.forEach((item) => {
+        if (item.classList.contains("selected")) count += 1;
+      });
+
+      selectedItemsCount.value = count;
+    }
+
+    function renameRequest() {
+      if (!lastSelectedItem.value) return;
+      if (lastSelectedItem.value.type === "goBack") return;
+
+      const oldName = lastSelectedItem.value.name;
+
+      simpleDialog.value.showPrompt({
+        title: getTranslation("save_game_explorer.rename_prompt_title"),
+        fieldName: getTranslation("save_game_explorer.rename_prompt_field"),
+        initialValue: oldName,
+        onConfirm: doRename,
+      });
+    }
+
+    async function doRename(name) {
+      const oldName = lastSelectedItem.value.name;
+      const isForbidenFolderName =
+        lastSelectedItem.value.type === "folder" && name.includes(".");
+      if (isForbidenFolderName) {
+        simpleDialog.value.showMessage({
+          title: getTranslation("save_game_explorer.forbidden_name_title"),
+          message: getTranslation("save_game_explorer.forbidden_name_message"),
+        });
+        return;
+      }
+      if (name === oldName) return;
+
+      let newName = name;
+      if (lastSelectedItem.value.type === "file" && !newName.endsWith('.pgn')) newName += '.pgn';
+
+      const from = `${explorer.value?.getCurrentFolder()}/${oldName}`;
+      const to = `${explorer.value?.getCurrentFolder()}/${newName}`;
+
+      try {
+        await Filesystem.rename({
+          from,
+          to,
+          directory: FilesystemDirectory.Documents,
+        });
+        explorer.value?.refreshContent();
+      } catch (err) {
+        console.error(err);
+        simpleDialog.value.showMessage({
+          title: getTranslation("save_game_explorer.failed_renaming_title"),
+          message: err,
+        });
+      }
+    }
+
+    function handleSelectedChanged({ item, newSelectedState }) {
+      if (newSelectedState === true) {
+        lastSelectedItem.value = item;
+      }
+      setTimeout(updateSelectedItemsCount, 50);
+    }
+
+    const renameButtonVisible = computed(() => {
+      return selectedItemsCount.value === 1;
+    });
+
     return {
       simpleDialog,
       handleError,
@@ -165,9 +250,14 @@ export default {
       save,
       filename,
       explorer,
-      folderOutline,
+      folder,
+      create,
       addFolderRequest,
       currentPathString,
+      renameRequest,
+      updateSelectedItemsCount,
+      handleSelectedChanged,
+      renameButtonVisible,
     };
   },
   components: {
@@ -197,13 +287,14 @@ export default {
   background-color: aliceblue;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
 }
 
 .toolbar .bar_item {
   border: 1px solid gray;
   padding: 3px;
+  margin: 6px;
 }
 
 .buttons_zone {

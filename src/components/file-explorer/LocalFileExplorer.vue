@@ -7,6 +7,9 @@
       :type="singleItem.type"
       :name="nameFor(singleItem)"
       :image="imageFor(singleItem)"
+      @selected-changed="
+        (newState) => handleSelectedChanged(singleItem, newState)
+      "
     />
   </div>
 </template>
@@ -143,6 +146,13 @@ export default {
       }
     }
 
+    function handleSelectedChanged(item, newSelectedState) {
+      emit("selected-changed", {
+        item,
+        newSelectedState,
+      });
+    }
+
     onMounted(() => {
       emit("new-path", currentPathString.value);
     });
@@ -157,6 +167,7 @@ export default {
       keyFor,
       imageFor,
       nameFor,
+      handleSelectedChanged,
     };
   },
   components: {

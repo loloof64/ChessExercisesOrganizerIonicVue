@@ -58,6 +58,11 @@
     "success_saving_game": "Game saved.",
     "new_folder_prompt_title": "New folder",
     "new_folder_prompt_field": "Name",
-    "failed_creating_folder": "Failed creating folder"
+    "failed_creating_folder": "Failed creating folder",
+    "rename_prompt_title": "Rename",
+    "rename_prompt_field": "Name",
+    "forbidden_name_title": "Forbidden name",
+    "forbidden_name_message": "No extension in a folder name.",
+    "failed_renaming_title": "Failed renaming"
   }
 }

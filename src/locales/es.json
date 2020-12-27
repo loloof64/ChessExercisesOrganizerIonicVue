@@ -57,6 +57,11 @@
     "success_saving_game": "Juego guardado.",
     "new_folder_prompt_title": "Nueva carpeta",
     "new_folder_prompt_field": "Apellido",
-    "failed_creating_folder": "No se pudo crear la carpeta"
+    "failed_creating_folder": "No se pudo crear la carpeta",
+    "rename_prompt_title": "Rebautizar",
+    "rename_prompt_field": "Apellido",
+    "forbidden_name_title": "Nombre prohibido",
+    "forbidden_name_message": "Sin extensión en el nombre de una carpeta.",
+    "failed_renaming_title": "No se pudo cambiar el nombre"
   }
 }

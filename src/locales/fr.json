@@ -58,6 +58,11 @@
     "success_saving_game": "Partie sauvegardée.",
     "new_folder_prompt_title": "Nouveau dossier",
     "new_folder_prompt_field": "Nom",
-    "failed_creating_folder": "Echec de création du dossier"
+    "failed_creating_folder": "Echec de création du dossier",
+    "rename_prompt_title": "Renommer",
+    "rename_prompt_field": "Nom",
+    "forbidden_name_title": "Nom interdit",
+    "forbidden_name_message": "Pas d'extension dans un nom de dossier.",
+    "failed_renaming_title": "Echec lors du renommage"
   }
 }
