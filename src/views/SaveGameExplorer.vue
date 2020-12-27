@@ -60,7 +60,7 @@ import { folder, create } from "ionicons/icons";
 import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import {
   Plugins,
   FilesystemDirectory,
@@ -69,11 +69,14 @@ import {
 
 const { Filesystem } = Plugins;
 
+import { useStore } from "vuex";
+
 export default {
   setup() {
     const simpleDialog = ref(null);
     const router = useRouter();
-    const route = useRoute();
+
+    const store = useStore();
 
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
@@ -139,7 +142,7 @@ export default {
         const name = filename.value;
         if (name.length === 0) return;
 
-        const gamePgn = JSON.parse(route.query.gamePgn);
+        const gamePgn = store.getters.activeGamePgn;
         const currentFolderPath = explorer.value?.getCurrentFolder();
 
         if (!currentFolderPath) throw "File explorer is not ready.";
@@ -209,7 +212,8 @@ export default {
       if (name === oldName) return;
 
       let newName = name;
-      if (lastSelectedItem.value.type === "file" && !newName.endsWith('.pgn')) newName += '.pgn';
+      if (lastSelectedItem.value.type === "file" && !newName.endsWith(".pgn"))
+        newName += ".pgn";
 
       const from = `${explorer.value?.getCurrentFolder()}/${oldName}`;
       const to = `${explorer.value?.getCurrentFolder()}/${newName}`;

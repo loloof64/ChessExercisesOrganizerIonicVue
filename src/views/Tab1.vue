@@ -46,12 +46,14 @@ import {
   useBackButton,
   useIonRouter,
 } from "@ionic/vue";
-import { Plugins } from '@capacitor/core';
+import { Plugins } from "@capacitor/core";
 const { App } = Plugins;
 import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
 import PgnGameSelector from "@/components/PgnGameSelector";
 import SimpleDialog from "@/components/SimpleDialog";
+
+import { useStore } from "vuex";
 
 export default {
   name: "SampleGames",
@@ -62,7 +64,7 @@ export default {
     IonContent,
     IonPage,
     PgnGameSelector,
-    SimpleDialog
+    SimpleDialog,
   },
   setup() {
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
@@ -76,6 +78,8 @@ export default {
         App.exitApp();
       }
     });
+
+    const store = useStore();
 
     const gameSelector = ref(null);
     const pgnGamesToPreview = ref(null);
@@ -121,16 +125,14 @@ export default {
         const gameData = pgnGamesToPreview.value[selectedGameIndex];
         const solutionData = convertPgnDataToHistory(gameData);
 
-        const gameDataJSON = JSON.stringify(gameData);
-        const solutionDataJSON = JSON.stringify(solutionData);
+        store.dispatch("clearPgnData");
+        store.dispatch("setSelectedGamePgn", { pgnDataObject: gameData });
+        store.dispatch("setSolutionPgn", { pgnDataObject: solutionData });
+        store.dispatch("setWhiteSide", { playerType: whiteSide });
+        store.dispatch("setBlackSide", { playerType: blackSide });
+
         await router.push({
           name: "game",
-          query: {
-            gameData: gameDataJSON,
-            solutionData: solutionDataJSON,
-            whiteSide,
-            blackSide,
-          },
         });
       } catch (err) {
         console.error(err);

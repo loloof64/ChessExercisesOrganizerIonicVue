@@ -98,7 +98,7 @@ import {
   arrowBackOutline,
 } from "ionicons/icons";
 import { ref, reactive, onBeforeUnmount, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { ScreenOrientation } from "@ionic-native/screen-orientation";
 import ChessBoard from "@/components/chess-board/ChessBoard";
 import SimpleHistory from "@/components/SimpleHistory";
@@ -106,6 +106,8 @@ import ChessEngineCommunication from "../services/ChessEngineCommunication";
 import usePgnUtils from "@/hooks/PgnUtils";
 import useTranslationUtils from "@/hooks/TranslationUtils";
 import SimpleDialog from "@/components/SimpleDialog";
+
+import { useStore } from "vuex";
 
 const { getSelectedGameGoal } = usePgnUtils();
 
@@ -131,8 +133,9 @@ export default {
     } = useTranslationUtils();
     initTranslationsUtils();
 
-    const route = useRoute();
     const router = useRouter();
+
+    const store = useStore();
 
     const boardComponent = ref(null);
     const boardReversed = ref(false);
@@ -314,15 +317,17 @@ export default {
       shouldShowSolution.value = false;
       const defaultPosition =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-      const gameData = JSON.parse(route.query.gameData);
-      const solutionData = JSON.parse(route.query.solutionData);
+      const gameData = store.getters.selectedGamePgn;
+
+      const solutionData = store.getters.solutionPgn;
       const gameCustomPosition =
         gameData.headers.find((it) => it.name === "FEN")?.value ||
         defaultPosition;
       const startPosition =
         gameCustomPosition !== undefined ? gameCustomPosition : defaultPosition;
-      const whiteType = parseInt(route.query.whiteSide);
-      const blackType = parseInt(route.query.blackSide);
+      const whiteType = store.getters.whiteSide;
+      const blackType = store.getters.blackSide;
+
       gameGoal.value = getSelectedGameGoal(gameData, locale.value);
 
       historyNavigationBarVisible.value = false;
@@ -521,12 +526,10 @@ export default {
 
       // More standard way of writing a Black first move.
       gamePgn = gamePgn.replace(". ...", "...");
-
-      const gamePgnJSON = JSON.stringify(gamePgn);
+      store.dispatch("setActiveGamePgn", { pgnDataObject: gamePgn });
 
       await router.push({
         name: "saveGameExplorer",
-        query: { gamePgn: gamePgnJSON },
       });
     }
 
