@@ -23,4 +23,4 @@ Manage your chess exercises and train yourself with them against the device.
 
 1. ionic build
 2. npx cap copy
-3. npx cap open android
+3. npx cap open android # Also adapt capacitor.config.json, and change the path to Android Studio

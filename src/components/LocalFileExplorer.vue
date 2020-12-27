@@ -1,23 +1,22 @@
 <template>
   <div class="root">
-    <div
-      class="item"
+    <explorer-item
       v-for="singleItem in items"
       :key="keyFor(singleItem)"
-      @click="handleItemClick(singleItem)"
-    >
-      <ion-img class="icon" :src="imageFor(singleItem)"></ion-img>
-      <div class="filename">{{ nameFor(singleItem) }}</div>
-    </div>
+      @click="handleItemClick"
+      :type="singleItem.type"
+      :name="nameFor(singleItem)"
+      :image="imageFor(singleItem)"
+    />
   </div>
 </template>
 
 <script>
 import { onMounted, computed, ref } from "vue";
-import { IonImg } from "@ionic/vue";
 import { FilesystemDirectory, Plugins } from "@capacitor/core";
 const { Filesystem } = Plugins;
 import useTranslationUtils from "@/hooks/TranslationUtils";
+import ExplorerItem from "@/components/ExplorerItem";
 
 export default {
   props: {
@@ -101,7 +100,9 @@ export default {
     }
 
     const currentPathString = computed(() => {
-      return `${getTranslation("local_explorer.path_prefix")}/${currentFolder.value}`;
+      return `${getTranslation("local_explorer.path_prefix")}/${
+        currentFolder.value
+      }`;
     });
 
     function keyFor(item) {
@@ -127,16 +128,15 @@ export default {
     function handleItemClick(item) {
       try {
         if (item.type === "goBack") {
-          const lastSlashIndex = currentFolder.value.lastIndexOf('/');
+          const lastSlashIndex = currentFolder.value.lastIndexOf("/");
           const strippedPath = currentFolder.value.slice(0, lastSlashIndex);
           currentFolder.value = strippedPath;
           refreshContent();
-          emit('new-path', currentPathString.value);
-        }
-        else if (item.type === "folder") {
+          emit("new-path", currentPathString.value);
+        } else if (item.type === "folder") {
           currentFolder.value += "/" + item.name;
           refreshContent();
-          emit('new-path', currentPathString.value);
+          emit("new-path", currentPathString.value);
         }
       } catch (err) {
         console.error(err);
@@ -144,8 +144,8 @@ export default {
     }
 
     onMounted(() => {
-      emit('new-path', currentPathString.value);
-    })
+      emit("new-path", currentPathString.value);
+    });
 
     return {
       currentPathString,
@@ -160,7 +160,7 @@ export default {
     };
   },
   components: {
-    IonImg,
+    ExplorerItem,
   },
 };
 </script>
@@ -170,25 +170,5 @@ export default {
   width: 100%;
   height: 100%;
   background-color: white;
-}
-
-.item {
-  width: 100%;
-  height: 18vw;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  border-bottom: 1px solid black;
-}
-
-.item > .icon {
-  width: 14vw;
-  height: 14vw;
-  margin: 4vw;
-}
-
-.item > .filename {
-  font-size: 0.8em;
 }
 </style>
