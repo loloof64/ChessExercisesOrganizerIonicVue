@@ -172,6 +172,7 @@ export default {
 
     function handleNewPath(path) {
       currentPathString.value = path;
+      selectedItemsCount.value = 0;
     }
 
     function updateSelectedItemsCount() {
