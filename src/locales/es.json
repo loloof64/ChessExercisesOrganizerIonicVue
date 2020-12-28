@@ -62,6 +62,8 @@
     "rename_prompt_field": "Apellido",
     "forbidden_name_title": "Nombre prohibido",
     "forbidden_name_message": "Sin extensión en el nombre de una carpeta.",
-    "failed_renaming_title": "No se pudo cambiar el nombre"
+    "failed_renaming_title": "No se pudo cambiar el nombre",
+    "items_opied_in_clipboard": "Elementos copiados al portapapeles",
+    "items_cut_in_clipboard": "Elementos cortados al portapapeles"
   }
 }

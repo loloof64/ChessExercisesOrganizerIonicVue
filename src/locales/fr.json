@@ -63,6 +63,8 @@
     "rename_prompt_field": "Nom",
     "forbidden_name_title": "Nom interdit",
     "forbidden_name_message": "Pas d'extension dans un nom de dossier.",
-    "failed_renaming_title": "Echec lors du renommage"
+    "failed_renaming_title": "Echec lors du renommage",
+    "items_copied_in_clipboard": "Eléments copiés dans le presse-papiers",
+    "items_cut_in_clipboard": "Eléments coupés dans le presse-papiers"
   }
 }

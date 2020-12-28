@@ -269,6 +269,7 @@ export default {
       itemsToCopy.value = explorer.value?.getSelectedItems() || [];
       explorer.value?.clearSelectedItems();
       blockingItemsSelection.value = true;
+      showToast(getTranslation('save_game_explorer.items_copied_in_clipboard'));
     }
 
     function cutSelection() {
@@ -276,6 +277,7 @@ export default {
       itemsToCut.value = explorer.value?.getSelectedItems() || [];
       explorer.value?.clearSelectedItems();
       blockingItemsSelection.value = true;
+      showToast(getTranslation('save_game_explorer.items_cut_in_clipboard'));
     }
 
     async function pasteSelection() {
