@@ -65,9 +65,9 @@ export default {
       gesture.get("pinch").set({ enable: false });
       gesture.get("swipe").set({ enable: false });
 
-      gesture.get("pan").set({ direction: Hammer.DIRECTION_ALL, threshold: 0 });
-      gesture.on("panstart", startTimer);
-      gesture.on("pancancel", cancelTimer);
+      gesture.get("pan").set({ enable: false });
+      gesture.on("press", startTimer);
+      gesture.on("pressup", cancelTimer);
     });
 
     return {

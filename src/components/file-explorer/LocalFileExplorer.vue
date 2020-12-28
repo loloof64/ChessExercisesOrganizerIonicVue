@@ -166,12 +166,15 @@ export default {
         newSelectedState: newStateIsSelected,
       });
 
-
       if (!newStateIsSelected) {
         selectedItems.value.splice(itemIndex, 1);
       } else {
         selectedItems.value.push({ ...item, path: itemPath });
       }
+
+      /////////////////////////////////////////////////////////////////
+      console.log(selectedItems.value);
+      ////////////////////////////////////////////////////////////////////////
     }
 
     function getSelectedItems() {
