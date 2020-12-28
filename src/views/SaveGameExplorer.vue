@@ -284,7 +284,9 @@ export default {
       if (!isCutAction && !isCopyAction) return;
 
       const selectedItems = isCutAction ? itemsToCut.value : itemsToCopy.value;
-      const destinationPath = explorer.value?.getCurrentFolder()
+      const destinationPath = explorer.value?.getCurrentFolder();
+
+      let copyFailedList = [];
 
       // copying
       selectedItems.forEach(async (item) => {
@@ -301,15 +303,22 @@ export default {
           explorer.value?.refreshContent();
         } catch (err) {
           console.error(err);
+          copyFailedList.push(item);
         }
       });
 
-      explorer.value?.refreshContent();
-
       setTimeout(() => {
+
         // removing if necessary
         if (isCutAction) {
           selectedItems.forEach(async (item) => {
+            const itemIndexInFailuresList = copyFailedList.findIndex(
+              (elt) => JSON.stringify(elt) === JSON.stringify(item)
+            );
+            if (itemIndexInFailuresList >= 0) {
+              console.log("Skipping delete of " + item.path);
+              return;
+            }
             try {
               const elementToRemove = `${copyPathString.value}/${item.name}`;
               const isFile = item.type === "file";
@@ -330,7 +339,6 @@ export default {
               console.error(err);
             }
           });
-
         }
       }, 600);
 
@@ -340,6 +348,7 @@ export default {
         itemsToCut.value = [];
         explorer.value?.clearSelectedItems();
         blockingItemsSelection.value = false;
+        explorer.value?.refreshContent();
       }, 900);
     }
 

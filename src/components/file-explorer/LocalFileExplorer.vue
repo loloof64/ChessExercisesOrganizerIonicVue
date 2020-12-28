@@ -158,9 +158,6 @@ export default {
     }
 
     function handleSelectedChanged(item) {
-      ///////////////////////////////////////////////
-      console.log(props.blockingItemsSelection);
-      //////////////////////////////////////////////////
       if (props.blockingItemsSelection === true) return;
       const itemPath = `${currentFolder.value}/${item.name}`;
       const itemIndex = selectedItems.value.findIndex(
