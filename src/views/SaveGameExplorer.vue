@@ -300,7 +300,18 @@ export default {
       if (!isCutAction && !isCopyAction) return;
 
       const selectedItems = isCutAction ? itemsToCut.value : itemsToCopy.value;
-      const destinationPath = explorer.value?.getCurrentFolder();
+      const destinationFolder = explorer.value?.getCurrentFolder();
+      const sourcePath = selectedItems[0].path;
+      const lastSlashIndexInSourcePath = sourcePath.lastIndexOf("/");
+      const sourceFolder = sourcePath.slice(0, lastSlashIndexInSourcePath);
+
+      if (isCutAction && destinationFolder === sourceFolder) {
+        clearSelection();
+        showToast(
+          getTranslation("save_game_explorer.cannot_cut_into_source_folder")
+        );
+        return;
+      }
 
       let copyFailedList = [];
 
@@ -308,7 +319,7 @@ export default {
       selectedItems.forEach(async (item) => {
         try {
           const from = item.path;
-          const to = `${destinationPath}/${item.name}`;
+          const to = `${destinationFolder}/${item.name}`;
 
           await Filesystem.copy({
             from,
@@ -367,6 +378,7 @@ export default {
       explorer.value?.clearSelectedItems();
       blockingItemsSelection.value = false;
       explorer.value?.refreshContent();
+      updateSelectedItemsCount();
     }
 
     function cancelSelection() {

@@ -65,6 +65,7 @@
     "failed_renaming_title": "No se pudo cambiar el nombre",
     "items_opied_in_clipboard": "Elementos copiados al portapapeles",
     "items_cut_in_clipboard": "Elementos cortados al portapapeles",
-    "copy_cut_cancelled": "El portapapeles se ha vaciado y no copiará (ni cortará) ni pegará nada."
+    "copy_cut_cancelled": "El portapapeles se ha vaciado y no copiará (ni cortará) ni pegará nada.",
+    "cannot_cut_into_source_folder": "No es necesario cortar / pegar en la misma carpeta."
   }
 }
