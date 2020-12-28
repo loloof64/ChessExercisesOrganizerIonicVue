@@ -28,9 +28,12 @@ export default {
       type: String,
       required: true,
     },
+    selected: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props, { emit }) {
-    const selected = ref(false);
     const timer = ref(null);
 
     function handleClick() {
@@ -49,8 +52,7 @@ export default {
     }
 
     function toggleActivatedState() {
-      selected.value = !selected.value;
-      emit("selected-changed", selected.value);
+      emit("selected-changed");
     }
 
     onMounted(() => {
@@ -70,7 +72,6 @@ export default {
 
     return {
       handleClick,
-      selected,
     };
   },
   components: {

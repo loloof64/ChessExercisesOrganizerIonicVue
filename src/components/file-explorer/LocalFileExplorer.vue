@@ -7,9 +7,8 @@
       :type="singleItem.type"
       :name="nameFor(singleItem)"
       :image="imageFor(singleItem)"
-      @selected-changed="
-        (newState) => handleSelectedChanged(singleItem, newState)
-      "
+      :selected="isItemSelected(singleItem)"
+      @selected-changed="handleSelectedChanged(singleItem)"
     />
   </div>
 </template>
@@ -129,6 +128,13 @@ export default {
       return item.name;
     }
 
+    function isItemSelected(item) {
+      const itemPath = `${currentFolder.value}/${item.name}`;
+      return (
+        selectedItems.value.find((elt) => elt.path === itemPath) !== undefined
+      );
+    }
+
     function handleItemClick(item) {
       try {
         if (item.type === "goBack") {
@@ -147,24 +153,33 @@ export default {
       }
     }
 
-    function handleSelectedChanged(item, newSelectedState) {
+    function handleSelectedChanged(item) {
+      const itemPath = `${currentFolder.value}/${item.name}`;
+      const itemIndex = selectedItems.value.findIndex(
+        (elt) => elt.path === itemPath && elt.type === item.type
+      );
+
+      const newStateIsSelected = itemIndex < 0;
+
       emit("selected-changed", {
         item,
-        newSelectedState,
+        newSelectedState: newStateIsSelected,
       });
 
-      if (newSelectedState === true) {
-        selectedItems.value.push(item);
-      }
-      else {
-        selectedItems.value = selectedItems.value.filter(elt => {
-          return (elt.name !== item.name) || (elt.type !== item.type)
-        });
+
+      if (!newStateIsSelected) {
+        selectedItems.value.splice(itemIndex, 1);
+      } else {
+        selectedItems.value.push({ ...item, path: itemPath });
       }
     }
 
     function getSelectedItems() {
       return selectedItems.value;
+    }
+
+    function clearSelectedItems() {
+      selectedItems.value = [];
     }
 
     onMounted(() => {
@@ -183,6 +198,8 @@ export default {
       nameFor,
       handleSelectedChanged,
       getSelectedItems,
+      clearSelectedItems,
+      isItemSelected,
     };
   },
   components: {

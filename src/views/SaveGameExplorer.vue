@@ -18,6 +18,9 @@
           <div class="bar_item" @click="copySelection" v-if="copyButtonVisible">
             <ion-icon :icon="copy" />
           </div>
+          <div class="bar_item" @click="cutSelection" v-if="copyButtonVisible">
+            <ion-icon :icon="cut" />
+          </div>
           <div
             class="bar_item"
             @click="pasteSelection"
@@ -66,7 +69,7 @@ import {
   toastController,
   IonIcon,
 } from "@ionic/vue";
-import { folder, create, copy, clipboard } from "ionicons/icons";
+import { folder, create, copy, clipboard, cut } from "ionicons/icons";
 import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
@@ -95,9 +98,10 @@ export default {
     const currentPathString = ref("");
     const copyPathString = ref(null);
     const explorer = ref(null);
-    const selectedItemsCount = ref(0);
     const lastSelectedItem = ref(null);
+    const selectedItemsCount = ref(0);
     const itemsToCopy = ref([]);
+    const itemsToCut = ref([]);
 
     function handleError(error) {
       console.error(error);
@@ -184,12 +188,19 @@ export default {
 
     function handleNewPath(path) {
       currentPathString.value = path;
-      selectedItemsCount.value = 0;
+      updateSelectedItemsCount();
     }
 
     function updateSelectedItemsCount() {
       const selectedItems = explorer.value?.getSelectedItems();
-      selectedItemsCount.value = selectedItems?.length || 0;
+      selectedItemsCount.value = 0;
+      const currentFolder = explorer.value?.getCurrentFolder();
+
+      selectedItems.forEach((item) => {
+        const lastSlashIndexInItemPath = item.path.lastIndexOf("/");
+        const itemFolder = item.path.slice(0, lastSlashIndexInItemPath);
+        if (itemFolder === currentFolder) selectedItemsCount.value += 1;
+      });
     }
 
     function renameRequest() {
@@ -232,6 +243,8 @@ export default {
           to,
           directory: FilesystemDirectory.Documents,
         });
+        explorer.value?.clearSelectedItems();
+        updateSelectedItemsCount();
         explorer.value?.refreshContent();
       } catch (err) {
         console.error(err);
@@ -254,14 +267,27 @@ export default {
       itemsToCopy.value = explorer.value?.getSelectedItems() || [];
     }
 
+    function cutSelection() {
+      copyPathString.value = explorer.value?.getCurrentFolder();
+      itemsToCut.value = explorer.value?.getSelectedItems() || [];
+    }
+
     async function pasteSelection() {
-      const selectedItems = itemsToCopy.value;
-      let failuresList = [];
+      const isCutAction = itemsToCut.value.length > 0;
+      const isCopyAction = itemsToCopy.value.length > 0;
+      if (!isCutAction && !isCopyAction) return;
+
+      const selectedItems = isCutAction ? itemsToCut.value : itemsToCopy.value;
       const destinationPath = explorer.value?.getCurrentFolder();
 
+      //////////////////////////////////////////////////////////////////////////////////
+      console.log(JSON.stringify(selectedItems));
+      //////////////////////////////////////////////////////////////////////////////////////
+
+      // copying
       selectedItems.forEach(async (item) => {
         try {
-          const from = `${copyPathString.value}/${item.name}`;
+          const from = item.path;
           const to = `${destinationPath}/${item.name}`;
 
           await Filesystem.copy({
@@ -272,22 +298,46 @@ export default {
 
           explorer.value?.refreshContent();
         } catch (err) {
-          failuresList.push(item);
+          console.error(err);
         }
       });
 
-      copyPathString.value = null;
-      itemsToCopy.value = [];
+      explorer.value?.refreshContent();
 
-      if (failuresList.length > 0) {
-        failuresList.forEach((item) => {
-         console.error(
-            `Failed to paste ${item.type === "folder" ? "folder" : "file"} ${
-              item.name
-            } !`
-          );
-        });
-      }
+      setTimeout(() => {
+        // removing if necessary
+        if (isCutAction) {
+          selectedItems.forEach(async (item) => {
+            try {
+              const elementToRemove = `${copyPathString.value}/${item.name}`;
+              const isFile = item.type === "file";
+
+              if (isFile) {
+                await Filesystem.deleteFile({
+                  path: elementToRemove,
+                  directory: FilesystemDirectory.Documents,
+                });
+              } else {
+                await Filesystem.rmdir({
+                  path: elementToRemove,
+                  directory: FilesystemDirectory.Documents,
+                  recursive: true,
+                });
+              }
+            } catch (err) {
+              console.error(err);
+            }
+          });
+
+        }
+      }, 600);
+
+      setTimeout(() => {
+        copyPathString.value = null;
+        itemsToCopy.value = [];
+        itemsToCut.value = [];
+        explorer.value?.clearSelectedItems();
+      }, 900);
     }
 
     const renameButtonVisible = computed(() => {
@@ -299,8 +349,8 @@ export default {
     });
 
     const pasteButtonVisible = computed(() => {
-      if (!itemsToCopy.value) return false;
-      return itemsToCopy.value.length > 0;
+      if (!itemsToCopy.value && !itemsToCut.value) return false;
+      return itemsToCopy.value.length > 0 || itemsToCut.value.length > 0;
     });
 
     return {
@@ -314,6 +364,7 @@ export default {
       explorer,
       folder,
       copy,
+      cut,
       create,
       clipboard,
       addFolderRequest,
@@ -326,6 +377,7 @@ export default {
       pasteButtonVisible,
       copySelection,
       pasteSelection,
+      cutSelection,
     };
   },
   components: {
