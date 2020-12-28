@@ -265,11 +265,13 @@ export default {
     function copySelection() {
       copyPathString.value = explorer.value?.getCurrentFolder();
       itemsToCopy.value = explorer.value?.getSelectedItems() || [];
+      explorer.value?.clearSelectedItems();
     }
 
     function cutSelection() {
       copyPathString.value = explorer.value?.getCurrentFolder();
       itemsToCut.value = explorer.value?.getSelectedItems() || [];
+      explorer.value?.clearSelectedItems();
     }
 
     async function pasteSelection() {
@@ -278,11 +280,7 @@ export default {
       if (!isCutAction && !isCopyAction) return;
 
       const selectedItems = isCutAction ? itemsToCut.value : itemsToCopy.value;
-      const destinationPath = explorer.value?.getCurrentFolder();
-
-      //////////////////////////////////////////////////////////////////////////////////
-      console.log(JSON.stringify(selectedItems));
-      //////////////////////////////////////////////////////////////////////////////////////
+      const destinationPath = explorer.value?.getCurrentFolder()
 
       // copying
       selectedItems.forEach(async (item) => {

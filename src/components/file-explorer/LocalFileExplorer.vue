@@ -171,10 +171,6 @@ export default {
       } else {
         selectedItems.value.push({ ...item, path: itemPath });
       }
-
-      /////////////////////////////////////////////////////////////////
-      console.log(selectedItems.value);
-      ////////////////////////////////////////////////////////////////////////
     }
 
     function getSelectedItems() {
