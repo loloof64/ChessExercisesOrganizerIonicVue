@@ -65,6 +65,6 @@
     "forbidden_name_message": "No extension in a folder name.",
     "failed_renaming_title": "Failed renaming",
     "items_copied_in_clipboard": "Items copied in clipbard",
-    "items_cut_in_clipboard": "Items cut in clipboard"
+    "items_cut_in_clipboard": "The clipboard has been emptied and will not copy (or cut) or paste anything."
   }
 }

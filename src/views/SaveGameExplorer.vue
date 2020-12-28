@@ -28,6 +28,13 @@
           >
             <ion-icon :icon="clipboard" />
           </div>
+          <div
+            class="bar_item"
+            @click="cancelSelection"
+            v-if="copyButtonVisible"
+          >
+            <ion-icon :icon="stopCircle" />
+          </div>
         </div>
       </ion-toolbar>
     </ion-header>
@@ -70,7 +77,14 @@ import {
   toastController,
   IonIcon,
 } from "@ionic/vue";
-import { folder, create, copy, clipboard, cut } from "ionicons/icons";
+import {
+  folder,
+  create,
+  copy,
+  clipboard,
+  cut,
+  stopCircle,
+} from "ionicons/icons";
 import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
@@ -269,7 +283,7 @@ export default {
       itemsToCopy.value = explorer.value?.getSelectedItems() || [];
       explorer.value?.clearSelectedItems();
       blockingItemsSelection.value = true;
-      showToast(getTranslation('save_game_explorer.items_copied_in_clipboard'));
+      showToast(getTranslation("save_game_explorer.items_copied_in_clipboard"));
     }
 
     function cutSelection() {
@@ -277,7 +291,7 @@ export default {
       itemsToCut.value = explorer.value?.getSelectedItems() || [];
       explorer.value?.clearSelectedItems();
       blockingItemsSelection.value = true;
-      showToast(getTranslation('save_game_explorer.items_cut_in_clipboard'));
+      showToast(getTranslation("save_game_explorer.items_cut_in_clipboard"));
     }
 
     async function pasteSelection() {
@@ -310,7 +324,6 @@ export default {
       });
 
       setTimeout(() => {
-
         // removing if necessary
         if (isCutAction) {
           selectedItems.forEach(async (item) => {
@@ -344,14 +357,21 @@ export default {
         }
       }, 600);
 
-      setTimeout(() => {
-        copyPathString.value = null;
-        itemsToCopy.value = [];
-        itemsToCut.value = [];
-        explorer.value?.clearSelectedItems();
-        blockingItemsSelection.value = false;
-        explorer.value?.refreshContent();
-      }, 900);
+      setTimeout(clearSelection, 900);
+    }
+
+    function clearSelection() {
+      copyPathString.value = null;
+      itemsToCopy.value = [];
+      itemsToCut.value = [];
+      explorer.value?.clearSelectedItems();
+      blockingItemsSelection.value = false;
+      explorer.value?.refreshContent();
+    }
+
+    function cancelSelection() {
+      clearSelection();
+      showToast(getTranslation("save_game_explorer.copy_cut_cancelled"), 2000);
     }
 
     const renameButtonVisible = computed(() => {
@@ -381,6 +401,7 @@ export default {
       cut,
       create,
       clipboard,
+      stopCircle,
       addFolderRequest,
       currentPathString,
       renameRequest,
@@ -392,6 +413,7 @@ export default {
       copySelection,
       pasteSelection,
       cutSelection,
+      cancelSelection,
       blockingItemsSelection,
     };
   },

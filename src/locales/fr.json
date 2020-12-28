@@ -65,6 +65,7 @@
     "forbidden_name_message": "Pas d'extension dans un nom de dossier.",
     "failed_renaming_title": "Echec lors du renommage",
     "items_copied_in_clipboard": "Eléments copiés dans le presse-papiers",
-    "items_cut_in_clipboard": "Eléments coupés dans le presse-papiers"
+    "items_cut_in_clipboard": "Eléments coupés dans le presse-papiers",
+    "copy_cut_cancelled": "Le presse-papiers a été vidé et ne copiera (ou ne coupera) et ne collera rien."
   }
 }
