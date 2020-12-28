@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, watch } from "vue";
 import { FilesystemDirectory, Plugins } from "@capacitor/core";
 const { Filesystem } = Plugins;
 import useTranslationUtils from "@/hooks/TranslationUtils";
@@ -25,6 +25,10 @@ export default {
     path: {
       type: String,
       required: true,
+    },
+    blockingItemsSelection: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, { emit }) {
@@ -154,6 +158,10 @@ export default {
     }
 
     function handleSelectedChanged(item) {
+      ///////////////////////////////////////////////
+      console.log(props.blockingItemsSelection);
+      //////////////////////////////////////////////////
+      if (props.blockingItemsSelection === true) return;
       const itemPath = `${currentFolder.value}/${item.name}`;
       const itemIndex = selectedItems.value.findIndex(
         (elt) => elt.path === itemPath && elt.type === item.type
@@ -184,6 +192,15 @@ export default {
     onMounted(() => {
       emit("new-path", currentPathString.value);
     });
+
+    watch(
+      () => props.blockingItemsSelection,
+      () => {
+        if (props.blockingItemsSelection === true) {
+          clearSelectedItems();
+        }
+      }
+    );
 
     return {
       currentPathString,

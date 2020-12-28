@@ -37,6 +37,7 @@
         path="pgn/my_games"
         @error="handleError"
         ref="explorer"
+        :blockingItemsSelection="blockingItemsSelection"
         @new-path="handleNewPath"
         @selected-changed="handleSelectedChanged"
       />
@@ -102,6 +103,7 @@ export default {
     const selectedItemsCount = ref(0);
     const itemsToCopy = ref([]);
     const itemsToCut = ref([]);
+    const blockingItemsSelection = ref(false);
 
     function handleError(error) {
       console.error(error);
@@ -266,12 +268,14 @@ export default {
       copyPathString.value = explorer.value?.getCurrentFolder();
       itemsToCopy.value = explorer.value?.getSelectedItems() || [];
       explorer.value?.clearSelectedItems();
+      blockingItemsSelection.value = true;
     }
 
     function cutSelection() {
       copyPathString.value = explorer.value?.getCurrentFolder();
       itemsToCut.value = explorer.value?.getSelectedItems() || [];
       explorer.value?.clearSelectedItems();
+      blockingItemsSelection.value = true;
     }
 
     async function pasteSelection() {
@@ -335,6 +339,7 @@ export default {
         itemsToCopy.value = [];
         itemsToCut.value = [];
         explorer.value?.clearSelectedItems();
+        blockingItemsSelection.value = false;
       }, 900);
     }
 
@@ -376,6 +381,7 @@ export default {
       copySelection,
       pasteSelection,
       cutSelection,
+      blockingItemsSelection,
     };
   },
   components: {
