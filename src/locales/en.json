@@ -68,6 +68,8 @@
     "items_cut_in_clipboard": "The clipboard has been emptied and will not copy (or cut) or paste anything.",
     "cannot_cut_into_source_folder": "It is not useful to cut/paste in the same folder.",
     "copy_in_same_folder_confirmation_title": "Copy in the same folder",
-    "copy_in_same_folder_confirmation_message": "Copy in the same folder ? This will have for effect that names of duplicated elements will be prefixed with current date and time."
+    "copy_in_same_folder_confirmation_message": "Copy in the same folder ? This will have for effect that names of duplicated elements will be prefixed with current date and time.",
+    "folder_already_exists_title": "Folder already exists",
+    "folder_already_exists_message": "Cannot create a folder with this name as it already exists."
   }
 }

@@ -141,6 +141,15 @@ export default {
     }
 
     async function addFolder(folderName) {
+      const folderAlreadyExists = explorer.value?.elementAlreadyExistsInCurrentFolder(folderName);
+      if (folderAlreadyExists) {
+        simpleDialog.value.showMessage({
+          title: getTranslation('save_game_explorer.folder_already_exists_title'),
+          message: getTranslation('save_game_explorer.folder_already_exists_message')
+        })
+        return; 
+      }
+
       const currentFolderPath = explorer.value?.getCurrentFolder();
       if (!currentFolderPath) throw "File explorer is not ready.";
 

@@ -186,6 +186,11 @@ export default {
       selectedItems.value = [];
     }
 
+    function elementAlreadyExistsInCurrentFolder(name) {
+      const elementIndex = items.value.findIndex(it => it.name === name);
+      return elementIndex >= 0;
+    }
+
     onMounted(() => {
       emit("new-path", currentPathString.value);
     });
@@ -213,6 +218,7 @@ export default {
       getSelectedItems,
       clearSelectedItems,
       isItemSelected,
+      elementAlreadyExistsInCurrentFolder,
     };
   },
   components: {

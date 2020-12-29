@@ -69,6 +69,8 @@
     "copy_cut_cancelled": "Le presse-papiers a été vidé et ne copiera (ou ne coupera) et ne collera rien.",
     "cannot_cut_into_source_folder": "Inutile de couper/coller dans le même dossier.",
     "copy_in_same_folder_confirmation_title": "Copie dans le même dossier",
-    "copy_in_same_folder_confirmation_message": "Copier les éléments dans le dossier d'origine ? Cela aura pour effet de préfixer les éléments dupliqués avec la date et l'heure courants."
+    "copy_in_same_folder_confirmation_message": "Copier les éléments dans le dossier d'origine ? Cela aura pour effet de préfixer les éléments dupliqués avec la date et l'heure courants.",
+    "folder_already_exists_title": "Le dossier existe déjà",
+    "folder_already_exists_message": "Impossible de créer un nouveau dossier sous ce nom car il existe déjà."
   }
 }
