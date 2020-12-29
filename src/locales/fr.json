@@ -74,6 +74,7 @@
     "folder_already_exists_message": "Impossible de créer un nouveau dossier sous ce nom car il existe déjà.",
     "file_already_exists_title": "Le fichier existe déjà",
     "file_already_exists_message": "Impossible de créer une nouvelle partie sous ce nom car elle existe déjà.",
-    "renaming_some_elements_while_pasting": "Certains éléments à coller existent déjà dans le dossier cible : les nouveaux éléments concernés ont donc été légèrement renommés."
+    "renaming_some_elements_while_pasting": "Certains éléments à coller existent déjà dans le dossier cible : les nouveaux éléments concernés ont donc été légèrement renommés.",
+    "moving_folder_from_parent_to_child_error": "Impossible de copier un dossier dans un de ses dossiers enfants : opération ignorée pour les éléments concernés."
   }
 }

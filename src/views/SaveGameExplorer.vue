@@ -385,13 +385,25 @@ export default {
             nameAlreadyTaken ? commonDatePrefix + "_" : ""
           }${item.name}`;
 
-          await Filesystem.copy({
-            from,
-            to,
-            directory: FilesystemDirectory.Documents,
-          });
+          const tryingToMoveParentFolderIntoChild =
+            item.type === "folder" && to.startsWith(from);
+          if (tryingToMoveParentFolderIntoChild) {
+            showToast(
+              getTranslation(
+                "save_game_explorer.moving_folder_from_parent_to_child_error"
+              ),
+              2000
+            );
+            copyFailedList.push(item);
+          } else {
+            await Filesystem.copy({
+              from,
+              to,
+              directory: FilesystemDirectory.Documents,
+            });
 
-          explorer.value?.refreshContent();
+            explorer.value?.refreshContent();
+          }
         } catch (err) {
           console.error(err);
           copyFailedList.push(item);
