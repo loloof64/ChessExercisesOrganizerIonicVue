@@ -399,14 +399,12 @@ export default {
       });
 
       if (overridingSomeElements) {
-        simpleDialog.value.showMessage({
-          title: getTranslation(
-            "save_game_explorer.renaming_some_elements_for_pasting_title"
+        showToast(
+          getTranslation(
+            "save_game_explorer.renaming_some_elements_while_pasting"
           ),
-          message: getTranslation(
-            "save_game_explorer.renaming_some_elements_for_pasting_message"
-          ),
-        });
+          4000
+        );
       }
 
       setTimeout(() => {

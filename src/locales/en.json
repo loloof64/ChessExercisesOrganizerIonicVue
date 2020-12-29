@@ -72,6 +72,7 @@
     "folder_already_exists_title": "Folder already exists",
     "folder_already_exists_message": "Cannot create a folder with this name as it already exists.",
     "file_already_exists_title": "File already exists",
-    "file_already_exists_message": "Cannot create a game with this name as it already exists."
+    "file_already_exists_message": "Cannot create a game with this name as it already exists.",
+    "renaming_some_elements_while_pasting": "Some elements already exists in the target folder : so slightly renaming concerned files."
   }
 }

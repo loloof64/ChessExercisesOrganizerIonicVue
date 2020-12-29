@@ -72,6 +72,8 @@
     "folder_already_exists_title": "La carpeta ya existe",
     "folder_already_exists_message": "No se puede crear una nueva carpeta con este nombre porque ya existe.",
     "file_already_exists_title": "El archivo ya existe",
-    "file_already_exists_message": "No se puede crear un juego nuevo con este nombre porque ya existe."
+    "file_already_exists_message": "No se puede crear un juego nuevo con este nombre porque ya existe.",
+    "file_already_exists_message": "Impossible de créer une nouvelle partie sous ce nom car elle existe déjà.",
+    "renaming_some_elements_while_pasting": "Algunos elementos para pegar ya existen en la carpeta de destino: por lo tanto, los nuevos elementos afectados se han renombrado ligeramente."
   }
 }
