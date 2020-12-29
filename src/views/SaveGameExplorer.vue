@@ -98,6 +98,7 @@ import {
 const { Filesystem } = Plugins;
 
 import { useStore } from "vuex";
+import moment from "moment";
 
 export default {
   setup() {
@@ -306,11 +307,21 @@ export default {
       const sourceFolder = sourcePath.slice(0, lastSlashIndexInSourcePath);
 
       if (isCutAction && destinationFolder === sourceFolder) {
+        console.error("Forbidden cut/paste operation");
+
         clearSelection();
         showToast(
           getTranslation("save_game_explorer.cannot_cut_into_source_folder")
         );
         return;
+      }
+
+      let commonDatePrefix = null;
+      if (isCopyAction && destinationFolder === sourceFolder) {
+        commonDatePrefix = moment().format("YYYYMMDDHHmmss");
+        ///////////////////////////////////////////////////////////////
+        console.log(commonDatePrefix);
+        ///////////////////////////////////////////////////////////////
       }
 
       let copyFailedList = [];
@@ -319,7 +330,13 @@ export default {
       selectedItems.forEach(async (item) => {
         try {
           const from = item.path;
-          const to = `${destinationFolder}/${item.name}`;
+          const to = `${destinationFolder}/${
+            commonDatePrefix ? commonDatePrefix + "_" : ""
+          }${item.name}`;
+
+          ////////////////////////////////////////////////////////////
+          console.log(from, to);
+          ///////////////////////////////////////////////////////////////
 
           await Filesystem.copy({
             from,
