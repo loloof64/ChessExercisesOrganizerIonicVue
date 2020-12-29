@@ -31,7 +31,7 @@
           <div
             class="bar_item"
             @click="cancelSelection"
-            v-if="copyButtonVisible"
+            v-if="pasteButtonVisible"
           >
             <ion-icon :icon="stopCircle" />
           </div>
