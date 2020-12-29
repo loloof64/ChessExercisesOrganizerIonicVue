@@ -22,9 +22,6 @@
     "confirm_stop_title": "Stop ?",
     "confirm_stop_message": "Do you really want to stop current game ?",
     "failed_loading_stockfish_title": "Error loading chess engine.",
-    "pgn_saved_title": "Pgn file saved successfully.",
-    "pgn_saved_message": "Pgn file saved in the documents folder : {filePath}.",
-    "error_saving_pgn_title": "Failed to save pgn file.",
     "confirm_exit_page_title": "Quit current game ?",
     "confirm_exit_page_message": "Do you really want to quit current game and return to the main page ?",
     "show_solution": "Show solution",
@@ -74,6 +71,8 @@
     "file_already_exists_title": "File already exists",
     "file_already_exists_message": "Cannot create a game with this name as it already exists.",
     "renaming_some_elements_while_pasting": "Some elements already exists in the target folder : so slightly renaming concerned files.",
-    "moving_folder_from_parent_to_child_error": "Cannot copy a folder into one of its children : operation aborded for concerned elements."
+    "moving_folder_from_parent_to_child_error": "Cannot copy a folder into one of its children : operation aborded for concerned elements.",
+    "delete_selection_confirmation_title": "Delete selection ?",
+    "delete_selection_confirmation_message": "Supprimer les éléments suivants du dossier {originFolder} :"
   }
 }

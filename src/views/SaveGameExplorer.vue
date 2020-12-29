@@ -115,7 +115,7 @@ export default {
 
     const store = useStore();
 
-    const { getTranslation, initTranslationsUtils } = useTranslationUtils();
+    const { t, getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
 
     const filename = ref("");
@@ -481,6 +481,21 @@ export default {
 
     function deleteSelection() {
       const selectedItems = explorer.value?.getSelectedItems();
+
+      const originFolder = currentPathString.value;
+      const elementsListString = selectedItems.map(item => `* ${item.name}`).join('<br />')
+
+      const message = `${t('save_game_explorer.delete_selection_confirmation_message', {originFolder})}<br />${elementsListString}`;
+
+      simpleDialog.value.showConfirm({
+        title: getTranslation('save_game_explorer.delete_selection_confirmation_title'),
+        message,
+        onConfirm: () => doDeleteSelection({selectedItems})
+      });
+
+    }
+
+    function doDeleteSelection({selectedItems}) {
       selectedItems.forEach(async (item) => {
         try {
           const elementToRemove = `${item.path}`;

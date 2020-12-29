@@ -22,9 +22,6 @@
     "confirm_stop_title": "Arrêter ?",
     "confirm_stop_message": "Souhaitez-vous vraiment arrêter la partie en cours ?",
     "failed_loading_stockfish_title": "Erreur de chargement du moteur d'échecs.",
-    "pgn_saved_title": "Fichier pgn sauvegardé avec succès.",
-    "pgn_saved_message": "Fichier pgn sauvegardé à l'intérieur du dossier documents : {filePath}.",
-    "error_saving_pgn_title": "Echec de sauvegarde du fichier pgn.",
     "confirm_exit_page_title": "Quitter la partie en cours ?",
     "confirm_exit_page_message": "Souhaitez-vous vraiment quitter la partie en cours et retourner sur la page principale ?",
     "show_solution": "Voir la solution",
@@ -75,6 +72,8 @@
     "file_already_exists_title": "Le fichier existe déjà",
     "file_already_exists_message": "Impossible de créer une nouvelle partie sous ce nom car elle existe déjà.",
     "renaming_some_elements_while_pasting": "Certains éléments à coller existent déjà dans le dossier cible : les nouveaux éléments concernés ont donc été légèrement renommés.",
-    "moving_folder_from_parent_to_child_error": "Impossible de copier un dossier dans un de ses dossiers enfants : opération ignorée pour les éléments concernés."
+    "moving_folder_from_parent_to_child_error": "Impossible de copier un dossier dans un de ses dossiers enfants : opération ignorée pour les éléments concernés.",
+    "delete_selection_confirmation_title": "Supprimer la selection ?",
+    "delete_selection_confirmation_message": "Supprimer les éléments suivants du dossier {originFolder} :"
   }
 }
