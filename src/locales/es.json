@@ -66,6 +66,8 @@
     "items_opied_in_clipboard": "Elementos copiados al portapapeles",
     "items_cut_in_clipboard": "Elementos cortados al portapapeles",
     "copy_cut_cancelled": "El portapapeles se ha vaciado y no copiará (ni cortará) ni pegará nada.",
-    "cannot_cut_into_source_folder": "No es necesario cortar / pegar en la misma carpeta."
+    "cannot_cut_into_source_folder": "No es necesario cortar / pegar en la misma carpeta.",
+    "copy_in_same_folder_confirmation_title": "Copiar a la misma carpeta",
+    "copy_in_same_folder_confirmation_message": "¿Copiar elementos a la carpeta original? Esto tendrá el efecto de anteponer los elementos duplicados con la fecha y hora actuales."
   }
 }

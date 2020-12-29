@@ -67,6 +67,8 @@
     "items_copied_in_clipboard": "Eléments copiés dans le presse-papiers",
     "items_cut_in_clipboard": "Eléments coupés dans le presse-papiers",
     "copy_cut_cancelled": "Le presse-papiers a été vidé et ne copiera (ou ne coupera) et ne collera rien.",
-    "cannot_cut_into_source_folder": "Inutile de couper/coller dans le même dossier."
+    "cannot_cut_into_source_folder": "Inutile de couper/coller dans le même dossier.",
+    "copy_in_same_folder_confirmation_title": "Copie dans le même dossier",
+    "copy_in_same_folder_confirmation_message": "Copier les éléments dans le dossier d'origine ? Cela aura pour effet de préfixer les éléments dupliqués avec la date et l'heure courants."
   }
 }

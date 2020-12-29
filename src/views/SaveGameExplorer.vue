@@ -295,7 +295,7 @@ export default {
       showToast(getTranslation("save_game_explorer.items_cut_in_clipboard"));
     }
 
-    async function pasteSelection() {
+    function pasteSelection() {
       const isCutAction = itemsToCut.value.length > 0;
       const isCopyAction = itemsToCopy.value.length > 0;
       if (!isCutAction && !isCopyAction) return;
@@ -319,10 +319,30 @@ export default {
       let commonDatePrefix = null;
       if (isCopyAction && destinationFolder === sourceFolder) {
         commonDatePrefix = moment().format("YYYYMMDDHHmmss");
-        ///////////////////////////////////////////////////////////////
-        console.log(commonDatePrefix);
-        ///////////////////////////////////////////////////////////////
-      }
+        simpleDialog.value.showConfirm({
+          title: getTranslation(
+            "save_game_explorer.copy_in_same_folder_confirmation_title"
+          ),
+          message: getTranslation(
+            "save_game_explorer.copy_in_same_folder_confirmation_message"
+          ),
+          onConfirm: () =>
+            doPasteSelection({
+              selectedItems,
+              commonDatePrefix,
+              isCutAction: false,
+            }),
+        });
+        return;
+      } else doPasteSelection({ selectedItems, commonDatePrefix, isCutAction });
+    }
+
+    async function doPasteSelection({
+      selectedItems,
+      commonDatePrefix,
+      isCutAction,
+    }) {
+      const destinationFolder = explorer.value?.getCurrentFolder();
 
       let copyFailedList = [];
 
@@ -333,10 +353,6 @@ export default {
           const to = `${destinationFolder}/${
             commonDatePrefix ? commonDatePrefix + "_" : ""
           }${item.name}`;
-
-          ////////////////////////////////////////////////////////////
-          console.log(from, to);
-          ///////////////////////////////////////////////////////////////
 
           await Filesystem.copy({
             from,
