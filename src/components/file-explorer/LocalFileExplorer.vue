@@ -38,6 +38,7 @@ export default {
     const currentFolder = ref(props.path);
     const items = ref([]);
     const selectedItems = ref([]);
+    const longOperationPending = ref(false);
 
     onMounted(async () => {
       try {
@@ -140,6 +141,11 @@ export default {
     }
 
     function handleItemClick(item) {
+       /////////////////////////////////////////////////////////////
+      console.log(longOperationPending.value);
+      /////////////////////////////////////////////////////////////
+      if (longOperationPending.value === true) return;
+
       try {
         if (item.type === "goBack") {
           const lastSlashIndex = currentFolder.value.lastIndexOf("/");
@@ -158,6 +164,10 @@ export default {
     }
 
     function handleSelectedChanged(item) {
+      /////////////////////////////////////////////////////////////
+      console.log(longOperationPending.value);
+      /////////////////////////////////////////////////////////////
+      if (longOperationPending.value === true) return;
       if (props.blockingItemsSelection === true) return;
       const itemPath = `${currentFolder.value}/${item.name}`;
       const itemIndex = selectedItems.value.findIndex(
@@ -178,6 +188,14 @@ export default {
       }
     }
 
+    function notifyLongOperationPending() {
+      longOperationPending.value = true;
+    }
+
+    function clearLongOperationPendingStatus() {
+      longOperationPending.value = false;
+    }
+
     function getSelectedItems() {
       return selectedItems.value;
     }
@@ -187,7 +205,7 @@ export default {
     }
 
     function elementAlreadyExistsInCurrentFolder(name) {
-      const elementIndex = items.value.findIndex(it => it.name === name);
+      const elementIndex = items.value.findIndex((it) => it.name === name);
       return elementIndex >= 0;
     }
 
@@ -219,6 +237,8 @@ export default {
       clearSelectedItems,
       isItemSelected,
       elementAlreadyExistsInCurrentFolder,
+      notifyLongOperationPending,
+      clearLongOperationPendingStatus,
     };
   },
   components: {

@@ -375,6 +375,8 @@ export default {
     }
 
     async function doPasteSelection({ selectedItems, isCutAction }) {
+      explorer.value?.notifyLongOperationPending();
+
       const destinationFolder = explorer.value?.getCurrentFolder();
       const commonDatePrefix = moment().format("YYYYMMDDHHmmss");
 
@@ -461,7 +463,14 @@ export default {
         }
       }, 600);
 
-      setTimeout(clearSelectionAndRefreshContent, 900);
+      if (isCutAction) {
+        setTimeout(clearSelectionAndRefreshContent, 900);
+      } else {
+        setTimeout(() => {
+          explorer.value?.refreshContent();
+          explorer.value?.clearLongOperationPendingStatus();
+        }, 900);
+      }
     }
 
     function clearSelectionAndRefreshContent() {
@@ -472,6 +481,7 @@ export default {
       blockingItemsSelection.value = false;
       explorer.value?.refreshContent();
       updateSelectedItemsCount();
+      explorer.value?.clearLongOperationPendingStatus();
     }
 
     function cancelSelection() {
@@ -483,44 +493,54 @@ export default {
       const selectedItems = explorer.value?.getSelectedItems();
 
       const originFolder = currentPathString.value;
-      const elementsListString = selectedItems.map(item => `* ${item.name}`).join('<br />')
+      const elementsListString = selectedItems
+        .map((item) => `* ${item.name}`)
+        .join("<br />");
 
-      const message = `${t('save_game_explorer.delete_selection_confirmation_message', {originFolder})}<br />${elementsListString}`;
+      const message = `${t(
+        "save_game_explorer.delete_selection_confirmation_message",
+        { originFolder }
+      )}<br />${elementsListString}`;
 
       simpleDialog.value.showConfirm({
-        title: getTranslation('save_game_explorer.delete_selection_confirmation_title'),
+        title: getTranslation(
+          "save_game_explorer.delete_selection_confirmation_title"
+        ),
         message,
-        onConfirm: () => doDeleteSelection({selectedItems})
+        onConfirm: () => doDeleteSelection({ selectedItems }),
       });
-
     }
 
-    function doDeleteSelection({selectedItems}) {
-      selectedItems.forEach(async (item) => {
-        try {
-          const elementToRemove = `${item.path}`;
-          const isFile = item.type === "file";
+    function doDeleteSelection({ selectedItems }) {
+      explorer.value?.notifyLongOperationPending();
 
-          if (isFile) {
-            await Filesystem.deleteFile({
-              path: elementToRemove,
-              directory: FilesystemDirectory.Documents,
-            });
-          } else {
-            await Filesystem.rmdir({
-              path: elementToRemove,
-              directory: FilesystemDirectory.Documents,
-              recursive: true,
-            });
+      setTimeout(() => {
+        selectedItems.forEach(async (item) => {
+          try {
+            const elementToRemove = `${item.path}`;
+            const isFile = item.type === "file";
+
+            if (isFile) {
+              await Filesystem.deleteFile({
+                path: elementToRemove,
+                directory: FilesystemDirectory.Documents,
+              });
+            } else {
+              await Filesystem.rmdir({
+                path: elementToRemove,
+                directory: FilesystemDirectory.Documents,
+                recursive: true,
+              });
+            }
+
+            explorer.value?.refreshContent();
+          } catch (err) {
+            console.error(err);
           }
+        });
 
-          explorer.value?.refreshContent();
-        } catch (err) {
-          console.error(err);
-        }
-      });
-
-      clearSelectionAndRefreshContent();
+        clearSelectionAndRefreshContent();
+      }, 1500);
     }
 
     const renameButtonVisible = computed(() => {
