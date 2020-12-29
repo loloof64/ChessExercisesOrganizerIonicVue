@@ -35,6 +35,13 @@
           >
             <ion-icon :icon="stopCircle" />
           </div>
+          <div
+            class="bar_item"
+            @click="deleteSelection"
+            v-if="copyButtonVisible"
+          >
+            <ion-icon :icon="trash" />
+          </div>
         </div>
       </ion-toolbar>
     </ion-header>
@@ -84,6 +91,7 @@ import {
   clipboard,
   cut,
   stopCircle,
+  trash,
 } from "ionicons/icons";
 import FileExplorer from "@/components/file-explorer/LocalFileExplorer";
 import SimpleDialog from "@/components/SimpleDialog";
@@ -341,7 +349,7 @@ export default {
       if (isCutAction && destinationFolder === sourceFolder) {
         console.error("Forbidden cut/paste operation");
 
-        clearSelection();
+        clearSelectionAndRefreshContent();
         showToast(
           getTranslation("save_game_explorer.cannot_cut_into_source_folder")
         );
@@ -453,10 +461,10 @@ export default {
         }
       }, 600);
 
-      setTimeout(clearSelection, 900);
+      setTimeout(clearSelectionAndRefreshContent, 900);
     }
 
-    function clearSelection() {
+    function clearSelectionAndRefreshContent() {
       copyPathString.value = null;
       itemsToCopy.value = [];
       itemsToCut.value = [];
@@ -467,8 +475,37 @@ export default {
     }
 
     function cancelSelection() {
-      clearSelection();
+      clearSelectionAndRefreshContent();
       showToast(getTranslation("save_game_explorer.copy_cut_cancelled"), 2000);
+    }
+
+    function deleteSelection() {
+      const selectedItems = explorer.value?.getSelectedItems();
+      selectedItems.forEach(async (item) => {
+        try {
+          const elementToRemove = `${item.path}`;
+          const isFile = item.type === "file";
+
+          if (isFile) {
+            await Filesystem.deleteFile({
+              path: elementToRemove,
+              directory: FilesystemDirectory.Documents,
+            });
+          } else {
+            await Filesystem.rmdir({
+              path: elementToRemove,
+              directory: FilesystemDirectory.Documents,
+              recursive: true,
+            });
+          }
+
+          explorer.value?.refreshContent();
+        } catch (err) {
+          console.error(err);
+        }
+      });
+
+      clearSelectionAndRefreshContent();
     }
 
     const renameButtonVisible = computed(() => {
@@ -499,6 +536,7 @@ export default {
       create,
       clipboard,
       stopCircle,
+      trash,
       addFolderRequest,
       currentPathString,
       renameRequest,
@@ -511,6 +549,7 @@ export default {
       pasteSelection,
       cutSelection,
       cancelSelection,
+      deleteSelection,
       blockingItemsSelection,
     };
   },
