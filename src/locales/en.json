@@ -73,7 +73,7 @@
     "renaming_some_elements_while_pasting": "Some elements already exists in the target folder : so slightly renaming concerned files.",
     "moving_folder_from_parent_to_child_error": "Cannot copy a folder into one of its children : operation aborded for concerned elements.",
     "delete_selection_confirmation_title": "Delete selection ?",
-    "delete_selection_confirmation_message": "Supprimer les éléments suivants du dossier {originFolder} :",
+    "delete_selection_confirmation_message": "Delete following elements in folder {originFolder} :",
     "deleted_elements": "Deleted elements."
   }
 }
