@@ -348,9 +348,7 @@ export default {
         return;
       }
 
-      let commonDatePrefix = null;
       if (isCopyAction && destinationFolder === sourceFolder) {
-        commonDatePrefix = moment().format("YYYYMMDDHHmmss");
         simpleDialog.value.showConfirm({
           title: getTranslation(
             "save_game_explorer.copy_in_same_folder_confirmation_title"
@@ -361,29 +359,30 @@ export default {
           onConfirm: () =>
             doPasteSelection({
               selectedItems,
-              commonDatePrefix,
               isCutAction: false,
             }),
         });
         return;
-      } else doPasteSelection({ selectedItems, commonDatePrefix, isCutAction });
+      } else doPasteSelection({ selectedItems, isCutAction });
     }
 
-    async function doPasteSelection({
-      selectedItems,
-      commonDatePrefix,
-      isCutAction,
-    }) {
+    async function doPasteSelection({ selectedItems, isCutAction }) {
       const destinationFolder = explorer.value?.getCurrentFolder();
+      const commonDatePrefix = moment().format("YYYYMMDDHHmmss");
 
       let copyFailedList = [];
+      let overridingSomeElements = false;
 
       // copying
       selectedItems.forEach(async (item) => {
         try {
+          const nameAlreadyTaken = explorer.value?.elementAlreadyExistsInCurrentFolder(
+            item.name
+          );
+          if (nameAlreadyTaken) overridingSomeElements = true;
           const from = item.path;
           const to = `${destinationFolder}/${
-            commonDatePrefix ? commonDatePrefix + "_" : ""
+            nameAlreadyTaken ? commonDatePrefix + "_" : ""
           }${item.name}`;
 
           await Filesystem.copy({
@@ -398,6 +397,17 @@ export default {
           copyFailedList.push(item);
         }
       });
+
+      if (overridingSomeElements) {
+        simpleDialog.value.showMessage({
+          title: getTranslation(
+            "save_game_explorer.renaming_some_elements_for_pasting_title"
+          ),
+          message: getTranslation(
+            "save_game_explorer.renaming_some_elements_for_pasting_message"
+          ),
+        });
+      }
 
       setTimeout(() => {
         // removing if necessary
