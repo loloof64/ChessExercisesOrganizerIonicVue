@@ -141,9 +141,6 @@ export default {
     }
 
     function handleItemClick(item) {
-       /////////////////////////////////////////////////////////////
-      console.log(longOperationPending.value);
-      /////////////////////////////////////////////////////////////
       if (longOperationPending.value === true) return;
 
       try {
@@ -164,9 +161,6 @@ export default {
     }
 
     function handleSelectedChanged(item) {
-      /////////////////////////////////////////////////////////////
-      console.log(longOperationPending.value);
-      /////////////////////////////////////////////////////////////
       if (longOperationPending.value === true) return;
       if (props.blockingItemsSelection === true) return;
       const itemPath = `${currentFolder.value}/${item.name}`;

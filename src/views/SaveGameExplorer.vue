@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import {
   IonHeader,
   IonToolbar,
@@ -127,6 +127,8 @@ export default {
     const itemsToCopy = ref([]);
     const itemsToCut = ref([]);
     const blockingItemsSelection = ref(false);
+    const remainingElementsToDelete = ref(0);
+    const needToClearSelectionAsync = ref(false);
 
     function handleError(error) {
       console.error(error);
@@ -514,6 +516,9 @@ export default {
     function doDeleteSelection({ selectedItems }) {
       explorer.value?.notifyLongOperationPending();
 
+      needToClearSelectionAsync.value = true;
+      remainingElementsToDelete.value = selectedItems.length;
+
       setTimeout(() => {
         selectedItems.forEach(async (item) => {
           try {
@@ -537,9 +542,9 @@ export default {
           } catch (err) {
             console.error(err);
           }
-        });
 
-        clearSelectionAndRefreshContent();
+          remainingElementsToDelete.value -= 1;
+        });
       }, 1500);
     }
 
@@ -554,6 +559,17 @@ export default {
     const pasteButtonVisible = computed(() => {
       if (!itemsToCopy.value && !itemsToCut.value) return false;
       return itemsToCopy.value.length > 0 || itemsToCut.value.length > 0;
+    });
+
+    watch([remainingElementsToDelete, needToClearSelectionAsync], () => {
+      if (
+        remainingElementsToDelete.value === 0 &&
+        needToClearSelectionAsync.value === true
+      ) {
+        needToClearSelectionAsync.value = false;
+        clearSelectionAndRefreshContent();
+        showToast(getTranslation("save_game_explorer.deleted_elements"));
+      }
     });
 
     return {
