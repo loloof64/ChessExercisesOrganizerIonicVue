@@ -452,7 +452,7 @@ export default {
     }
 
     const renameButtonVisible = computed(() => {
-      return selectedItemsCount.value === 1;
+      return selectedItemsCount.value === 1 && !pasteButtonVisible.value;
     });
 
     const copyButtonVisible = computed(() => {
