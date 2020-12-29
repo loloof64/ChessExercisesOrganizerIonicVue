@@ -5,7 +5,11 @@
         <ion-title>{{ getTranslation("save_game_explorer.title") }}</ion-title>
         <div class="path">{{ currentPathString }}</div>
         <div class="toolbar">
-          <div class="bar_item" @click="addFolderRequest">
+          <div
+            class="bar_item"
+            @click="addFolderRequest"
+            v-if="newFolderButtonVisible"
+          >
             <ion-icon :icon="folder" />
           </div>
           <div
@@ -548,17 +552,32 @@ export default {
       }, 1500);
     }
 
+    const newFolderButtonVisible = computed(() => {
+      return remainingElementsToDelete.value <= 0;
+    });
+
     const renameButtonVisible = computed(() => {
-      return selectedItemsCount.value === 1 && !pasteButtonVisible.value;
+      return (
+        selectedItemsCount.value === 1 &&
+        !pasteButtonVisible.value &&
+        remainingElementsToDelete.value <= 0
+      );
     });
 
     const copyButtonVisible = computed(() => {
-      return selectedItemsCount.value > 0 && !pasteButtonVisible.value;
+      return (
+        selectedItemsCount.value > 0 &&
+        !pasteButtonVisible.value &&
+        remainingElementsToDelete.value <= 0
+      );
     });
 
     const pasteButtonVisible = computed(() => {
       if (!itemsToCopy.value && !itemsToCut.value) return false;
-      return itemsToCopy.value.length > 0 || itemsToCut.value.length > 0;
+      return (
+        itemsToCopy.value.length > 0 ||
+        (itemsToCut.value.length > 0 && remainingElementsToDelete.value <= 0)
+      );
     });
 
     watch([remainingElementsToDelete, needToClearSelectionAsync], () => {
@@ -593,6 +612,7 @@ export default {
       renameRequest,
       updateSelectedItemsCount,
       handleSelectedChanged,
+      newFolderButtonVisible,
       renameButtonVisible,
       copyButtonVisible,
       pasteButtonVisible,
