@@ -71,6 +71,8 @@
     "copy_in_same_folder_confirmation_title": "Copie dans le même dossier",
     "copy_in_same_folder_confirmation_message": "Copier les éléments dans le dossier d'origine ? Cela aura pour effet de préfixer les éléments dupliqués avec la date et l'heure courants.",
     "folder_already_exists_title": "Le dossier existe déjà",
-    "folder_already_exists_message": "Impossible de créer un nouveau dossier sous ce nom car il existe déjà."
+    "folder_already_exists_message": "Impossible de créer un nouveau dossier sous ce nom car il existe déjà.",
+    "file_already_exists_title": "Le fichier existe déjà",
+    "file_already_exists_message": "Impossible de créer une nouvelle partie sous ce nom car elle existe déjà."
   }
 }

@@ -70,6 +70,8 @@
     "copy_in_same_folder_confirmation_title": "Copiar a la misma carpeta",
     "copy_in_same_folder_confirmation_message": "¿Copiar elementos a la carpeta original? Esto tendrá el efecto de anteponer los elementos duplicados con la fecha y hora actuales.",
     "folder_already_exists_title": "La carpeta ya existe",
-    "folder_already_exists_message": "No se puede crear una nueva carpeta con este nombre porque ya existe."
+    "folder_already_exists_message": "No se puede crear una nueva carpeta con este nombre porque ya existe.",
+    "file_already_exists_title": "El archivo ya existe",
+    "file_already_exists_message": "No se puede crear un juego nuevo con este nombre porque ya existe."
   }
 }

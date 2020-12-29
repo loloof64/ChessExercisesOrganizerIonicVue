@@ -141,13 +141,19 @@ export default {
     }
 
     async function addFolder(folderName) {
-      const folderAlreadyExists = explorer.value?.elementAlreadyExistsInCurrentFolder(folderName);
+      const folderAlreadyExists = explorer.value?.elementAlreadyExistsInCurrentFolder(
+        folderName
+      );
       if (folderAlreadyExists) {
         simpleDialog.value.showMessage({
-          title: getTranslation('save_game_explorer.folder_already_exists_title'),
-          message: getTranslation('save_game_explorer.folder_already_exists_message')
-        })
-        return; 
+          title: getTranslation(
+            "save_game_explorer.folder_already_exists_title"
+          ),
+          message: getTranslation(
+            "save_game_explorer.folder_already_exists_message"
+          ),
+        });
+        return;
       }
 
       const currentFolderPath = explorer.value?.getCurrentFolder();
@@ -184,12 +190,29 @@ export default {
         const name = filename.value;
         if (name.length === 0) return;
 
+        const namePgn = `${filename.value.trim()}.pgn`;
+        const alreadyExists = explorer.value?.elementAlreadyExistsInCurrentFolder(
+          namePgn
+        );
+
+        if (alreadyExists) {
+          simpleDialog.value.showMessage({
+            title: getTranslation(
+              "save_game_explorer.file_already_exists_title"
+            ),
+            message: getTranslation(
+              "save_game_explorer.file_already_exists_message"
+            ),
+          });
+          return;
+        }
+
         const gamePgn = store.getters.activeGamePgn;
         const currentFolderPath = explorer.value?.getCurrentFolder();
 
         if (!currentFolderPath) throw "File explorer is not ready.";
 
-        const filePath = `${currentFolderPath}/${filename.value.trim()}.pgn`;
+        const filePath = `${currentFolderPath}/${namePgn}`;
         await Filesystem.writeFile({
           path: filePath,
           data: gamePgn,
