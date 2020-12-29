@@ -98,7 +98,10 @@ export default {
 }
 
 .item > .filename {
+  width: 70vw;
   font-size: 0.8em;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .selected {
