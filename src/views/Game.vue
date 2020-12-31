@@ -109,7 +109,16 @@ import SimpleDialog from "@/components/SimpleDialog";
 
 import { useStore } from "vuex";
 
-const { getSelectedGameGoal } = usePgnUtils();
+const boardComponent = ref(null);
+const boardReversed = ref(false);
+const historyComponent = ref(null);
+const historyNavigationBarVisible = ref(false);
+const engineCommunication = ref({});
+const engineReady = ref(false);
+const pendingPositionToSendToEngine = ref(null);
+const gameGoal = ref("");
+const shouldShowSolution = ref(false);
+const simpleDialog = ref(null);
 
 export default {
   name: "Game",
@@ -126,27 +135,13 @@ export default {
     SimpleDialog,
   },
   setup() {
+    const { getSelectedGameGoal } = usePgnUtils();
+
     const {
       getTranslation,
       initTranslationsUtils,
       locale,
     } = useTranslationUtils();
-    initTranslationsUtils();
-
-    const router = useRouter();
-
-    const store = useStore();
-
-    const boardComponent = ref(null);
-    const boardReversed = ref(false);
-    const historyComponent = ref(null);
-    const historyNavigationBarVisible = ref(false);
-    const engineCommunication = ref({});
-    const engineReady = ref(false);
-    const pendingPositionToSendToEngine = ref(null);
-    const gameGoal = ref("");
-    const shouldShowSolution = ref(false);
-    const simpleDialog = ref(null);
 
     const waitingSpinnerStyle = reactive({
       transform: "scale(3)",
@@ -157,6 +152,12 @@ export default {
     });
 
     let engineReadyTimer;
+
+    initTranslationsUtils();
+
+    const router = useRouter();
+
+    const store = useStore();
 
     try {
       const engineCommunicationLayer = new ChessEngineCommunication(

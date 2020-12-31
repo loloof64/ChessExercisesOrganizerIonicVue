@@ -381,102 +381,111 @@ export default {
     }
 
     async function doPasteSelection({ selectedItems, isCutAction }) {
-      explorer.value?.notifyLongOperationPending();
+      if (isCutAction) {
+        explorer.value?.notifyLongOperationPending();
 
-      const destinationFolder = explorer.value?.getCurrentFolder();
-      const commonDatePrefix = moment().format("YYYYMMDDHHmmss");
-
-      let copyFailedList = [];
-      let overridingSomeElements = false;
-
-      // copying
-      selectedItems.forEach(async (item) => {
-        try {
-          const nameAlreadyTaken = explorer.value?.elementAlreadyExistsInCurrentFolder(
-            item.name
-          );
-          if (nameAlreadyTaken) overridingSomeElements = true;
-          const from = item.path;
-          const to = `${destinationFolder}/${
-            nameAlreadyTaken ? commonDatePrefix + "_" : ""
-          }${item.name}`;
-
-          const tryingToMoveParentFolderIntoChild =
-            item.type === "folder" && to.startsWith(from);
-          if (tryingToMoveParentFolderIntoChild) {
-            showToast(
-              getTranslation(
-                "save_game_explorer.moving_folder_from_parent_to_child_error"
-              ),
-              2000
-            );
-            copyFailedList.push(item);
-          } else {
-            await Filesystem.copy({
-              from,
-              to,
-              directory: FilesystemDirectory.Documents,
-            });
-
-            explorer.value?.refreshContent();
-          }
-        } catch (err) {
-          console.error(err);
-          copyFailedList.push(item);
-        }
-      });
-
-      if (overridingSomeElements) {
-        showToast(
-          getTranslation(
-            "save_game_explorer.renaming_some_elements_while_pasting"
-          ),
-          4000
-        );
+        needToClearSelectionAsync.value = true;
+        remainingElementsToDelete.value = selectedItems.length;
       }
 
       setTimeout(() => {
-        // removing if necessary
-        if (isCutAction) {
-          selectedItems.forEach(async (item) => {
-            const itemIndexInFailuresList = copyFailedList.findIndex(
-              (elt) => JSON.stringify(elt) === JSON.stringify(item)
+        const destinationFolder = explorer.value?.getCurrentFolder();
+        const commonDatePrefix = moment().format("YYYYMMDDHHmmss");
+
+        let copyFailedList = [];
+        let overridingSomeElements = false;
+
+        // copying
+        selectedItems.forEach(async (item) => {
+          try {
+            const nameAlreadyTaken = explorer.value?.elementAlreadyExistsInCurrentFolder(
+              item.name
             );
-            if (itemIndexInFailuresList >= 0) {
-              console.log("Skipping delete of " + item.path);
-              return;
-            }
-            try {
-              const elementToRemove = `${copyPathString.value}/${item.name}`;
-              const isFile = item.type === "file";
+            if (nameAlreadyTaken) overridingSomeElements = true;
+            const from = item.path;
+            const to = `${destinationFolder}/${
+              nameAlreadyTaken ? commonDatePrefix + "_" : ""
+            }${item.name}`;
 
-              if (isFile) {
-                await Filesystem.deleteFile({
-                  path: elementToRemove,
-                  directory: FilesystemDirectory.Documents,
-                });
-              } else {
-                await Filesystem.rmdir({
-                  path: elementToRemove,
-                  directory: FilesystemDirectory.Documents,
-                  recursive: true,
-                });
-              }
-            } catch (err) {
-              console.error(err);
+            const tryingToMoveParentFolderIntoChild =
+              item.type === "folder" && to.startsWith(from);
+            if (tryingToMoveParentFolderIntoChild) {
+              showToast(
+                getTranslation(
+                  "save_game_explorer.moving_folder_from_parent_to_child_error"
+                ),
+                2000
+              );
+              copyFailedList.push(item);
+            } else {
+              await Filesystem.copy({
+                from,
+                to,
+                directory: FilesystemDirectory.Documents,
+              });
+
+              explorer.value?.refreshContent();
             }
-          });
+          } catch (err) {
+            console.error(err);
+            copyFailedList.push(item);
+          }
+        });
+
+        if (overridingSomeElements) {
+          showToast(
+            getTranslation(
+              "save_game_explorer.renaming_some_elements_while_pasting"
+            ),
+            4000
+          );
         }
-      }, 600);
 
-      if (isCutAction) {
-        setTimeout(clearSelectionAndRefreshContent, 900);
-      } else {
         setTimeout(() => {
-          explorer.value?.refreshContent();
-          explorer.value?.clearLongOperationPendingStatus();
-        }, 900);
-      }
+          // removing if necessary
+          if (isCutAction) {
+            selectedItems.forEach(async (item) => {
+              const itemIndexInFailuresList = copyFailedList.findIndex(
+                (elt) => JSON.stringify(elt) === JSON.stringify(item)
+              );
+              if (itemIndexInFailuresList >= 0) {
+                console.log("Skipping delete of " + item.path);
+                return;
+              }
+              try {
+                const elementToRemove = `${copyPathString.value}/${item.name}`;
+                const isFile = item.type === "file";
+
+                if (isFile) {
+                  await Filesystem.deleteFile({
+                    path: elementToRemove,
+                    directory: FilesystemDirectory.Documents,
+                  });
+                } else {
+                  await Filesystem.rmdir({
+                    path: elementToRemove,
+                    directory: FilesystemDirectory.Documents,
+                    recursive: true,
+                  });
+                }
+              } catch (err) {
+                console.error(err);
+              }
+
+              remainingElementsToDelete.value -= 1;
+            });
+          }
+        }, 600);
+
+        if (isCutAction) {
+          setTimeout(clearSelectionAndRefreshContent, 900);
+        } else {
+          setTimeout(() => {
+            explorer.value?.refreshContent();
+            explorer.value?.clearLongOperationPendingStatus();
+          }, 900);
+        }
+      }, 1500);
     }
 
     function clearSelectionAndRefreshContent() {
