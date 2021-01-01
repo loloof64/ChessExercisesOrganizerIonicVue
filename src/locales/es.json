@@ -74,6 +74,7 @@
     "moving_folder_from_parent_to_child_error": "No se puede copiar una carpeta a una de sus carpetas secundarias: operación ignorada para los elementos afectados.",
     "delete_selection_confirmation_title": "¿Eliminar selección?",
     "delete_selection_confirmation_message": "Elimina los siguientes elementos de la carpeta {originFolder} :",
-    "deleted_elements": "Elementos eliminados."
+    "deleted_elements": "Elementos eliminados.",
+    "copied_elements": "Elementos copiados."
   }
 }

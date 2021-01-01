@@ -74,6 +74,7 @@
     "moving_folder_from_parent_to_child_error": "Cannot copy a folder into one of its children : operation aborded for concerned elements.",
     "delete_selection_confirmation_title": "Delete selection ?",
     "delete_selection_confirmation_message": "Delete following elements in folder {originFolder} :",
-    "deleted_elements": "Deleted elements."
+    "deleted_elements": "Deleted elements.",
+    "copied_elements": "Copied elements."
   }
 }

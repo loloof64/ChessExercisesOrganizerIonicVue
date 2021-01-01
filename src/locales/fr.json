@@ -75,6 +75,7 @@
     "moving_folder_from_parent_to_child_error": "Impossible de copier un dossier dans un de ses dossiers enfants : opération ignorée pour les éléments concernés.",
     "delete_selection_confirmation_title": "Supprimer la selection ?",
     "delete_selection_confirmation_message": "Supprimer les éléments suivants du dossier {originFolder} :",
-    "deleted_elements": "Eléments supprimés."
+    "deleted_elements": "Eléments supprimés.",
+    "copied_elements": "Eléments copiés."
   }
 }

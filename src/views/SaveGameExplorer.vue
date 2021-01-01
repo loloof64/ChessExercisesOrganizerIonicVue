@@ -22,9 +22,6 @@
           <div class="bar_item" @click="copySelection" v-if="copyButtonVisible">
             <ion-icon :icon="copy" />
           </div>
-          <div class="bar_item" @click="cutSelection" v-if="copyButtonVisible">
-            <ion-icon :icon="cut" />
-          </div>
           <div
             class="bar_item"
             @click="pasteSelection"
@@ -132,7 +129,9 @@ export default {
     const itemsToCut = ref([]);
     const blockingItemsSelection = ref(false);
     const remainingElementsToDelete = ref(0);
-    const needToClearSelectionAsync = ref(false);
+    const remainingElementsToCopy = ref(0);
+    const needToClearDeleteSelectionAsync = ref(false);
+    const needToClearCopySelectionAsync = ref(false);
 
     function handleError(error) {
       console.error(error);
@@ -333,34 +332,15 @@ export default {
       showToast(getTranslation("save_game_explorer.items_copied_in_clipboard"));
     }
 
-    function cutSelection() {
-      copyPathString.value = explorer.value?.getCurrentFolder();
-      itemsToCut.value = explorer.value?.getSelectedItems() || [];
-      explorer.value?.clearSelectedItems();
-      blockingItemsSelection.value = true;
-      showToast(getTranslation("save_game_explorer.items_cut_in_clipboard"));
-    }
-
     function pasteSelection() {
-      const isCutAction = itemsToCut.value.length > 0;
       const isCopyAction = itemsToCopy.value.length > 0;
-      if (!isCutAction && !isCopyAction) return;
+      if (!isCopyAction) return;
 
-      const selectedItems = isCutAction ? itemsToCut.value : itemsToCopy.value;
+      const selectedItems = itemsToCopy.value;
       const destinationFolder = explorer.value?.getCurrentFolder();
       const sourcePath = selectedItems[0].path;
       const lastSlashIndexInSourcePath = sourcePath.lastIndexOf("/");
       const sourceFolder = sourcePath.slice(0, lastSlashIndexInSourcePath);
-
-      if (isCutAction && destinationFolder === sourceFolder) {
-        console.error("Forbidden cut/paste operation");
-
-        clearSelectionAndRefreshContent();
-        showToast(
-          getTranslation("save_game_explorer.cannot_cut_into_source_folder")
-        );
-        return;
-      }
 
       if (isCopyAction && destinationFolder === sourceFolder) {
         simpleDialog.value.showConfirm({
@@ -373,20 +353,17 @@ export default {
           onConfirm: () =>
             doPasteSelection({
               selectedItems,
-              isCutAction: false,
             }),
         });
         return;
-      } else doPasteSelection({ selectedItems, isCutAction });
+      } else doPasteSelection({ selectedItems });
     }
 
-    async function doPasteSelection({ selectedItems, isCutAction }) {
-      if (isCutAction) {
-        explorer.value?.notifyLongOperationPending();
+    async function doPasteSelection({ selectedItems }) {
+      explorer.value?.notifyLongOperationPending();
 
-        needToClearSelectionAsync.value = true;
-        remainingElementsToDelete.value = selectedItems.length;
-      }
+      needToClearCopySelectionAsync.value = true;
+      remainingElementsToCopy.value = selectedItems.length;
 
       setTimeout(() => {
         const destinationFolder = explorer.value?.getCurrentFolder();
@@ -430,6 +407,8 @@ export default {
             console.error(err);
             copyFailedList.push(item);
           }
+
+          remainingElementsToCopy.value -= 1;
         });
 
         if (overridingSomeElements) {
@@ -442,49 +421,9 @@ export default {
         }
 
         setTimeout(() => {
-          // removing if necessary
-          if (isCutAction) {
-            selectedItems.forEach(async (item) => {
-              const itemIndexInFailuresList = copyFailedList.findIndex(
-                (elt) => JSON.stringify(elt) === JSON.stringify(item)
-              );
-              if (itemIndexInFailuresList >= 0) {
-                console.log("Skipping delete of " + item.path);
-                return;
-              }
-              try {
-                const elementToRemove = `${copyPathString.value}/${item.name}`;
-                const isFile = item.type === "file";
-
-                if (isFile) {
-                  await Filesystem.deleteFile({
-                    path: elementToRemove,
-                    directory: FilesystemDirectory.Documents,
-                  });
-                } else {
-                  await Filesystem.rmdir({
-                    path: elementToRemove,
-                    directory: FilesystemDirectory.Documents,
-                    recursive: true,
-                  });
-                }
-              } catch (err) {
-                console.error(err);
-              }
-
-              remainingElementsToDelete.value -= 1;
-            });
-          }
-        }, 600);
-
-        if (isCutAction) {
-          setTimeout(clearSelectionAndRefreshContent, 900);
-        } else {
-          setTimeout(() => {
-            explorer.value?.refreshContent();
-            explorer.value?.clearLongOperationPendingStatus();
-          }, 900);
-        }
+          explorer.value?.refreshContent();
+          explorer.value?.clearLongOperationPendingStatus();
+        }, 900);
       }, 1500);
     }
 
@@ -529,7 +468,7 @@ export default {
     function doDeleteSelection({ selectedItems }) {
       explorer.value?.notifyLongOperationPending();
 
-      needToClearSelectionAsync.value = true;
+      needToClearDeleteSelectionAsync.value = true;
       remainingElementsToDelete.value = selectedItems.length;
 
       setTimeout(() => {
@@ -562,14 +501,18 @@ export default {
     }
 
     const newFolderButtonVisible = computed(() => {
-      return remainingElementsToDelete.value <= 0;
+      return (
+        remainingElementsToDelete.value <= 0 &&
+        remainingElementsToCopy.value <= 0
+      );
     });
 
     const renameButtonVisible = computed(() => {
       return (
         selectedItemsCount.value === 1 &&
         !pasteButtonVisible.value &&
-        remainingElementsToDelete.value <= 0
+        remainingElementsToDelete.value <= 0 &&
+        remainingElementsToCopy.value <= 0
       );
     });
 
@@ -577,7 +520,8 @@ export default {
       return (
         selectedItemsCount.value > 0 &&
         !pasteButtonVisible.value &&
-        remainingElementsToDelete.value <= 0
+        remainingElementsToDelete.value <= 0 &&
+        remainingElementsToCopy.value <= 0
       );
     });
 
@@ -585,18 +529,31 @@ export default {
       if (!itemsToCopy.value && !itemsToCut.value) return false;
       return (
         itemsToCopy.value.length > 0 ||
-        (itemsToCut.value.length > 0 && remainingElementsToDelete.value <= 0)
+        (itemsToCut.value.length > 0 &&
+          remainingElementsToDelete.value <= 0 &&
+          remainingElementsToCopy.value <= 0)
       );
     });
 
-    watch([remainingElementsToDelete, needToClearSelectionAsync], () => {
+    watch([remainingElementsToDelete, needToClearDeleteSelectionAsync], () => {
       if (
         remainingElementsToDelete.value === 0 &&
-        needToClearSelectionAsync.value === true
+        needToClearDeleteSelectionAsync.value === true
       ) {
-        needToClearSelectionAsync.value = false;
+        needToClearDeleteSelectionAsync.value = false;
         clearSelectionAndRefreshContent();
         showToast(getTranslation("save_game_explorer.deleted_elements"));
+      }
+    });
+
+    watch([remainingElementsToCopy, needToClearCopySelectionAsync], () => {
+      if (
+        remainingElementsToCopy.value === 0 &&
+        needToClearCopySelectionAsync.value === true
+      ) {
+        needToClearCopySelectionAsync.value = false;
+        clearSelectionAndRefreshContent();
+        showToast(getTranslation("save_game_explorer.copied_elements"));
       }
     });
 
@@ -627,7 +584,6 @@ export default {
       pasteButtonVisible,
       copySelection,
       pasteSelection,
-      cutSelection,
       cancelSelection,
       deleteSelection,
       blockingItemsSelection,
