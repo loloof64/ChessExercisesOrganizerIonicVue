@@ -6,9 +6,9 @@
         <div class="path">{{ currentPathString }}</div>
         <div class="toolbar">
           <ion-spinner
-        color="tertiary"
-        v-if="longOperationPending"
-      ></ion-spinner>
+            color="tertiary"
+            v-if="longOperationPending"
+          ></ion-spinner>
           <div
             class="bar_item"
             @click="addFolderRequest"
@@ -80,6 +80,7 @@
 <script>
 import { ref, computed, watch } from "vue";
 import {
+  IonSpinner,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -130,10 +131,9 @@ export default {
     const lastSelectedItem = ref(null);
     const selectedItemsCount = ref(0);
     const itemsToCopy = ref([]);
-    const itemsToCut = ref([]);
     const blockingItemsSelection = ref(false);
-    const remainingElementsToDelete = ref(0);
-    const remainingElementsToCopy = ref(0);
+    const remainingLongOperationElementsToDelete = ref(0);
+    const remainingLongOperationElementsToCopy = ref(0);
     const needToClearDeleteSelectionAsync = ref(false);
     const needToClearCopySelectionAsync = ref(false);
     const longOperationPending = ref(false);
@@ -185,7 +185,7 @@ export default {
           recursive: true,
         });
 
-        explorer.value?.refreshContent();
+        refreshContent();
       } catch (err) {
         console.error(err);
         simpleDialog.value.showMessage({
@@ -312,7 +312,7 @@ export default {
         });
         explorer.value?.clearSelectedItems();
         updateSelectedItemsCount();
-        explorer.value?.refreshContent();
+        refreshContent();
       } catch (err) {
         console.error(err);
         simpleDialog.value.showMessage({
@@ -369,7 +369,7 @@ export default {
       longOperationPending.value = true;
 
       needToClearCopySelectionAsync.value = true;
-      remainingElementsToCopy.value = selectedItems.length;
+      remainingLongOperationElementsToCopy.value = selectedItems.length;
 
       setTimeout(() => {
         const destinationFolder = explorer.value?.getCurrentFolder();
@@ -407,14 +407,14 @@ export default {
                 directory: FilesystemDirectory.Documents,
               });
 
-              explorer.value?.refreshContent();
+              refreshContent();
             }
           } catch (err) {
             console.error(err);
             copyFailedList.push(item);
           }
 
-          remainingElementsToCopy.value -= 1;
+          remainingLongOperationElementsToCopy.value -= 1;
         });
 
         if (overridingSomeElements) {
@@ -426,26 +426,33 @@ export default {
           );
         }
 
-        setTimeout(() => {
-          explorer.value?.refreshContent();
-          explorer.value?.clearLongOperationPendingStatus();
-        }, 900);
       }, 1500);
     }
 
-    function clearSelectionAndRefreshContent() {
-      copyPathString.value = null;
+    function clearSelection() {
       itemsToCopy.value = [];
+      copyPathString.value = null;
       explorer.value?.clearSelectedItems();
-      blockingItemsSelection.value = false;
-      explorer.value?.refreshContent();
       updateSelectedItemsCount();
+    }
+
+    function refreshContent() {
+      explorer.value?.refreshContent();
+    }
+
+    function cancelLongOperationBlockingStatus() {
       explorer.value?.clearLongOperationPendingStatus();
       longOperationPending.value = false;
     }
 
+    function cancelItemsInteractionBlocking() {
+      blockingItemsSelection.value = false;
+    }
+
     function cancelSelection() {
-      clearSelectionAndRefreshContent();
+      clearSelection();
+      cancelItemsInteractionBlocking();
+      refreshContent();
       showToast(getTranslation("save_game_explorer.copy_cut_cancelled"), 2000);
     }
 
@@ -476,7 +483,7 @@ export default {
       longOperationPending.value = true;
 
       needToClearDeleteSelectionAsync.value = true;
-      remainingElementsToDelete.value = selectedItems.length;
+      remainingLongOperationElementsToDelete.value = selectedItems.length;
 
       setTimeout(() => {
         selectedItems.forEach(async (item) => {
@@ -497,73 +504,76 @@ export default {
               });
             }
 
-            explorer.value?.refreshContent();
+            refreshContent();
           } catch (err) {
             console.error(err);
           }
 
-          remainingElementsToDelete.value -= 1;
+          remainingLongOperationElementsToDelete.value -= 1;
         });
       }, 1500);
     }
 
     const newFolderButtonVisible = computed(() => {
-      return (
-        remainingElementsToDelete.value <= 0 &&
-        remainingElementsToCopy.value <= 0
-      );
+      if (remainingLongOperationElementsToDelete.value) return false;
+      if (remainingLongOperationElementsToCopy.value) return false;
+      return true;
     });
 
     const renameButtonVisible = computed(() => {
-      return (
-        selectedItemsCount.value === 1 &&
-        !pasteButtonVisible.value &&
-        remainingElementsToDelete.value <= 0 &&
-        remainingElementsToCopy.value <= 0
-      );
+      if (remainingLongOperationElementsToDelete.value) return false;
+      if (remainingLongOperationElementsToCopy.value) return false;
+      return selectedItemsCount.value === 1;
     });
 
     const copyButtonVisible = computed(() => {
-      return (
-        selectedItemsCount.value > 0 &&
-        !pasteButtonVisible.value &&
-        remainingElementsToDelete.value <= 0 &&
-        remainingElementsToCopy.value <= 0
-      );
+      if (remainingLongOperationElementsToDelete.value) return false;
+      if (remainingLongOperationElementsToCopy.value) return false;
+      const itemsToCopyLength = itemsToCopy.value?.length || 0;
+      return selectedItemsCount.value > 0 && itemsToCopyLength === 0;
     });
 
     const pasteButtonVisible = computed(() => {
+      if (remainingLongOperationElementsToDelete.value) return false;
+      if (remainingLongOperationElementsToCopy.value) return false;
       if (!itemsToCopy.value) return false;
-      if (itemsToCopy)
-      return (
-        itemsToCopy.value.length > 0 ||
-        (itemsToCut.value.length > 0 &&
-          remainingElementsToDelete.value <= 0 &&
-          remainingElementsToCopy.value <= 0)
-      );
+      return itemsToCopy.value.length > 0;
     });
 
-    watch([remainingElementsToDelete, needToClearDeleteSelectionAsync], () => {
-      if (
-        remainingElementsToDelete.value === 0 &&
-        needToClearDeleteSelectionAsync.value === true
-      ) {
-        needToClearDeleteSelectionAsync.value = false;
-        clearSelectionAndRefreshContent();
-        showToast(getTranslation("save_game_explorer.deleted_elements"));
-      }
-    });
+    watch(
+      [remainingLongOperationElementsToDelete, needToClearDeleteSelectionAsync],
+      () => {
+        if (
+          remainingLongOperationElementsToDelete.value === 0 &&
+          needToClearDeleteSelectionAsync.value === true
+        ) {
+          needToClearDeleteSelectionAsync.value = false;
+          clearSelection();
+          refreshContent();
+          cancelLongOperationBlockingStatus();
+          cancelItemsInteractionBlocking();
 
-    watch([remainingElementsToCopy, needToClearCopySelectionAsync], () => {
-      if (
-        remainingElementsToCopy.value === 0 &&
-        needToClearCopySelectionAsync.value === true
-      ) {
-        needToClearCopySelectionAsync.value = false;
-        clearSelectionAndRefreshContent();
-        showToast(getTranslation("save_game_explorer.copied_elements"));
+          showToast(getTranslation("save_game_explorer.deleted_elements"));
+        }
       }
-    });
+    );
+
+    watch(
+      [remainingLongOperationElementsToCopy, needToClearCopySelectionAsync],
+      () => {
+        if (
+          remainingLongOperationElementsToCopy.value === 0 &&
+          needToClearCopySelectionAsync.value === true
+        ) {
+          needToClearCopySelectionAsync.value = false;
+
+          refreshContent();
+          cancelLongOperationBlockingStatus();
+
+          showToast(getTranslation("save_game_explorer.copied_elements"));
+        }
+      }
+    );
 
     return {
       simpleDialog,
@@ -599,6 +609,7 @@ export default {
     };
   },
   components: {
+    IonSpinner,
     IonHeader,
     IonFooter,
     IonToolbar,
