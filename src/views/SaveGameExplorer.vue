@@ -5,6 +5,10 @@
         <ion-title>{{ getTranslation("save_game_explorer.title") }}</ion-title>
         <div class="path">{{ currentPathString }}</div>
         <div class="toolbar">
+          <ion-spinner
+        color="tertiary"
+        v-if="longOperationPending"
+      ></ion-spinner>
           <div
             class="bar_item"
             @click="addFolderRequest"
@@ -132,6 +136,7 @@ export default {
     const remainingElementsToCopy = ref(0);
     const needToClearDeleteSelectionAsync = ref(false);
     const needToClearCopySelectionAsync = ref(false);
+    const longOperationPending = ref(false);
 
     function handleError(error) {
       console.error(error);
@@ -361,6 +366,7 @@ export default {
 
     async function doPasteSelection({ selectedItems }) {
       explorer.value?.notifyLongOperationPending();
+      longOperationPending.value = true;
 
       needToClearCopySelectionAsync.value = true;
       remainingElementsToCopy.value = selectedItems.length;
@@ -430,12 +436,12 @@ export default {
     function clearSelectionAndRefreshContent() {
       copyPathString.value = null;
       itemsToCopy.value = [];
-      itemsToCut.value = [];
       explorer.value?.clearSelectedItems();
       blockingItemsSelection.value = false;
       explorer.value?.refreshContent();
       updateSelectedItemsCount();
       explorer.value?.clearLongOperationPendingStatus();
+      longOperationPending.value = false;
     }
 
     function cancelSelection() {
@@ -467,6 +473,7 @@ export default {
 
     function doDeleteSelection({ selectedItems }) {
       explorer.value?.notifyLongOperationPending();
+      longOperationPending.value = true;
 
       needToClearDeleteSelectionAsync.value = true;
       remainingElementsToDelete.value = selectedItems.length;
@@ -526,7 +533,8 @@ export default {
     });
 
     const pasteButtonVisible = computed(() => {
-      if (!itemsToCopy.value && !itemsToCut.value) return false;
+      if (!itemsToCopy.value) return false;
+      if (itemsToCopy)
       return (
         itemsToCopy.value.length > 0 ||
         (itemsToCut.value.length > 0 &&
@@ -587,6 +595,7 @@ export default {
       cancelSelection,
       deleteSelection,
       blockingItemsSelection,
+      longOperationPending,
     };
   },
   components: {
