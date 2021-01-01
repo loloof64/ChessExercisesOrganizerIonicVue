@@ -75,6 +75,8 @@
     "delete_selection_confirmation_title": "¿Eliminar selección?",
     "delete_selection_confirmation_message": "Elimina los siguientes elementos de la carpeta {originFolder} :",
     "deleted_elements": "Elementos eliminados.",
-    "copied_elements": "Elementos copiados."
+    "copied_elements": "Elementos copiados.",
+    "confirm_exit_title": "¿Salir del explorador?",
+    "confirm_exit_message": "¿Está seguro de que desea salir de Explorer y abandonar la operación de larga duración?"
   }
 }

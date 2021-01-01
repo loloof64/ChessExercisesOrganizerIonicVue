@@ -66,7 +66,7 @@
         Nom: <input type="text" v-model="filename" />.pgn
       </div>
       <div class="buttons_zone">
-        <div class="button cancel" @click="cancel">
+        <div class="button cancel" @click="cancelExplorer">
           {{ getTranslation("general.cancel_button") }}
         </div>
         <div class="button ok" @click="save">
@@ -146,7 +146,20 @@ export default {
       });
     }
 
-    function cancel() {
+    function cancelExplorer() {
+      const longOperationRunning = longOperationPending.value;
+
+      if (longOperationRunning) {
+        simpleDialog.value.showConfirm({
+          title: getTranslation("save_game_explorer.confirm_exit_title"),
+          message: getTranslation("save_game_explorer.confirm_exit_message"),
+          onConfirm: doCancelExplorer,
+        })
+      }
+      else doCancelExplorer()
+    }
+
+    function doCancelExplorer() {
       router.back();
     }
 
@@ -580,7 +593,7 @@ export default {
       handleError,
       handleNewPath,
       getTranslation,
-      cancel,
+      cancelExplorer,
       save,
       filename,
       explorer,

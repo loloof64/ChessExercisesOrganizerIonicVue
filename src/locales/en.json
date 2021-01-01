@@ -75,6 +75,8 @@
     "delete_selection_confirmation_title": "Delete selection ?",
     "delete_selection_confirmation_message": "Delete following elements in folder {originFolder} :",
     "deleted_elements": "Deleted elements.",
-    "copied_elements": "Copied elements."
+    "copied_elements": "Copied elements.",
+    "confirm_exit_title": "Exit explorer ?",
+    "confirm_exit_message": "Do you really want to quit explorer and give up current long operation ?"
   }
 }

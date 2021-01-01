@@ -76,6 +76,8 @@
     "delete_selection_confirmation_title": "Supprimer la selection ?",
     "delete_selection_confirmation_message": "Supprimer les éléments suivants du dossier {originFolder} :",
     "deleted_elements": "Eléments supprimés.",
-    "copied_elements": "Eléments copiés."
+    "copied_elements": "Eléments copiés.",
+    "confirm_exit_title": "Quitter l'explorateur ?",
+    "confirm_exit_message": "Souhaitez-vous vraiment quitter l'explorateur et abandonner la longue opération en cours ?"
   }
 }
