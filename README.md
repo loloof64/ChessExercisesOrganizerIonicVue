@@ -14,13 +14,15 @@ Manage your chess exercises and train yourself with them against the device.
 
 ### Setup
 
-1. Install NodeJs and Android Studio
-2. npm install -g @ionic/cli@latest native-run cordova-res
-3. npm i # installing dependencies
-4. cordova-res --copy # generating icon and splash screen
+1. Install NodeJs and Android Studio (and eventually yarn)
+2. `npm install -g @ionic/cli@latest native-run cordova-res` (or `yarn global add @ionic/cli@latest native-run cordova-res`)
+3. `npm i` # installing dependencies (or `yarn`)
+4. `cordova-res --copy` # generating icon and splash screen
 
 ### Build
 
-1. ionic build
-2. npx cap copy
-3. npx cap open android # Also adapt capacitor.config.json, and change the path to Android Studio
+1. `ionic build`
+2. `npx cap copy`
+3. `npx cap open android` # Also adapt capacitor.config.json, and change the path to Android Studio
+
+You may also need to run `ionic capacitor update android`.
