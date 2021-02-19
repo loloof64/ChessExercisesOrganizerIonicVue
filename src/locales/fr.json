@@ -5,7 +5,8 @@
     "save_button": "Sauvegarder"
   },
   "main_page": {
-    "samples_tab": "Exemples"
+    "samples_tab": "Exemples",
+    "download_tab": "Télécharger"
   },
   "game": {
     "white_win": "Les Blancs ont gagné.",
@@ -35,6 +36,9 @@
     "2bishops_king_vs_king": "2Fous+Roi / Roi",
     "pawn_endgames": "Finales de pions",
     "exercise_loading_error_title": "Erreur de chargement de l'exercice"
+  },
+  "download_tab": {
+    "title": "Télécharger (Google Drive)"
   },
   "game_selector": {
     "whites": "Blancs",

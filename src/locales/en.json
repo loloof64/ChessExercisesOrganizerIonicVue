@@ -5,7 +5,8 @@
     "save_button": "Save"
   },
   "main_page": {
-    "samples_tab": "Samples"
+    "samples_tab": "Samples",
+    "download_tab": "Download"
   },
   "game": {
     "white_win": "White has won.",
@@ -35,6 +36,9 @@
     "2bishops_king_vs_king": "2Bishops+King / King",
     "pawn_endgames": "Pawn endgames",
     "exercise_loading_error_title": "Failed to load exercise"
+  },
+  "download_tab": {
+    "title": "Download (Google Drive)"
   },
   "game_selector": {
     "whites": "Whites",

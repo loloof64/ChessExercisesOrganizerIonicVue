@@ -8,8 +8,8 @@
         </ion-tab-button>
 
         <ion-tab-button tab="tab2" href="/tabs/tab2">
-          <ion-icon :icon="ellipse" />
-          <ion-label>Tab 2</ion-label>
+          <ion-icon :icon="cloudDownloadOutline" />
+          <ion-label>{{ getTranslation("main_page.download_tab")}}</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="tab3" href="/tabs/tab3">
@@ -30,7 +30,7 @@ import {
   IonIcon,
   IonPage,
 } from "@ionic/vue";
-import { ellipse, square, library } from "ionicons/icons";
+import { ellipse, square, library, cloudDownloadOutline } from "ionicons/icons";
 import useTranslationUtils from "@/hooks/TranslationUtils";
 
 export default {
@@ -44,6 +44,7 @@ export default {
       ellipse,
       square,
       library,
+      cloudDownloadOutline,
       getTranslation,
     };
   },

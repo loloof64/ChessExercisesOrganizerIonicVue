@@ -5,7 +5,8 @@
     "save_button": "Salvar"
   },
   "main_page": {
-    "samples_tab": "Ejemplos"
+    "samples_tab": "Ejemplos",
+    "download_tab": "Descargar"
   },
   "game": {
     "white_win": "Los blancos ganaron.",
@@ -34,6 +35,9 @@
     "rook_king_vs_king": "2Alfiles+Rey / Rey",
     "pawn_endgames": "Finales de peones",
     "exercise_loading_error_title": "Error al cargar el ejercicio"
+  },
+  "download_tab": {
+    "title": "Descargar (Google Drive)"
   },
   "game_selector": {
     "whites": "Blancos",
