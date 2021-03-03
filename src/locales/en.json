@@ -6,7 +6,7 @@
   },
   "main_page": {
     "samples_tab": "Samples",
-    "download_tab": "Download"
+    "cloud_tab": "Dropbox"
   },
   "game": {
     "white_win": "White has won.",
@@ -38,7 +38,8 @@
     "exercise_loading_error_title": "Failed to load exercise"
   },
   "download_tab": {
-    "title": "Download (Google Drive)"
+    "title": "Dropbox",
+    "download_button": "Download"
   },
   "game_selector": {
     "whites": "Whites",

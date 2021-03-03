@@ -6,7 +6,7 @@
   },
   "main_page": {
     "samples_tab": "Exemples",
-    "download_tab": "Télécharger"
+    "cloud_tab": "Dropbox"
   },
   "game": {
     "white_win": "Les Blancs ont gagné.",
@@ -38,7 +38,8 @@
     "exercise_loading_error_title": "Erreur de chargement de l'exercice"
   },
   "download_tab": {
-    "title": "Télécharger (Google Drive)"
+    "title": "Dropbox",
+    "download_button": "Télécharger"
   },
   "game_selector": {
     "whites": "Blancs",

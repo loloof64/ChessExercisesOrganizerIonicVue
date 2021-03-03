@@ -2,7 +2,18 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ getTranslation('download_tab.title')}}</ion-title>
+        <ion-title>{{ getTranslation("download_tab.title") }}</ion-title>
+        <VueDropboxPicker
+          :api-key="dropboxApiKey"
+          link-type="direct"
+          :multiselect="true"
+          :extensions="['.pgn']"
+          :folderselect="false"
+          button-type="chooser"
+          @picked="onPicked"
+        >
+          <span class="dropbox_button">{{ getTranslation("download_tab.download_button") }}</span>
+        </VueDropboxPicker>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -18,7 +29,10 @@
 </template>
 
 <script>
+import dropboxKey from "@/services/dropboxkey.json";
+import { ref } from "vue";
 import useTranslationUtils from "@/hooks/TranslationUtils";
+import VueDropboxPicker from "@/components/VueDropboxPicker";
 import {
   IonPage,
   IonHeader,
@@ -37,15 +51,34 @@ export default {
     IonTitle,
     IonContent,
     IonPage,
+    VueDropboxPicker,
   },
   setup() {
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
 
+    const dropboxApiKey = ref(dropboxKey.id);
+
+    function onPicked(data) {
+      console.log(data);
+    }
+
     return {
       getTranslation,
-    }
-    
-  }
+      dropboxApiKey,
+      onPicked, 
+    };
+  },
 };
 </script>
+
+<style scoped>
+.dropbox_button {
+  margin: 5px;
+  padding: 5px 20px;
+  text-decoration: none;
+  background-color: green;
+  color: whitesmoke;
+  border-radius: 10px;
+}
+</style>
