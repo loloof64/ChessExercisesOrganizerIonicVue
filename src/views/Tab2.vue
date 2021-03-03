@@ -60,7 +60,7 @@ export default {
     const dropboxApiKey = ref(dropboxKey.id);
 
     function onPicked(data) {
-      console.log(data);
+      console.log(data.map(it => it.link));
     }
 
     return {
