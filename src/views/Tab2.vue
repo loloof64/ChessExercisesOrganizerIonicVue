@@ -3,17 +3,12 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ getTranslation("download_tab.title") }}</ion-title>
-        <VueDropboxPicker
-          :api-key="dropboxApiKey"
-          link-type="direct"
-          :multiselect="true"
-          :extensions="['.pgn']"
-          :folderselect="false"
-          button-type="chooser"
-          @picked="onPicked"
-        >
-          <span class="dropbox_button">{{ getTranslation("download_tab.download_button") }}</span>
-        </VueDropboxPicker>
+        <ion-button @click="connectToDropbox">
+          {{ getTranslation("download_tab.connect_button") }}
+        </ion-button>
+        <a v-if="isConnected" :href="authUrl" class="actionButton">
+          {{ getTranslation("download_tab.download_button") }}
+        </a>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -29,16 +24,16 @@
 </template>
 
 <script>
-import dropboxKey from "@/services/dropboxkey.json";
-import { ref } from "vue";
+import DropboxCommunication from "@/services/DropboxCommunication";
+import { ref, computed } from "vue";
 import useTranslationUtils from "@/hooks/TranslationUtils";
-import VueDropboxPicker from "@/components/VueDropboxPicker";
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
+  IonButton,
 } from "@ionic/vue";
 import ExploreContainer from "@/components/ExploreContainer.vue";
 
@@ -51,34 +46,43 @@ export default {
     IonTitle,
     IonContent,
     IonPage,
-    VueDropboxPicker,
+    IonButton,
   },
   setup() {
     const { getTranslation, initTranslationsUtils } = useTranslationUtils();
     initTranslationsUtils();
 
-    const dropboxApiKey = ref(dropboxKey.id);
+    const dropboxChannel = ref(new DropboxCommunication());
+    const authUrl = ref(null);
+    const isConnected = computed(() => {
+      return false;
+    });
 
-    function onPicked(data) {
-      console.log(data.map(it => it.link));
-    }
+    const connectToDropbox = async () => {
+      try {
+        const localAuthUrl = await dropboxChannel.value.connect();
+        authUrl.value = localAuthUrl;
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
     return {
       getTranslation,
-      dropboxApiKey,
-      onPicked, 
+      connectToDropbox,
+      isConnected,
+      authUrl,
     };
   },
 };
 </script>
 
 <style scoped>
-.dropbox_button {
-  margin: 5px;
-  padding: 5px 20px;
-  text-decoration: none;
+a.actionButton {
+  margin: 3px;
+  padding: 10px;
   background-color: green;
-  color: whitesmoke;
-  border-radius: 10px;
+  color: white;
+  border-radius: 3px;
 }
 </style>

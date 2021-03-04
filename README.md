@@ -8,7 +8,6 @@ Manage your chess exercises and train yourself with them against the device.
 * Using some vectors from flaticon.com :
     * Folder : https://www.flaticon.com/free-icon/folder_715563 (by DinosoftLabs)
     * File : https://www.flaticon.com/free-icon/files_901533 (by PhatPlus)
-* Vue Dropbox Picker was taken from project [Vue Dropbox Chooser](https://github.com/Feniksss/vue-dropbox-chooser/blob/master/src/components/DropboxPicker.vue)
 
 
 ## Developers

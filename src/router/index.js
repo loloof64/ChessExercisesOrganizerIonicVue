@@ -38,6 +38,11 @@ const routes = [
     name: "saveGameExplorer",
     component: () => import("@/views/SaveGameExplorer.vue"),
   },
+  {
+    path: "/auth",
+    name: "auth",
+    component: () => import("@/views/Authenticated.vue"),
+  },
 ];
 
 const router = createRouter({

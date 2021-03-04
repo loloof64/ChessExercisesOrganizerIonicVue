@@ -39,6 +39,7 @@
   },
   "download_tab": {
     "title": "Dropbox",
+    "connect_button": "Connect",
     "download_button": "Download"
   },
   "game_selector": {
