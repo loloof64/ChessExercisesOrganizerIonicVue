@@ -1,0 +1,14 @@
+{
+    "appId": "com.loloof64.chessexercisesorganizer",
+    "appName": "chess-exercises-organizer",
+    "bundledWebRuntime": false,
+    "npmClient": "npm",
+    "webDir": "dist",
+    "plugins": {
+        "SplashScreen": {
+            "launchShowDuration": 0
+        }
+    },
+    "cordova": {},
+    "linuxAndroidStudioPath": "/home/laurent-bernabe/Programmes/Programmation/android-studio-4_2_beta/bin/studio.sh"
+}

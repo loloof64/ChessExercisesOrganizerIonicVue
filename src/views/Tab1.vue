@@ -46,8 +46,7 @@ import {
   useBackButton,
   useIonRouter,
 } from "@ionic/vue";
-import { Plugins } from "@capacitor/core";
-const { App } = Plugins;
+import { App } from "@capacitor/app";
 import PgnParser from "pgn-parser";
 import convertPgnDataToHistory from "@/services/PgnGameDataToHistoryData";
 import PgnGameSelector from "@/components/PgnGameSelector";

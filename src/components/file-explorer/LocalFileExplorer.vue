@@ -15,8 +15,7 @@
 
 <script>
 import { onMounted, computed, ref, watch } from "vue";
-import { FilesystemDirectory, Plugins } from "@capacitor/core";
-const { Filesystem } = Plugins;
+import { Filesystem, Directory } from '@capacitor/filesystem';
 import useTranslationUtils from "@/hooks/TranslationUtils";
 import ExplorerItem from "@/components/file-explorer/ExplorerItem";
 
@@ -44,7 +43,7 @@ export default {
       try {
         await Filesystem.mkdir({
           path: props.path,
-          directory: FilesystemDirectory.Documents,
+          directory: Directory.Documents,
           recursive: true,
         });
       } catch (err) {
@@ -58,7 +57,7 @@ export default {
       try {
         const files = await Filesystem.readdir({
           path: currentFolder.value,
-          directory: FilesystemDirectory.Documents,
+          directory: Directory.Documents,
         });
 
         const content = files.files

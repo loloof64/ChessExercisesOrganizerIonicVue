@@ -104,12 +104,10 @@ import SimpleDialog from "@/components/SimpleDialog";
 import useTranslationUtils from "@/hooks/TranslationUtils";
 import { useRouter } from "vue-router";
 import {
-  Plugins,
-  FilesystemDirectory,
-  FilesystemEncoding,
-} from "@capacitor/core";
-
-const { Filesystem } = Plugins;
+  Filesystem,
+  Directory,
+  Encoding,
+} from "@capacitor/filesystem";
 
 import { useStore } from "vuex";
 import moment from "moment";
@@ -139,7 +137,6 @@ export default {
     const longOperationPending = ref(false);
 
     function handleError(error) {
-      console.error(error);
       simpleDialog.value.showMessage({
         title: getTranslation("save_game_explorer.error_in_explorer"),
         message: error,
@@ -194,13 +191,12 @@ export default {
       try {
         await Filesystem.mkdir({
           path,
-          directory: FilesystemDirectory.Documents,
+          directory: Directory.Documents,
           recursive: true,
         });
 
         refreshContent();
       } catch (err) {
-        console.error(err);
         simpleDialog.value.showMessage({
           title: getTranslation("save_game_explorer.failed_creating_folder"),
           message: err,
@@ -247,8 +243,8 @@ export default {
         await Filesystem.writeFile({
           path: filePath,
           data: gamePgn,
-          directory: FilesystemDirectory.Documents,
-          encoding: FilesystemEncoding.ASCII,
+          directory: Directory.Documents,
+          encoding: Encoding.ASCII,
           recursive: true,
         });
 
@@ -256,7 +252,6 @@ export default {
 
         router.back();
       } catch (err) {
-        console.error(err);
         simpleDialog.value.showMessage({
           title: getTranslation("save_game_explorer.failed_saving_game_title"),
           message: getTranslation(
@@ -321,13 +316,12 @@ export default {
         await Filesystem.rename({
           from,
           to,
-          directory: FilesystemDirectory.Documents,
+          directory: Directory.Documents,
         });
         explorer.value?.clearSelectedItems();
         updateSelectedItemsCount();
         refreshContent();
       } catch (err) {
-        console.error(err);
         simpleDialog.value.showMessage({
           title: getTranslation("save_game_explorer.failed_renaming_title"),
           message: err,
@@ -417,13 +411,12 @@ export default {
               await Filesystem.copy({
                 from,
                 to,
-                directory: FilesystemDirectory.Documents,
+                directory: Directory.Documents,
               });
 
               refreshContent();
             }
           } catch (err) {
-            console.error(err);
             copyFailedList.push(item);
           }
 
@@ -507,22 +500,22 @@ export default {
             if (isFile) {
               await Filesystem.deleteFile({
                 path: elementToRemove,
-                directory: FilesystemDirectory.Documents,
+                directory: Directory.Documents,
               });
             } else {
               await Filesystem.rmdir({
                 path: elementToRemove,
-                directory: FilesystemDirectory.Documents,
+                directory: Directory.Documents,
                 recursive: true,
               });
             }
 
             refreshContent();
-          } catch (err) {
-            console.error(err);
+          }
+          finally {
+            remainingLongOperationElementsToDelete.value -= 1;
           }
 
-          remainingLongOperationElementsToDelete.value -= 1;
         });
       }, 1500);
     }

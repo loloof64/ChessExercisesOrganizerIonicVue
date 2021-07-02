@@ -20,15 +20,19 @@ Manage your chess exercises and train yourself with them against the device.
         "id": "YOUR_DROPBOX_CLIENT_ID"
     }
     ```
-2. Install NodeJs and Android Studio (and eventually yarn)
+2. Install NodeJs (and eventually yarn)
 3. `npm install -g @ionic/cli@latest native-run cordova-res` (or `yarn global add @ionic/cli@latest native-run cordova-res`)
 4. `npm i` # installing dependencies (or `yarn`)
 5. `cordova-res --copy` # generating icon and splash screen
 
 ### Build
 
-1. `ionic build`
-2. `npx cap copy`
-3. `npx cap open android` # Also adapt capacitor.config.json, and change the path to Android Studio
+`ionic build`
 
-You may also need to run `ionic capacitor update android`.
+### Run 
+
+`ionic capacitor run android --no-open`
+
+even
+
+`ionic capacitor run android --no-open -l --external` (for live reload on device)

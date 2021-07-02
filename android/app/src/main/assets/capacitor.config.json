@@ -1,14 +1,9 @@
 {
-    "appId": "com.loloof64.chessexercisesorganizer",
-    "appName": "chess-exercises-organizer",
-    "bundledWebRuntime": false,
-    "npmClient": "npm",
-    "webDir": "dist",
-    "plugins": {
-        "SplashScreen": {
-            "launchShowDuration": 0
-        }
-    },
-    "cordova": {},
-    "linuxAndroidStudioPath": "/home/laurent-bernabe/Programmes/Programmation/android-studio-4_2_beta/bin/studio.sh"
+	"appId": "com.loloof64.chessexercisesorganizer",
+	"appName": "Chess Exercises Organizer",
+	"webDir": "public",
+	"bundledWebRuntime": false,
+	"server": {
+		"url": "http://192.168.1.14:8100"
+	}
 }
