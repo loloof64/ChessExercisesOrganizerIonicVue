@@ -6,7 +6,7 @@
 import { parseQueryString } from "@/utils/UrlUtils";
 export default {
     setup() {
-        let code = parseQueryString(window.location.href).code;
+        const code = parseQueryString(window.location.href).code;
         console.log(code);
     }
 };

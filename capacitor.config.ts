@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.loloof64.chessexercisesorganizer',
   appName: 'Chess Exercises Organizer',
-  webDir: 'public',
+  webDir: 'dist',
   bundledWebRuntime: false
 };
 

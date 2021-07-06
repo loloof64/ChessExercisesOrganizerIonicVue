@@ -1,5 +1,6 @@
-import { createRouter, createWebHistory } from "@ionic/vue-router";
-import Tabs from "../views/Tabs.vue";
+import { createRouter, createWebHistory } from '@ionic/vue-router';
+import { RouteRecordRaw } from 'vue-router';
+import Tabs from '../views/Tabs.vue'
 
 const routes = [
   {
@@ -43,11 +44,11 @@ const routes = [
     name: "auth",
     component: () => import("@/views/Authenticated.vue"),
   },
-];
+]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes,
-});
+  routes
+})
 
-export default router;
+export default router

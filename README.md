@@ -17,9 +17,11 @@ Manage your chess exercises and train yourself with them against the device.
 1. Set up a file `dropboxkey.json` in the folder `services` : put the client with the `id` key
     ```
     {
-        "id": "YOUR_DROPBOX_CLIENT_ID"
+        "id": "YOUR_DROPBOX_CLIENT_ID",
+        "redirect_url": "YOUR_DROPBOX_REDIRECT_URL",
     }
     ```
+    Don't worry, this file is listed in `.gitgnore` file.
 2. Install NodeJs (and eventually yarn)
 3. `npm install -g @ionic/cli@latest native-run cordova-res` (or `yarn global add @ionic/cli@latest native-run cordova-res`)
 4. `npm i` # installing dependencies (or `yarn`)
@@ -27,12 +29,14 @@ Manage your chess exercises and train yourself with them against the device.
 
 ### Build
 
-`ionic build`
+1. `cd android`
+2. `ionic build --prod && ionic cap sync android && ./gradlew installDebug`
+3. You can run the application installed from your applications menu on your device.
 
-### Run 
+### Run (for development)
 
-`ionic capacitor run android --no-open`
+`ionic capacitor run android`
 
 even
 
-`ionic capacitor run android --no-open -l --external` (for live reload on device)
+`ionic capacitor run android -l --external` (for live reload on device)

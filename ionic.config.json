@@ -1,5 +1,5 @@
 {
-  "name": "chess-exercises-organizer",
+  "name": "ChessExercisesOrganizer",
   "integrations": {
     "capacitor": {}
   },
